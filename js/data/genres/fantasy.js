@@ -1,0 +1,118 @@
+// High fantasy tables. Original Castmaker content — CC BY 4.0.
+// Peoples map to SRD 5.1 ancestries in the D&D 5e adapter.
+
+export default {
+  id: "fantasy",
+  label: "High fantasy",
+  vocab: { coin: "silver", drink: "ale", package: "sealed letter", messages: "letters", city: "town" },
+
+  cultures: {
+    valemark: { people: "human", first: ["Aldric", "Bryn", "Corwin", "Edda", "Garrick", "Hesper", "Isolde", "Joren", "Maren", "Osric", "Rowena", "Tamsin", "Wendel", "Yara"], last: ["Ashdown", "Blackwood", "Corrin", "Fairweather", "Holloway", "Marsh", "Pellam", "Thorne", "Underhill", "Wexley"] },
+    elf: { people: "elf", first: ["Ithrael", "Saevyn", "Calennor", "Mirethel", "Aelindra", "Thalorin", "Venarion", "Ilmaren", "Sethiel", "Naeris", "Orivane"], last: ["Moonbrook", "Thaelorn", "Silverfrond", "Duskwhisper", "Aerendyl", "Starhollow"] },
+    dwarf: { people: "dwarf", first: ["Borrik", "Hedda", "Kazrin", "Magda", "Torvald", "Gunnhild", "Dorrik", "Ragna", "Brumli", "Sigrun"], last: ["Stonehollow", "Ironmantle", "Deepdelver", "Coppervein", "Hammerfall", "Granitebrow"] },
+    halfling: { people: "halfling", first: ["Tobin", "Marigold", "Ned", "Posy", "Wendell", "Lila", "Barnaby", "Clover", "Fenn", "Dilly"], last: ["Goodbarrel", "Thistledown", "Hollowell", "Applebrook", "Tealeaf", "Bramblefoot"] },
+    orc: { people: "halforc", first: ["Draka", "Ushka", "Korg", "Varga", "Thokk", "Shara", "Brug", "Yenna", "Morra", "Gash"], last: ["Ashfang", "Redmaw", "Stonejaw", "Ironhide", "Bloodriver"] },
+    freecity: { people: "tiefling", first: ["Vesper", "Mordai", "Ishara", "Kallista", "Nemeia", "Rieven", "Sorrow", "Ember", "Quill", "Malachar", "Patience"], last: ["Ashdown", "Vane", "Corrin", "Morrow", "Sable", "Pellam"] },
+    gnome: { people: "gnome", first: ["Bimble", "Tannifer", "Orla", "Quillo", "Nissa", "Sprocket", "Fennimore", "Wizzle"], last: ["Gearwhistle", "Tumblebrook", "Copperpot", "Nackle", "Fizzbang"] },
+    dragonborn: { people: "dragonborn", first: ["Vorsaar", "Khesra", "Tazhul", "Rhoska", "Szarith", "Kaelix", "Daarvos", "Iyrsha"], last: ["Ysthrak", "Valdorr", "Kharash", "Thurrix"] },
+    halfelf: { people: "halfelf", first: ["Aldric", "Saevyn", "Isolde", "Thalorin", "Maren", "Naeris", "Corwin", "Mirethel"], last: ["Blackwood", "Moonbrook", "Fairweather", "Silverfrond", "Thorne"] },
+  },
+
+  peoples: {
+    human: { label: "human", age: [17, 65] },
+    elf: { label: "elf", age: [100, 450] },
+    dwarf: { label: "dwarf", age: [50, 280] },
+    halfling: { label: "halfling", age: [20, 110] },
+    halforc: { label: "half-orc", age: [15, 60] },
+    tiefling: { label: "tiefling", age: [17, 85] },
+    gnome: { label: "gnome", age: [40, 380] },
+    dragonborn: { label: "dragonborn", age: [15, 70] },
+    halfelf: { label: "half-elf", age: [20, 160] },
+  },
+
+  origins: [
+    { t: "a river town in the Valemark", short: "the Valemark", cultures: ["valemark", "valemark", "halfelf", "halfling"], tags: ["family", "craft", "travel"] },
+    { t: "the high forest of Saevyn", short: "the high forest", cultures: ["elf", "elf", "halfelf"], tags: ["wild", "art", "isolation"] },
+    { t: "the deep holds under the Greyteeth mountains", short: "the deep holds", cultures: ["dwarf", "dwarf", "gnome"], tags: ["craft", "order", "family"] },
+    { t: "a hill village of round-doored burrows", short: "the hill burrows", cultures: ["halfling", "halfling", "gnome"], tags: ["family", "craft"] },
+    { t: "a war-camp on the grass steppe", short: "the steppe camps", cultures: ["orc", "orc", "valemark"], tags: ["violence", "wild", "duty"] },
+    { t: "the crowded Lantern Quarter of the free city of Ostrava", short: "Ostrava", cultures: ["freecity", "valemark", "halfelf", "gnome", "dragonborn"], tags: ["crime", "wealth", "art"] },
+    { t: "a clan aerie on the Ember Coast", short: "the Ember Coast", cultures: ["dragonborn", "dragonborn"], tags: ["duty", "faith", "violence"] },
+    { t: "a tinkers' warren beneath the capital", short: "the tinkers' warren", cultures: ["gnome", "gnome", "halfling"], tags: ["tech", "learning", "craft"] },
+    { t: "a border fortress that changed hands three times in {their} childhood", short: "the border fortress", cultures: ["valemark", "dwarf", "orc", "halfelf"], tags: ["violence", "duty", "loss"] },
+  ],
+
+  upbringings: [
+    { t: "in a temple orphanage, where kindness came with a schedule", tags: ["faith", "order", "poverty"] },
+    { t: "in a noble house that was quietly running out of money", tags: ["wealth", "family", "ambition"] },
+    { t: "on the road with a troupe of players", tags: ["art", "travel"] },
+    { t: "in the back of a smithy, among sparks and shouting", tags: ["craft", "family"] },
+    { t: "in a thieves' den that was the closest thing to a family", tags: ["crime", "poverty", "family"] },
+    { t: "alone in the woods after the age of eight", tags: ["wild", "isolation"] },
+    { t: "as the youngest of nine, mostly ignored", tags: ["family", "poverty"] },
+    { t: "in a scholar's tower, surrounded by books and silence", tags: ["learning", "isolation"] },
+    { t: "in a garrison town where everyone answered to the bell", tags: ["duty", "order", "violence"] },
+    { t: "on a river barge, never in one place for long", tags: ["travel", "crime"] },
+  ],
+
+  occupations: [
+    { t: "a caravan guard", tags: ["violence", "travel", "duty"], arch: ["warrior"], skills: ["reading a road for ambush", "calming a spooked horse"] },
+    { t: "a temple healer", tags: ["faith", "healing"], arch: ["healer"], skills: ["setting bones", "herb lore"] },
+    { t: "a hedge witch", tags: ["wild", "healing", "secrecy"], arch: ["caster", "wild", "healer"], skills: ["charms and curses", "reading the weather"] },
+    { t: "a cutpurse", tags: ["crime", "poverty"], arch: ["skulker"], skills: ["picking pockets", "vanishing into a crowd"] },
+    { t: "a court scribe", tags: ["learning", "order", "secrecy"], arch: ["sage", "face"], skills: ["forging handwriting", "court etiquette"] },
+    { t: "a failed wizard's apprentice", tags: ["learning", "ambition", "chaos"], arch: ["caster"], skills: ["a handful of minor spells", "reading old scripts"] },
+    { t: "a traveling minstrel", tags: ["art", "travel"], arch: ["face"], skills: ["lute and song", "remembering every face"] },
+    { t: "a blacksmith", tags: ["craft", "family"], arch: ["warrior"], skills: ["metalwork", "judging a blade at a glance"] },
+    { t: "a deserter from the duke's army", tags: ["violence", "betrayal", "duty"], arch: ["warrior", "skulker"], skills: ["shield-wall drill", "living rough"] },
+    { t: "a monster hunter for hire", tags: ["violence", "wild"], arch: ["wild", "warrior"], skills: ["tracking", "knowing what bleeds"] },
+    { t: "a smuggler on the river barges", tags: ["crime", "travel"], arch: ["skulker", "face"], skills: ["hidden compartments", "bribing toll-keepers"] },
+    { t: "a grave warden", tags: ["faith", "loss", "isolation"], arch: ["healer", "sage"], skills: ["funeral rites", "spotting the restless dead"] },
+    { t: "a merchant's factor", tags: ["wealth", "ambition"], arch: ["face"], skills: ["haggling", "appraising goods"] },
+    { t: "a forester", tags: ["wild", "isolation"], arch: ["wild"], skills: ["archery", "moving silently through woods"] },
+    { t: "a cartographer", tags: ["learning", "travel"], arch: ["sage", "skulker"], skills: ["mapmaking", "navigating by the stars"] },
+    { t: "an oath-bound knight", tags: ["duty", "order", "faith"], arch: ["warrior", "healer"], skills: ["mounted combat", "heraldry"] },
+    { t: "a tavern keeper", tags: ["family", "craft"], arch: ["face"], skills: ["brewing", "hearing every rumor"] },
+    { t: "a cultist who escaped", tags: ["faith", "secrecy", "betrayal"], arch: ["caster", "skulker"], skills: ["forbidden rites", "lying under pressure"] },
+    { t: "an alchemist", tags: ["learning", "craft", "tech"], arch: ["sage", "caster"], skills: ["brewing potions", "identifying poisons"] },
+  ],
+
+  events: [
+    { t: "the red fever came through and took {their} mother and baby brother within a week", short: "the red fever", tags: ["loss", "healing", "family"], wound: "watching the people {they} loved die while {they} could do nothing" },
+    { t: "raiders burned {their} village while {they} hid in the root cellar", short: "the burning of {their} village", tags: ["violence", "loss"], wound: "hiding while others died" },
+    { t: "{their} closest friend sold {them} out to the city watch", short: "the betrayal", tags: ["betrayal", "crime"], wound: "being betrayed by the one person {they} trusted" },
+    { t: "{they} killed a man in a tavern brawl that should have ended with bruises", short: "the tavern death", tags: ["violence", "loss", "chaos"], wound: "taking a life that didn't need taking" },
+    { t: "a wandering mage saw something in {them}, promised to return, and never did", short: "the mage who left", tags: ["learning", "isolation", "betrayal"], wound: "being chosen and then abandoned" },
+    { t: "{their} family's lands were seized on a lie told to the duke", short: "the seizure of the family lands", tags: ["family", "betrayal", "wealth"], wound: "watching {their} parents lose everything to a lie" },
+    { t: "{they} spent a winter lost in the mountains and came back different", short: "the lost winter", tags: ["wild", "isolation"], wound: "surviving something {they} can't describe" },
+    { t: "{they} {was} sold into service to pay a debt {they} didn't owe", short: "the indenture", tags: ["poverty", "crime", "order"], wound: "being owned" },
+    { t: "{they} saw a miracle at the temple, and no one believed {them}", short: "the miracle", tags: ["faith", "isolation"], wound: "being called a liar for telling the truth" },
+    { t: "{their} older sister went into the deep woods to find a cure and never came out", short: "{their} sister's disappearance", tags: ["family", "wild", "loss"], wound: "not going with her" },
+  ],
+
+  appearance: {
+    builds: ["wiry", "broad-shouldered", "slight", "heavyset", "tall and stooped", "compact and strong", "lanky", "soft-bodied but quick"],
+    features: ["a ritual tattoo across the knuckles", "one silver-grey eye", "a calloused sword hand", "a braid threaded with small charms", "a badly set nose", "a streak of white through dark hair", "ink-stained fingers", "a burn scar along one forearm", "a gap-toothed smile", "freckles everywhere"],
+    styles: ["travel-stained leathers", "a patched but carefully mended cloak", "cheap finery worn with total confidence", "plain homespun, always clean", "mismatched armor from three different owners", "temple greys"],
+    items: ["a dented tin locket", "a dagger with someone else's initials", "a pipe that's never lit", "a deck of hand-painted cards", "a lucky copper coin with a hole through it", "a prayer cord with one bead missing", "a battered map case", "a whistle carved from bone"],
+  },
+
+  combat: {
+    warrior: ["shield and spear, holding the line", "a greatsword swung with more strength than grace"],
+    skulker: ["a knife from the dark, then gone", "crossbow from cover"],
+    caster: ["fire and fury from the back rank", "subtle hexes and misdirection"],
+    face: ["talks first; rapier when talking fails", "rallies others and lets them fight"],
+    healer: ["mace and shield, keeping allies on their feet", "holds off death rather than dealing it"],
+    sage: ["avoids fights; knows the monster's weakness", "quarterstaff and quick wards"],
+    wild: ["longbow at range, hatchet up close", "fights like a cornered animal"],
+  },
+  abilities: {
+    warrior: ["takes a hit that would drop most people", "reads an enemy's stance"],
+    skulker: ["opens most locks", "goes unnoticed in a crowd"],
+    caster: ["casts minor spells", "senses magic nearby"],
+    face: ["talks guards into things", "reads lies in a face"],
+    healer: ["closes wounds", "eases pain and fear"],
+    sage: ["identifies relics and runes", "recalls obscure lore"],
+    wild: ["tracks over bare stone", "calms wild animals"],
+  },
+};

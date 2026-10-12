@@ -1,0 +1,12 @@
+{
+  "name": "castmaker",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "A deep, universal generator for original characters.",
+  "license": "MIT",
+  "scripts": {
+    "serve": "python3 -m http.server 8080",
+    "test": "node tools/smoke-test.js"
+  }
+}
