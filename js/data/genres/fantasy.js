@@ -78,6 +78,7 @@ export default {
   ],
 
   events: [
+    { t: "{they} served a long, quiet apprenticeship that taught {them} patience and little else", short: "the long apprenticeship", tags: ["craft", "duty"], wound: "years spent waiting for a life to start" },
     { t: "the red fever came through and took {their} mother and baby brother within a week", short: "the red fever", tags: ["loss", "healing", "family"], wound: "watching the people {they} loved die while {they} could do nothing" },
     { t: "raiders burned {their} village while {they} hid in the root cellar", short: "the burning of {their} village", tags: ["violence", "loss"], wound: "hiding while others died" },
     { t: "{their} closest friend sold {them} out to the city watch", short: "the betrayal", tags: ["betrayal", "crime"], wound: "being betrayed by the one person {they} trusted" },
@@ -88,6 +89,27 @@ export default {
     { t: "{they} {was} sold into service to pay a debt {they} didn't owe", short: "the indenture", tags: ["poverty", "crime", "order"], wound: "being owned" },
     { t: "{they} saw a miracle at the temple, and no one believed {them}", short: "the miracle", tags: ["faith", "isolation"], wound: "being called a liar for telling the truth" },
     { t: "{their} older sister went into the deep woods to find a cure and never came out", short: "{their} sister's disappearance", tags: ["family", "wild", "loss"], wound: "not going with her" },
+  ],
+
+  // Gifts scale with grade. Common characters have none. Each is a phrase
+  // that follows the character's first name.
+  gifts: [
+    { t: "has a way with animals that borders on uncanny", tier: 1, tags: ["wild"] },
+    { t: "has a beautiful singing voice", tier: 1, tags: ["art"] },
+    { t: "picks up languages in weeks", tier: 1, tags: ["learning", "travel"] },
+    { t: "has endless patience", tier: 1, tags: ["craft"] },
+    { t: "has uncanny luck at cards and dice", tier: 2, tags: ["crime", "chaos"] },
+    { t: "has a minor talent for healing magic", tier: 2, tags: ["healing", "faith"] },
+    { t: "is followed everywhere by a hawk that seems to understand speech", tier: 2, tags: ["wild"] },
+    { t: "always knows which way is north, even underground", tier: 2, tags: ["travel"] },
+    { t: "carries a hereditary blade that knows its bearer", tier: 3, tags: ["family", "violence"] },
+    { t: "commands raw storm magic {they} never trained for", tier: 3, tags: ["chaos", "wild"] },
+    { t: "can speak with the dead for one minute at a time", tier: 3, tags: ["faith", "loss"] },
+    { t: "is the rightful heir to a lost throne", tier: 3, tags: ["family", "wealth", "secrecy"] },
+    { t: "is named in a prophecy as the one who will end the Long Night", tier: 4, tags: ["faith", "duty"] },
+    { t: "carries the blood of the last dragon-kings, and the fire that comes with it", tier: 4, tags: ["family", "violence"] },
+    { t: "dreams the future, and the dreams always come true", tier: 4, tags: ["faith", "isolation"] },
+    { t: "cannot be harmed by any weapon forged by mortal hands", tier: 4, tags: ["violence", "faith"] },
   ],
 
   appearance: {

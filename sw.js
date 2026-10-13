@@ -1,7 +1,7 @@
 // Offline support: cache the app shell on install, serve cache-first,
 // and refresh the cache in the background. Bump VERSION on each release.
 
-const VERSION = "castmaker-v0.1.0";
+const VERSION = "castmaker-v0.3.0";
 const SHELL = [
   "./",
   "index.html",
@@ -13,6 +13,10 @@ const SHELL = [
   "js/app.js",
   "js/storage.js",
   "js/export.js",
+  "js/reveal.js",
+  "js/engine/dice.js",
+  "js/engine/rarity.js",
+  "js/data/rarity.js",
   "js/engine/rng.js",
   "js/engine/text.js",
   "js/engine/generate.js",

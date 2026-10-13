@@ -55,6 +55,7 @@ export default {
   ],
 
   events: [
+    { t: "{their} habitat ran on strict rationing for {their} whole childhood", short: "the rationing years", tags: ["poverty", "order"], wound: "learning that there is never quite enough" },
     { t: "a hull breach killed half of {their} deck while {they} slept", short: "the breach", tags: ["loss", "violence", "isolation"], wound: "waking up alive when others didn't" },
     { t: "{they} discovered {their} employer was poisoning the colony's water", short: "the water scandal", tags: ["secrecy", "betrayal", "crime"], wound: "learning the people in charge would let everyone die for profit" },
     { t: "{their} family was declared surplus and shipped to a work colony", short: "the surplus order", tags: ["poverty", "family", "order"], wound: "being declared worth nothing" },
@@ -64,6 +65,26 @@ export default {
     { t: "{they} mutinied against a captain who was about to space the refugees", short: "the mutiny", tags: ["violence", "duty", "order"], wound: "breaking an oath to keep {their} conscience" },
     { t: "{they} lost a year to cryosleep and woke to find {their} partner had moved on", short: "the lost year", tags: ["loss", "travel"], wound: "the world going on without {them}" },
     { t: "{they} won a lottery seat on a colony ship and gave it to {their} sister", short: "the lottery seat", tags: ["family", "loss", "duty"], wound: "choosing to stay behind" },
+  ],
+
+  // Gifts scale with grade. Common characters have none.
+  gifts: [
+    { t: "has zero-g reflexes", tier: 1, tags: ["travel"] },
+    { t: "has a head for orbital math", tier: 1, tags: ["learning", "tech"] },
+    { t: "sleeps anywhere and wakes instantly", tier: 1, tags: ["duty"] },
+    { t: "speaks ring slang and three trade tongues", tier: 1, tags: ["travel", "crime"] },
+    { t: "still has a working pre-war neural lace", tier: 2, tags: ["tech"] },
+    { t: "is immune to every known void plague", tier: 2, tags: ["healing"] },
+    { t: "navigates without instruments", tier: 2, tags: ["travel"] },
+    { t: "is shadowed by an AI companion that is a little too loyal", tier: 2, tags: ["tech", "isolation"] },
+    { t: "has rare psionic sensitivity", tier: 3, tags: ["faith", "isolation"] },
+    { t: "carries military-grade augments {they} shouldn't have", tier: 3, tags: ["violence", "tech", "secrecy"] },
+    { t: "flies by instinct better than any AI", tier: 3, tags: ["travel"] },
+    { t: "holds the command codes to a lost warship", tier: 3, tags: ["secrecy", "violence"] },
+    { t: "is the only human the alien Choir will speak to", tier: 4, tags: ["learning", "isolation"] },
+    { t: "carries a dead AI's mind braided into {their} own", tier: 4, tags: ["tech", "loss"] },
+    { t: "can feel jump-space routes like currents in water", tier: 4, tags: ["travel", "wild"] },
+    { t: "is a perfect clone of a legendary war hero, with the memories to prove it", tier: 4, tags: ["violence", "secrecy", "duty"] },
   ],
 
   appearance: {

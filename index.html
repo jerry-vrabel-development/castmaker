@@ -19,7 +19,7 @@
     <div class="brand">
       <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="12" r="5"/><circle cx="21" cy="12" r="5"/><path d="M3 27c1.5-5 4.5-8 8-8s6.5 3 8 8M13 27c1.5-5 4.5-8 8-8s6.5 3 8 8"/></svg>
       <span class="brand-name">Castmaker</span>
-      <span class="brand-tag">v0.1 prototype</span>
+      <span class="brand-tag">v0.3 prototype</span>
     </div>
     <div class="topbar-actions">
       <button class="btn ghost" data-action="export" id="btn-export">Export</button>
@@ -49,6 +49,17 @@
     <div class="control control-inline" id="tt-level">
       <label class="control-label" for="level">5e level</label>
       <input type="number" id="level" min="1" max="20" value="1" inputmode="numeric">
+    </div>
+
+    <div class="control-pair">
+      <div class="control">
+        <span class="control-label" id="lbl-reveal">Reveal</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="lbl-reveal" id="reveal-group"></div>
+      </div>
+      <div class="control">
+        <span class="control-label" id="lbl-sound">Sound</span>
+        <div class="segmented" role="radiogroup" aria-labelledby="lbl-sound" id="sound-group"></div>
+      </div>
     </div>
 
     <button class="btn primary roll" data-action="roll" id="btn-roll">

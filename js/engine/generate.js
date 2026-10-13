@@ -8,18 +8,36 @@
 import * as T from "../data/shared.js";
 import { GENRES } from "../data/genres/index.js";
 import { makeRng, newSeed } from "./rng.js";
+import { rollWeight, rarityOf, GRADE_MATCH } from "../data/rarity.js";
+import { roll4d6DropLowest, gradeOfTotal } from "./dice.js";
 
-export const CORE_SECTIONS = ["identity", "background", "personality", "flaws", "motivation", "appearance", "voice", "hook", "relationships"];
+// Combine coherence (tags) with real-world or designed odds.
+const odds = (w, kind, genre, keyOf) => (item) => w(item) * rollWeight(kind, genre, keyOf(item));
+
+// Combine coherence with the character's grade: entries whose tier is close
+// to the grade are much more likely. Heroes get heroic stakes.
+const graded = (w, kind, genre, keyOf, grade) => (item) =>
+  w(item) * GRADE_MATCH[Math.abs(rarityOf(kind, genre, keyOf(item)).tier - grade)];
+
+const gradeOf = (c) => c.core.grade?.tier ?? 0;
+
+export const CORE_SECTIONS = ["grade", "identity", "background", "personality", "flaws", "motivation", "morality", "gift", "appearance", "voice", "hook", "relationships"];
 export const LAYER_SECTIONS = ["tabletop", "writer"];
 export const SECTIONS = [...CORE_SECTIONS, ...LAYER_SECTIONS];
 
 // When a section is rerolled, these unlocked sections follow it so the
 // character stays consistent.
 const DEPENDENTS = {
+  grade: ["gift", "background", "motivation", "hook", "morality", "tabletop", "writer"],
   identity: ["tabletop"],
-  background: ["writer"],
-  personality: ["voice", "tabletop"],
+  background: ["writer", "morality"],
+  personality: ["voice", "morality", "tabletop"],
+  motivation: ["morality"],
 };
+
+// Grade nudges: how far strengths move, and how extreme morality gets.
+const GRADE_STRENGTH = [-2, -1, 0, 1, 3];
+const GRADE_MORAL = [0.6, 0.8, 1, 1.25, 1.6];
 
 export const ARCHETYPES = {
   warrior: { label: "Warrior", tags: ["violence", "duty"], base: { might: 4, agility: 3, wits: 2, presence: 2, resolve: 4 } },
@@ -90,6 +108,13 @@ const uniq = (arr) => [...new Set(arr)];
 // ---------- section generators ----------
 
 const GEN = {
+  // Six ability scores rolled 4d6-drop-lowest. Their total sets the grade.
+  grade(c, rng) {
+    const rolls = Array.from({ length: 6 }, () => roll4d6DropLowest(rng));
+    const total = rolls.reduce((a, b) => a + b, 0);
+    return { rolls, total, tier: gradeOfTotal(total), _tags: [] };
+  },
+
   identity(c, rng, bag, G) {
     const origin = rng.weighted(G.origins, weigher(bag, 1));
     const cultureId = rng.pick(origin.cultures);
@@ -102,7 +127,7 @@ const GEN = {
     const pronouns = rng.weighted(["she", "he", "they"], (p) => (p === "they" ? 1 : 2));
     const originBag = { ...bag };
     for (const t of origin.tags) originBag[t] = (originBag[t] || 0) + 1;
-    const occ = rng.weighted(G.occupations, weigher(originBag, 2));
+    const occ = rng.weighted(G.occupations, odds(weigher(originBag, 2), "occupation", G.id, (o) => o.t));
     return {
       name: `${first} ${last}`, first, last, age, pronouns,
       people: culture.people, peopleLabel: people.label, culture: cultureId,
@@ -116,11 +141,11 @@ const GEN = {
     const up = rng.weighted(G.upbringings, weigher(bag));
     const bag2 = { ...bag };
     for (const t of up.tags) bag2[t] = (bag2[t] || 0) + 1;
-    const ev = rng.weighted(G.events, weigher(bag2));
+    const ev = rng.weighted(G.events, graded(weigher(bag2), "event", G.id, (e) => e.short, gradeOf(c)));
     const turn = rng.weighted(T.TURNING_POINTS, weigher(bag2, 1));
     return {
       upbringing: up.t,
-      event: { t: ev.t, short: ev.short, wound: ev.wound },
+      event: { t: ev.t, short: ev.short, wound: ev.wound, tags: ev.tags },
       turningPoint: turn.t,
       _tags: uniq([...up.tags, ...ev.tags, ...ev.tags]),
     };
@@ -149,9 +174,44 @@ const GEN = {
     };
   },
 
-  motivation(c, rng, bag) {
-    const want = rng.weighted(T.WANTS, weigher(bag, 2.5));
+  motivation(c, rng, bag, G) {
+    const want = rng.weighted(T.WANTS, graded(weigher(bag, 2.5), "want", G.id, (w) => w.short, gradeOf(c)));
     return { want: want.t, short: want.short, why: rng.pick(want.why), _tags: want.tags };
+  },
+
+  // Where the character sits on two axes, from their traits, history and
+  // wants. Higher grades are pushed toward the extremes: paragons and monsters.
+  morality(c, rng, bag) {
+    const traits = c.core.personality?.traits || [];
+    const pull = (axis) => {
+      let v = 0;
+      for (const [t, w] of Object.entries(T.MORAL_PULL[axis])) v += Math.min(bag[t] || 0, 2) * w;
+      return v;
+    };
+    const noise = () => (rng.float() + rng.float() + rng.float() - 1.5) * 0.35;
+    const k = GRADE_MORAL[gradeOf(c)];
+    const clamp = (v) => Math.max(-1, Math.min(1, v));
+    // The -0.15 offsets the tables, which lean slightly toward order.
+    const order = clamp((traits.reduce((s, t) => s + t.law, 0) * 0.35 + pull("order") * 0.09 - 0.15 + noise()) * k);
+    const mercy = clamp((traits.reduce((s, t) => s + t.good, 0) * 0.4 + pull("mercy") * 0.09 + noise()) * k);
+    const line = rng.weighted(T.MORAL_LINES, (l) => weigher(bag, 2)(l) * (l.mercy != null && mercy < l.mercy - 0.6 ? 0.3 : 1));
+    const breaking = rng.weighted(T.BREAKING_POINTS, weigher(bag, 2));
+    return {
+      order: Math.round(order * 100) / 100,
+      mercy: Math.round(mercy * 100) / 100,
+      line: line.t,
+      breakingPoint: breaking.t,
+      _tags: [],
+    };
+  },
+
+  // Common characters have no gift. Higher grades draw from matching tiers.
+  gift(c, rng, bag, G) {
+    const grade = gradeOf(c);
+    if (grade === 0) return { none: true, tier: 0, _tags: [] };
+    const options = G.gifts.filter((g) => g.tier === grade);
+    const g = rng.weighted(options, weigher(bag, 2));
+    return { t: g.t, tier: g.tier, _tags: g.tags };
   },
 
   appearance(c, rng, bag, G) {
@@ -173,8 +233,8 @@ const GEN = {
     return { style, desc: v.desc, habits: rng.sample(v.habits, 2), line: rng.pick(v.lines), _tags: [] };
   },
 
-  hook(c, rng, bag) {
-    const h = rng.weighted(T.HOOKS, weigher(bag, 2));
+  hook(c, rng, bag, G) {
+    const h = rng.weighted(T.HOOKS, graded(weigher(bag, 2), "hook", G.id, (x) => x.t, gradeOf(c)));
     return { t: h.t, _tags: [] };
   },
 
@@ -207,6 +267,18 @@ const GEN = {
     }
     strengths[rng.pick(STRENGTHS)] += rng.pick([-1, 1]);
     for (const s of STRENGTHS) strengths[s] = Math.max(1, Math.min(5, strengths[s]));
+    // Grade lifts or lowers the whole profile: heroes peak, extras flatten.
+    let shift = GRADE_STRENGTH[gradeOf(c)];
+    while (shift > 0) {
+      const up = STRENGTHS.filter((s) => strengths[s] < 5).sort((a, b) => strengths[b] - strengths[a])[0];
+      if (!up) break;
+      strengths[up] += 1; shift -= 1;
+    }
+    while (shift < 0) {
+      const down = STRENGTHS.filter((s) => strengths[s] > 1).sort((a, b) => strengths[b] - strengths[a])[0];
+      if (!down) break;
+      strengths[down] -= 1; shift += 1;
+    }
 
     const dndClass = rng.weighted(DND5E_CLASSES[archKey], (cl) => {
       let w = 2;
@@ -225,25 +297,36 @@ const GEN = {
     };
   },
 
-  writer(c, rng, bag) {
+  writer(c, rng, bag, G) {
     const evBag = { ...bag };
     for (const t of c.core.background?._tags || []) evBag[t] = (evBag[t] || 0) + 2;
-    const lie = rng.weighted(T.LIES, weigher(evBag, 2));
-    const good = (c.core.personality?.traits || []).reduce((s, x) => s + x.good, 0);
-    const chaos = (c.core.personality?.traits || []).reduce((s, x) => s - x.law, 0) > 0;
+    const lie = rng.weighted(T.LIES, odds(weigher(evBag, 2), "lie", G.id, (x) => x.lie));
+    const m = c.core.morality || { order: 0, mercy: 0 };
+    const good = m.mercy;
+    const chaos = m.order < -0.2;
     const age = c.core.identity?.age || 30;
-    const role = rng.weighted(T.ROLES, (r) => {
-      if (r.minGood != null && good < r.minGood) return 0.3;
-      if (r.maxGood != null && good > r.maxGood) return 0.3;
-      if (r.minAge && age < r.minAge) return 0.2;
-      if (r.chaos && !chaos) return 0.4;
-      return r.t === "protagonist" ? 3 : 1.5;
-    });
+    const grade = gradeOf(c);
+    // Story role follows grade: extras and minor parts at the bottom,
+    // protagonists and antagonists at the top.
+    const LEAD = ["protagonist", "antagonist"];
+    const role = grade === 0 ? { t: "background character" }
+      : grade === 1 ? { t: "minor character" }
+      : rng.weighted(T.ROLES, (r) => {
+        if (grade === 2 && LEAD.includes(r.t)) return 0;
+        if (grade === 4 && !LEAD.includes(r.t)) return 0;
+        if (grade === 3 && !LEAD.includes(r.t) && r.t !== "rival") return 0;
+        if (r.t === "protagonist" && good < -0.3) return 0.2;
+        if (r.t === "antagonist") return good < -0.2 ? 4 : 0.4;
+        if (r.minGood != null && good < r.minGood) return 0.3;
+        if (r.minAge && age < r.minAge) return 0.2;
+        if (r.chaos && !chaos) return 0.4;
+        return r.t === "protagonist" ? 3 : 1.5;
+      });
     const arcType = role.t === "antagonist"
       ? rng.weighted(["positive", "negative", "flat"], (a) => ({ positive: 1, negative: 4, flat: 1 })[a])
       : rng.weighted(["positive", "negative", "flat"], (a) => ({ positive: 6, negative: 2, flat: 2 })[a]);
     return {
-      lie: lie.lie, need: lie.need, never: lie.never,
+      lie: lie.lie, need: lie.need, never: lie.never, lieTags: lie.tags,
       role: role.t, arcType,
       turn: rng.pick(T.ARC_TURNS).t,
       _tags: [],
@@ -298,6 +381,18 @@ export function rerollSection(prev, s) {
     runSection(c, sec, sectionRng(c, sec));
   }
   c.updated = new Date().toISOString();
+  return c;
+}
+
+// Fill in any sections a character saved by an older version is missing
+// (for example grade, gift and morality, added in v0.3).
+export function upgradeCharacter(prev) {
+  const missing = SECTIONS.filter((s) => !getSection(prev, s));
+  if (!missing.length) return prev;
+  const c = structuredCloneSafe(prev);
+  c.locks = c.locks || [];
+  c.nonces = c.nonces || {};
+  for (const s of missing) runSection(c, s, sectionRng(c, s));
   return c;
 }
 

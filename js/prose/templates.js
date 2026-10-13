@@ -5,6 +5,14 @@
 import { GENRES } from "../data/genres/index.js";
 import { PRONOUNS, fill, cap, article, stripArticle } from "../engine/text.js";
 import { ARCHETYPES } from "../engine/generate.js";
+import { MORAL_NAMES } from "../data/shared.js";
+
+// Name for a point on the moral compass.
+export function moralLabel(m) {
+  if (!m) return "Unknown";
+  const band = (v) => (v >= 0.33 ? 0 : v <= -0.33 ? 2 : 1);
+  return MORAL_NAMES[band(m.mercy)][band(m.order)];
+}
 
 export function textContext(c) {
   const id = c.core.identity;
@@ -45,18 +53,26 @@ export const TemplateProvider = {
 
     const backstory = [
       `${first} comes from ${f(id.origin)} and grew up ${f(bg.upbringing)}.`,
-      `Everything changed when ${f(bg.event.t)}.`,
+      (c.core.grade?.tier ?? 2) >= 2 ? `Everything changed when ${f(bg.event.t)}.` : `What shaped ${first} most: ${f(bg.event.t)}.`,
       `Then came the turning point: ${f(bg.turningPoint)}.`,
       `Now ${first} is ${article(traits[0])} ${traits.join(", ")} ${occ}. ${f("{They} {is}")} ${f(pe.temperament.phrase)}.`,
+      c.core.gift && !c.core.gift.none ? `And ${first} ${f(c.core.gift.t)}.` : "",
       `What ${first} wants most is ${f(mo.want)}, ${f(mo.why)}.`,
       `${f("{They}")} won't admit it, but ${f("{they} {is}")} afraid of ${f(fl.fears[0])}.`,
-    ].join(" ");
+    ].filter(Boolean).join(" ");
+
+    const mo2 = c.core.morality;
+    const moral = mo2 ? {
+      label: moralLabel(mo2),
+      line: `${first} ${f(mo2.line)}, but would cross that line ${f(mo2.breakingPoint)}.`,
+    } : null;
 
     const gmNotes = [
       `Play ${first} ${f(vo.desc)}. ${first} ${f(vo.habits[0])}.`,
       `Under pressure, ${first} ${f(fl.weaknesses[0])}.`,
       `Bring up ${f(bg.event.short)} and watch ${f("{them}")} go quiet.`,
-    ].join(" ");
+      moral ? moral.line : "",
+    ].filter(Boolean).join(" ");
 
     let arc;
     if (wr.arcType === "positive") {
@@ -88,6 +104,8 @@ export const TemplateProvider = {
       partyHook: `${first} ${f(tt.partyHook)}`,
       hook: `${first} ${f(c.core.hook.t)}`,
       voiceLine: f(vo.line),
+      moral,
+      gift: c.core.gift && !c.core.gift.none ? `${first} ${f(c.core.gift.t)}.` : null,
       archetypeLabel: ARCHETYPES[tt.archetype].label,
     };
   },

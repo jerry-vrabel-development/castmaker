@@ -63,6 +63,7 @@ export default {
   ],
 
   events: [
+    { t: "{their} family moved towns three times before {they} turned twelve", short: "the moves", tags: ["family", "travel"], wound: "never staying long enough to belong" },
     { t: "{their} younger brother overdosed, and {they} {was} the one who found him", short: "{their} brother's overdose", tags: ["loss", "family", "healing"], wound: "finding him too late" },
     { t: "{they} testified against someone dangerous and had to move cities", short: "the testimony", tags: ["crime", "secrecy", "violence"], wound: "losing a whole life for doing the right thing" },
     { t: "the family business went bankrupt after a partner stole from it", short: "the bankruptcy", tags: ["betrayal", "wealth", "family"], wound: "watching {their} parents' life's work disappear" },
@@ -72,6 +73,27 @@ export default {
     { t: "{their} parents divorced and each asked {them} to spy on the other", short: "the divorce", tags: ["family", "betrayal", "secrecy"], wound: "being used as a weapon by the people who should have protected {them}" },
     { t: "{they} served overseas and came back with fewer friends than {they} left with", short: "the deployment", tags: ["violence", "duty", "loss"], wound: "coming home when others didn't" },
     { t: "a viral video made {them} briefly and horribly famous", short: "the video", tags: ["art", "isolation"], wound: "being judged by millions for one bad moment" },
+  ],
+
+  // Gifts scale with grade. Common characters have none. At Legendary, the
+  // modern genre turns superhero.
+  gifts: [
+    { t: "can fix almost anything", tier: 1, tags: ["craft", "tech"] },
+    { t: "never forgets a name", tier: 1, tags: ["art", "family"] },
+    { t: "is a natural with kids and animals", tier: 1, tags: ["family", "healing"] },
+    { t: "has a sharp eye for a lie", tier: 1, tags: ["secrecy"] },
+    { t: "has a photographic memory", tier: 2, tags: ["learning"] },
+    { t: "has perfect pitch and a voice that stops rooms", tier: 2, tags: ["art"] },
+    { t: "speaks seven languages fluently", tier: 2, tags: ["learning", "travel"] },
+    { t: "feels no fear, in a way doctors can't explain", tier: 2, tags: ["violence"] },
+    { t: "is the best alive at one thing, and everyone in that world knows it", tier: 3, tags: ["craft", "ambition"] },
+    { t: "reads people so well it looks like mind reading", tier: 3, tags: ["secrecy", "art"] },
+    { t: "was trained since childhood by an order that doesn't officially exist", tier: 3, tags: ["secrecy", "violence", "duty"] },
+    { t: "has a body that heals in days from injuries that take others months", tier: 3, tags: ["healing"] },
+    { t: "survived a lightning strike and now hears every electrical signal nearby", tier: 4, tags: ["tech"] },
+    { t: "heals from any wound overnight, and has never once been sick", tier: 4, tags: ["healing"] },
+    { t: "is impossibly strong, and has hidden it since childhood", tier: 4, tags: ["violence", "secrecy"] },
+    { t: "can stop time for three seconds, once a day", tier: 4, tags: ["chaos"] },
   ],
 
   appearance: {

@@ -254,6 +254,22 @@ export const WANTS = [
     why: ["because {they} gave {their} word to someone who died", "because breaking it would make {them} someone {they} hate"] },
   { t: "to prove {their} old mentor wrong", short: "prove {their} mentor wrong", tags: ["learning", "ambition", "betrayal"],
     why: ["because the mentor called {them} ordinary", "because the mentor stole {their} best work"] },
+  // Small, everyday wants for background characters.
+  { t: "to get through the week without trouble", short: "get through the week", tags: ["poverty", "duty"],
+    why: ["because the rent is due and the roof leaks", "because last week was bad enough"] },
+  { t: "to be left alone to do {their} work", short: "be left alone", tags: ["craft", "isolation"],
+    why: ["because people are more trouble than they're worth", "because the work is the only thing that makes sense"] },
+  { t: "to open a small business of {their} own", short: "open a business of {their} own", tags: ["ambition", "craft", "family"],
+    why: ["because {they} {is} tired of making someone else rich", "because {their} grandfather always meant to"] },
+  { t: "to win back someone's good opinion", short: "win back someone's respect", tags: ["family", "art"],
+    why: ["because {they} said something unforgivable at a wedding", "because it was {their} fault the shop burned"] },
+  // World-scale wants for heroes of legend.
+  { t: "to stop a catastrophe only {they} can see coming", short: "stop the catastrophe only {they} can see", tags: ["faith", "duty", "loss"],
+    why: ["because the visions get closer every night", "because {they} saw it happen once already, and woke up in the past"] },
+  { t: "to break a curse that has followed {their} bloodline for generations", short: "break {their} family's curse", tags: ["family", "faith", "loss"],
+    why: ["because {they} {is} the last one left", "because it took {their} mother on her fortieth birthday, and {their} own is coming"] },
+  { t: "to overthrow the power that rules {their} world", short: "overthrow the power that rules {their} world", tags: ["order", "violence", "poverty"],
+    why: ["because no one else has ever come so close", "because {they} {was} raised to be its weapon and know where it is weak"] },
 ];
 
 export const TURNING_POINTS = [
@@ -321,6 +337,15 @@ export const HOOKS = [
   { t: "knows where the missing heir is hiding.", tags: ["secrecy", "wealth", "order"] },
   { t: "was promised a reward for a job and is about to learn the reward was a lie.", tags: ["betrayal", "ambition"] },
   { t: "is secretly the person everyone is looking for.", tags: ["secrecy", "chaos", "violence"] },
+  // Small secrets for background characters.
+  { t: "is saving up for something small and specific, and won't say what.", tags: ["poverty", "family"] },
+  { t: "has a crush on a regular customer and has never said a word.", tags: ["art", "isolation"] },
+  { t: "is quietly planning to quit.", tags: ["travel", "chaos"] },
+  { t: "waters down the {drink}, but only for people {they} dislike.", tags: ["crime", "craft"] },
+  // World-shaking secrets for heroes of legend.
+  { t: "is the subject of a prophecy {they} {has} spent {their} whole life trying to outrun.", tags: ["faith", "secrecy", "travel"] },
+  { t: "carries the only key to something that was locked away for a very good reason.", tags: ["secrecy", "duty", "learning"] },
+  { t: "is the lost heir of the very power {they} {is} fighting against.", tags: ["family", "secrecy", "order"] },
 ];
 
 export const RELATIONSHIP_TYPES = [
@@ -363,4 +388,49 @@ export const PARTY_HOOKS = [
   "owes one of the party a favor and hates it.",
   "has information the party needs, and wants a promise first.",
   "was hired to watch the party, and has started to like them.",
+];
+
+// ---------- Moral compass ----------
+// Two axes, each from -1 to +1:
+//   order:  Freedom (-1) <-> Order (+1)
+//   mercy:  Ruthlessness (-1) <-> Mercy (+1)
+
+// Tags that pull a character along each axis.
+export const MORAL_PULL = {
+  order: { duty: 1, order: 1, faith: 0.6, family: 0.3, chaos: -1, crime: -0.6, travel: -0.4, art: -0.3 },
+  mercy: { healing: 1, family: 0.6, faith: 0.5, loss: 0.2, violence: -0.6, crime: -0.4, betrayal: -0.5, ambition: -0.5, wealth: -0.3 },
+};
+
+// Names for the nine regions of the compass, [mercy row][order column],
+// rows from merciful to ruthless, columns from order to freedom.
+export const MORAL_NAMES = [
+  ["Guardian", "Good Samaritan", "Rebel with a cause"],
+  ["Rule keeper", "Pragmatist", "Free agent"],
+  ["Iron fist", "Mercenary", "Wildfire"],
+];
+
+export const MORAL_LINES = [
+  { t: "never harms a child", tags: ["family", "healing"], mercy: 0 },
+  { t: "never breaks a sworn oath", tags: ["duty", "order", "faith"], order: 0.2 },
+  { t: "never leaves anyone behind", tags: ["family", "duty", "violence"], mercy: 0.2 },
+  { t: "never kills someone who has surrendered", tags: ["violence", "duty"], mercy: 0 },
+  { t: "never lies to family", tags: ["family", "betrayal"] },
+  { t: "never takes from people poorer than {them}", tags: ["poverty", "crime"], mercy: 0.1 },
+  { t: "never kneels to anyone", tags: ["chaos", "ambition"], order: -0.2 },
+  { t: "never betrays an employer mid-job", tags: ["crime", "duty"] },
+  { t: "never lets a debt go unpaid, in either direction", tags: ["crime", "wealth", "betrayal"] },
+  { t: "never abandons a patient", tags: ["healing", "duty"], mercy: 0.2 },
+  { t: "never trusts power that comes with no price", tags: ["learning", "tech", "order"] },
+  { t: "never sells out a friend, whatever the price", tags: ["betrayal", "family", "crime"] },
+];
+
+export const BREAKING_POINTS = [
+  { t: "if someone {they} love were in danger", tags: ["family", "loss"] },
+  { t: "for enough money to never be poor again", tags: ["poverty", "wealth"] },
+  { t: "to keep {their} past buried", tags: ["secrecy", "crime"] },
+  { t: "if the law itself became the threat", tags: ["order", "duty"] },
+  { t: "for revenge on whoever betrayed {them}", tags: ["betrayal", "violence"] },
+  { t: "if {their} faith demanded it", tags: ["faith"] },
+  { t: "to save more lives than it cost", tags: ["healing", "duty", "learning"] },
+  { t: "if {they} {was} sure no one would ever know", tags: ["secrecy", "ambition"] },
 ];

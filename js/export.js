@@ -7,6 +7,10 @@ import { toDnd5e, signed, ABILITIES, ATTRIBUTION } from "./engine/adapters/dnd5e
 import { STRENGTHS } from "./engine/generate.js";
 import { PRONOUNS } from "./engine/text.js";
 import { GENRES } from "./data/genres/index.js";
+import { computeRarity, TIERS } from "./engine/rarity.js";
+import { oneIn } from "./engine/dice.js";
+
+const signedNum = (n) => (n >= 0 ? `+${n.toFixed(2)}` : n.toFixed(2));
 
 export function toJSON(c) {
   const strip = (o) => JSON.parse(JSON.stringify(o, (k, v) => (k === "_tags" ? undefined : v)));
@@ -24,6 +28,9 @@ export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1 }
   L.push(`# ${id.name}`, "", `*${p.pitch}*`, "");
   L.push(`**${cap(id.peopleLabel)}, ${id.age}** · ${PRONOUNS[id.pronouns].label} · ${cap(stripArticle(id.occupation.t))} · ${GENRES[c.genre].label}`, "");
 
+  const r = computeRarity(c);
+  L.push(`**Grade: ${r.tierInfo.label}** (${r.tierInfo.story}) · rolled ${r.rolls.join(", ")} = ${r.total}, ${oneIn(r.gradeOdds)} rolls land in this grade${r.theme ? ` · resonant: ${r.theme}` : ""}`, "");
+  if (p.gift) L.push(`**Gift:** ${p.gift}`, "");
   L.push("## Background", "", p.backstory, "");
   L.push("## Personality", "");
   L.push(`- **Traits:** ${c.core.personality.traits.map((t) => t.t).join(", ")}`);
@@ -31,6 +38,10 @@ export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1 }
   L.push(`- **Quirks:** ${c.core.personality.quirks.map((q) => `${first} ${f(q)}`).join("; ")}`);
   L.push(`- **Flaws:** ${c.core.flaws.weaknesses.map(f).join("; ")}`);
   L.push(`- **Fears:** ${c.core.flaws.fears.map(f).join("; ")}`, "");
+  if (p.moral) {
+    const m = c.core.morality;
+    L.push("## Moral compass", "", `**${p.moral.label}** · Order ${signedNum(m.order)} (freedom −1 to order +1) · Mercy ${signedNum(m.mercy)} (ruthless −1 to merciful +1)`, "", p.moral.line, "");
+  }
 
   const ap = c.core.appearance;
   L.push("## Appearance", "", `${cap(ap.build)}, with ${ap.features.map(f).join(" and ")}. Wears ${f(ap.style)}. Never without ${f(ap.item)}.`, "");

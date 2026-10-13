@@ -38,7 +38,7 @@ const ARMOR_LABEL = {
 };
 
 export const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
-const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8];
+const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]; // fallback for characters saved before rolled stats
 const ASI_LEVELS = [4, 8, 12, 16, 19];
 
 export const mod = (score) => Math.floor((score - 10) / 2);
@@ -57,9 +57,16 @@ function armorClass(kind, m) {
   }
 }
 
-function alignment(traits) {
-  const law = traits.reduce((s, t) => s + (t.law || 0), 0);
-  const good = traits.reduce((s, t) => s + (t.good || 0), 0);
+// The moral compass maps onto the nine 5e alignments.
+function alignment(c) {
+  const m = c.core.morality;
+  let law, good;
+  if (m) { law = m.order >= 0.33 ? 1 : m.order <= -0.33 ? -1 : 0; good = m.mercy >= 0.33 ? 1 : m.mercy <= -0.33 ? -1 : 0; }
+  else {
+    const traits = c.core.personality?.traits || [];
+    law = traits.reduce((s, t) => s + (t.law || 0), 0);
+    good = traits.reduce((s, t) => s + (t.good || 0), 0);
+  }
   const a = law >= 1 ? "Lawful" : law <= -1 ? "Chaotic" : "Neutral";
   const b = good >= 1 ? "Good" : good <= -1 ? "Evil" : "Neutral";
   return a === "Neutral" && b === "Neutral" ? "Neutral" : `${a} ${b}`;
@@ -81,7 +88,9 @@ export function toDnd5e(c, level = 1) {
   const rest = ABILITIES.filter((a) => !K.prim.includes(a)).sort((a, b) => affinity[b] - affinity[a]);
   const order = [...K.prim, ...rest];
   const scores = {};
-  order.forEach((a, i) => { scores[a] = STANDARD_ARRAY[i]; });
+  // Rolled scores (4d6 drop lowest), highest assigned to the class's key abilities.
+  const values = (c.core.grade?.rolls || STANDARD_ARRAY).slice().sort((x, y) => y - x);
+  order.forEach((a, i) => { scores[a] = values[i]; });
 
   for (const [a, v] of Object.entries(anc.bonus)) scores[a] += v;
   if (anc.flex) {
@@ -107,7 +116,8 @@ export function toDnd5e(c, level = 1) {
     size: anc.size,
     className: cls,
     level,
-    alignment: alignment(c.core.personality?.traits || []),
+    alignment: alignment(c),
+    rolled: values,
     scores,
     mods: m,
     ac: armorClass(K.armor, m),
