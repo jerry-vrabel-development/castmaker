@@ -1,0 +1,39 @@
+# Build output
+dist-preview/
+dist/
+build/
+
+# Release archives
+*.zip
+
+# Node (no dependencies yet, but npx and future tooling create these)
+node_modules/
+npm-debug.log*
+.npm/
+
+# Python (dev server and build script)
+__pycache__/
+*.pyc
+
+# Environment and secrets: API keys for the future AI prose layer go here
+.env
+.env.*
+!.env.example
+
+# Editors and IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and scratch
+*.log
+tmp/
+.cache/
+.goutputstream-*
