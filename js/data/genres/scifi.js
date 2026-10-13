@@ -1,9 +1,9 @@
 // Science fiction tables. Original Castmaker content — CC BY 4.0.
 
-export default {
+const G = {
   id: "scifi",
   label: "Science fiction",
-  vocab: { coin: "credits", drink: "recycled coffee", package: "sealed data-chip", messages: "messages", city: "the station" },
+  vocab: { coin: "credits", drink: "recycled coffee", package: "sealed data-chip", messages: "messages", city: "the station", authority: "station security", ruler: "the station governor" },
 
   cultures: {
     core: { people: "human", first: ["Aster", "Jun", "Leda", "Orion", "Sable", "Tycho", "Vega", "Mira", "Cassius", "Iona"], last: ["Okonkwo-Lind", "Varga", "Halloran", "Sato", "Mbeki", "Castellane", "Ruiz-Abara", "Voss"] },
@@ -113,3 +113,132 @@ export default {
     wild: ["survives hostile atmospheres", "pilots anything with thrusters"],
   },
 };
+
+// ---------- Expanded content (v0.4) ----------
+const more = (list, ...items) => list.push(...items);
+
+more(G.cultures.core.first, "Altair", "Calla", "Dorian", "Elara", "Halcyon", "Isra", "Kepler", "Noor", "Rigel", "Talia", "Ursa", "Zephyr");
+more(G.cultures.core.last, "Abernathy", "Chandrasekhar", "Delacourt", "Kowalczyk", "Nakashima-Bell", "Oyelaran", "Petrova-Vance", "Strand");
+more(G.cultures.belt.first, "Bex", "Cass", "Fitz", "Jinx", "Lark", "Mags", "Nix", "Ozzy", "Remy", "Tam", "Vix", "Wim");
+more(G.cultures.belt.last, "Cole", "Dutta", "Faro", "Grieve", "Holm", "Kade", "Musa", "Sax");
+more(G.cultures.mars.first, "Ares", "Bellamy", "Cyra", "Deimos", "Ezra", "Ilsa", "Jovan", "Kaveh", "Phobe", "Rusk", "Tamsin", "Vesna");
+more(G.cultures.mars.last, "Borealis", "Cratersmith", "Dumont", "Hellas", "Okafor-Reyes", "Tharsis", "Valles", "Zhao");
+more(G.cultures.shipborn.first, "Anchor", "Bright", "Constance", "Ember", "Faith", "Gale", "Harbor", "Keel", "Meridian", "Patience", "Steady", "Tide");
+more(G.cultures.shipborn.last, "of Hydroponics", "of the Long Watch", "Arkwright", "Brenner", "Fairhold", "Sternfeld");
+more(G.cultures.arcology.first, "Aurelia", "Benedikt", "Celeste", "Ignatius", "Lucien", "Margaux", "Octavia", "Raphael", "Sebastian", "Viviane");
+more(G.cultures.arcology.last, "Ashcroft", "Blackwell-Ito", "Castell", "Montague", "Sinclair", "Vandermeer");
+
+more(G.origins,
+  { t: "a tidally locked world where everyone lives on the twilight line", short: "the twilight line", cultures: ["core", "mars", "belt"], tags: ["wild", "isolation", "craft"] },
+  { t: "a refugee fleet that has never been allowed to dock", short: "the refugee fleet", cultures: ["belt", "shipborn", "core"], tags: ["poverty", "travel", "family"] },
+  { t: "a pleasure station that caters to the rich", short: "the pleasure station", cultures: ["arcology", "core", "belt"], tags: ["wealth", "crime", "art"] },
+  { t: "an ice-mining colony under a frozen ocean", short: "the ice colony", cultures: ["belt", "mars"], tags: ["craft", "isolation", "poverty"] },
+);
+
+more(G.upbringings,
+  { t: "on a long-haul freighter, the only child aboard", tags: ["travel", "isolation"] },
+  { t: "in a hydroponics bay, tending food for ten thousand people", tags: ["craft", "duty", "wild"] },
+  { t: "as a corporate ward, raised under contract", tags: ["order", "wealth", "isolation"] },
+  { t: "in a scrapyard on a moon nobody visits", tags: ["poverty", "craft", "tech"] },
+  { t: "in a military family that moved every eighteen months", tags: ["duty", "travel", "order"] },
+  { t: "in a cult that worshipped the ship's AI", tags: ["faith", "tech", "secrecy"] },
+  { t: "as a gene-tailored child who was supposed to be perfect", tags: ["ambition", "tech", "family"] },
+  { t: "in a dockside gang that ran the cargo bays", tags: ["crime", "family", "poverty"] },
+  { t: "in quarantine, for most of childhood", tags: ["healing", "isolation"] },
+  { t: "with grandparents who still remembered Earth's oceans", tags: ["family", "loss"] },
+  { t: "in a terraforming crew camp, under tents and dust", tags: ["wild", "craft", "travel"] },
+  { t: "in the arcology's servant levels", tags: ["poverty", "order", "secrecy"] },
+);
+
+more(G.occupations,
+  { t: "a dock loader", tags: ["craft", "poverty"], arch: ["warrior"], skills: ["running cargo mechs", "knowing what's in every crate"] },
+  { t: "a hydroponics tech", tags: ["craft", "wild"], arch: ["sage", "healer"], skills: ["growing food anywhere", "water reclamation"] },
+  { t: "a station bartender", tags: ["art", "crime"], arch: ["face"], skills: ["hearing every rumor", "mixing drinks from anything"] },
+  { t: "an asteroid miner", tags: ["craft", "poverty", "isolation"], arch: ["warrior", "wild"], skills: ["blasting rock", "long EVA shifts"] },
+  { t: "a customs inspector", tags: ["order", "secrecy"], arch: ["sage", "face"], skills: ["spotting contraband", "reading cargo manifests"] },
+  { t: "a cryo-bay attendant", tags: ["healing", "isolation"], arch: ["healer"], skills: ["thawing sleepers safely", "noticing who doesn't wake"] },
+  { t: "a news-feed reporter", tags: ["learning", "secrecy"], arch: ["face", "sage"], skills: ["getting people to talk", "tapping comm traffic"] },
+  { t: "a recycler", tags: ["poverty", "craft"], arch: ["skulker", "sage"], skills: ["finding value in trash", "crawling ducts"] },
+  { t: "a terraformer", tags: ["wild", "learning", "craft"], arch: ["wild", "sage"], skills: ["atmosphere chemistry", "surviving thin air"] },
+  { t: "a bounty hunter", tags: ["violence", "crime"], arch: ["warrior", "skulker"], skills: ["tracking ID trails", "stun weapons"], w: 0.3 },
+  { t: "a synthetic-mind therapist", tags: ["healing", "tech"], arch: ["healer", "sage"], skills: ["talking down rogue AIs", "memory repair"], w: 0.15 },
+  { t: "a jump-gate engineer", tags: ["tech", "learning"], arch: ["sage", "caster"], skills: ["gate calibration", "exotic physics"], w: 0.2 },
+  { t: "a racing pilot on the underground circuit", tags: ["chaos", "crime", "travel"], arch: ["skulker", "wild"], skills: ["reckless flying", "engine tuning"], w: 0.15 },
+  { t: "a first-contact linguist", tags: ["learning", "isolation"], arch: ["sage", "face"], skills: ["alien grammar", "patience"], w: 0.06 },
+);
+
+more(G.events,
+  { t: "{their} contract was sold to another company without {their} knowledge", short: "the contract sale", tier: 0, tags: ["order", "betrayal"], wound: "being treated as property" },
+  { t: "{they} spent a long winter shift alone on a relay station", short: "the relay shift", tier: 0, tags: ["isolation", "duty"], wound: "too much silence" },
+  { t: "{their} first ship was scrapped while {they} watched", short: "the scrapping", tier: 0, tags: ["loss", "craft"], wound: "watching something {they} loved become salvage" },
+  { t: "{they} failed the pilot exam twice and {was} grounded", short: "the grounding", tier: 0, tags: ["ambition", "travel"], wound: "being told {they} {was} not enough" },
+  { t: "an accident in the docks left {them} with a mechanical arm", short: "the dock accident", tier: 0, tags: ["tech", "loss", "craft"], wound: "losing part of {themself}" },
+  { t: "{they} {was} caught smuggling medicine and did two years of hard labor", short: "the labor sentence", tier: 1, tags: ["crime", "healing", "order"], wound: "being punished for doing the right thing" },
+  { t: "{their} sibling vanished during a jump and was declared lost", short: "the lost jump", tier: 1, tags: ["family", "loss", "travel"], wound: "never getting a body to bury" },
+  { t: "{they} {was} memory-wiped after a job and found a note in {their} own handwriting", short: "the wiped job", tier: 2, tags: ["secrecy", "tech"], wound: "not trusting {their} own mind" },
+  { t: "{they} {was} the officer who signed the order to abandon a sinking station", short: "the abandonment order", tier: 2, tags: ["duty", "loss", "order"], wound: "choosing who would live" },
+  { t: "{they} witnessed a corporate massacre covered up as a reactor accident", short: "the cover-up", tier: 2, tags: ["violence", "secrecy", "order"], wound: "knowing the truth and being powerless" },
+  { t: "{they} touched an alien artifact and {has} heard music ever since", short: "the artifact", tier: 3, tags: ["learning", "faith"], wound: "being changed by something no one understands" },
+  { t: "{they} {was} the first human born outside the solar system", short: "the first birth", tier: 3, tags: ["family", "travel"], wound: "being a symbol instead of a person" },
+  { t: "{they} {was} declared legally dead and spent a year as a ghost in the system", short: "the year as a ghost", tier: 3, tags: ["secrecy", "crime", "isolation"], wound: "learning how easily a person can be erased" },
+  { t: "{they} {was} grown in a lab as the backup copy of someone powerful", short: "the copy", tier: 4, tags: ["tech", "secrecy", "family"], wound: "not knowing which memories are {theirs}" },
+  { t: "{they} returned from a lost expedition forty years late, and {has}n't aged a day", short: "the lost expedition", tier: 4, tags: ["travel", "loss", "secrecy"], wound: "everyone {they} knew growing old without {them}" },
+  { t: "{they} heard the first message from the void, and it used {their} name", short: "the message", tier: 4, tags: ["faith", "learning", "isolation"], wound: "being chosen by something unknowable" },
+);
+
+more(G.gifts,
+  { t: "can fix any engine with duct tape and swearing", tier: 1, tags: ["craft", "tech"] },
+  { t: "has perfect balance in any gravity", tier: 1, tags: ["travel"] },
+  { t: "can tell air quality by smell", tier: 1, tags: ["wild", "craft"] },
+  { t: "never gets space-sick", tier: 1, tags: ["travel"] },
+  { t: "can talk any AI into bending a rule", tier: 2, tags: ["tech", "art"] },
+  { t: "has cybernetic eyes that see heat", tier: 2, tags: ["tech", "violence"] },
+  { t: "survives on half the oxygen anyone else needs", tier: 2, tags: ["wild", "healing"] },
+  { t: "reads star charts like poetry, and finds hidden routes", tier: 2, tags: ["travel", "learning"] },
+  { t: "can interface with ship systems by touch", tier: 3, tags: ["tech"] },
+  { t: "has a clone body in storage, just in case", tier: 3, tags: ["tech", "secrecy"] },
+  { t: "heals with nanites that are slowly rewriting {them}", tier: 3, tags: ["healing", "tech"] },
+  { t: "is gene-engineered for combat and was never meant to retire", tier: 3, tags: ["violence", "tech"] },
+  { t: "can fold space around {themself} for a heartbeat", tier: 4, tags: ["travel", "chaos"] },
+  { t: "carries the last seed vault of Earth in {their} bloodstream", tier: 4, tags: ["family", "loss", "healing"] },
+  { t: "can hear the thoughts of every machine within a mile", tier: 4, tags: ["tech", "isolation"] },
+  { t: "was the pilot of the ship that ended the last war, and was erased from history", tier: 4, tags: ["violence", "secrecy"] },
+);
+
+more(G.appearance.features,
+  "a glowing subdermal ID tag on one wrist", "a mag-boot limp", "pale skin that has never seen a real sun", "a vacuum-burn scar across one cheek",
+  "chrome fingertips", "hair dyed in station-gang colors", "an old corporate barcode tattoo", "eyes that refocus with a faint click",
+  "freckles from a red dwarf's light", "a jaw rebuilt after an accident", "unnervingly perfect teeth", "a breathing mask scar around the mouth",
+);
+more(G.appearance.styles,
+  "a vacuum suit liner worn as everyday clothes", "an expensive coat with the brand cut out", "hydroponics overalls stained green",
+  "a pilot's jacket with someone else's name", "station-gang leathers", "a monk's habit over armor plates", "scavenged parts as jewelry",
+  "a tailored suit that's been patched twice",
+);
+more(G.appearance.items,
+  "a pressed leaf from a real tree", "a wrench older than the station", "a recording of rain", "a deck of plastic playing cards",
+  "an expired ID card with a different name", "a broken drone that follows {them} anyway", "a tin of real tea, almost empty",
+  "a medal {they} refuse to talk about", "a child's spacesuit patch", "a dog tag from a ship that was lost", "a crumpled pre-war banknote",
+  "a hand-drawn map of a station that no longer exists", "a jar of dirt from Mars", "a slate full of unsent messages",
+  "a pocket radio tuned to static", "a small brass bell from a generation ship",
+);
+for (const [k, list] of Object.entries({
+  warrior: ["shotgun at point-blank in zero-g", "boarding axe and a mag-lock shield"],
+  skulker: ["cuts the lights and works in the dark", "a mono-wire garotte"],
+  caster: ["hijacks the enemy's targeting", "overloads their suits' life support"],
+  face: ["bluffs a fleet into retreating", "promises bounties to the enemy's crew"],
+  healer: ["seals breaches and patches suits mid-fight", "a stun pistol and a steady hand"],
+  sage: ["vents the right compartment at the right time", "runs the fight from the sensor board"],
+  wild: ["uses the hull as a battlefield", "a long-range rifle braced on an antenna"],
+})) G.combat[k].push(...list);
+for (const [k, list] of Object.entries({
+  warrior: ["fights in zero gravity", "handles heavy weapons"],
+  skulker: ["forges ship IDs", "spots surveillance"],
+  caster: ["writes viruses", "reprograms security bots"],
+  face: ["talks past customs", "plays corporate politics"],
+  healer: ["treats cryo-sickness", "performs emergency cybernetic repair"],
+  sage: ["reads alien script", "calculates orbits by hand"],
+  wild: ["survives on hostile worlds", "tames alien beasts"],
+})) G.abilities[k].push(...list);
+
+export default G;

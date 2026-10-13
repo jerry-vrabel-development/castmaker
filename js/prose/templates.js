@@ -6,6 +6,13 @@ import { GENRES } from "../data/genres/index.js";
 import { PRONOUNS, fill, cap, article, stripArticle } from "../engine/text.js";
 import { ARCHETYPES } from "../engine/generate.js";
 import { MORAL_NAMES } from "../data/shared.js";
+import { orientationLabel, spouseWord } from "../data/orientation.js";
+
+const PARTNER_PRONOUNS = {
+  woman: { pthey: "she", pthem: "her", ptheir: "her" },
+  man: { pthey: "he", pthem: "him", ptheir: "his" },
+  nonbinary: { pthey: "they", pthem: "them", ptheir: "their" },
+};
 
 // Name for a point on the moral compass.
 export function moralLabel(m) {
@@ -26,7 +33,26 @@ export function textContext(c) {
     originShort: id.originShort,
     eventShort: c.core.background?.event.short || "the past",
     wantShort: c.core.motivation?.short || "get what they want",
+    ...loveTokens(c.core.love),
   };
+}
+
+function loveTokens(love) {
+  if (!love || !love.partner) return {};
+  const g = love.partner.gender;
+  return {
+    partner: love.partner.name,
+    spouse: spouseWord(g),
+    duration: love.years <= 1 ? "a year" : `${love.years} years`,
+    ...(PARTNER_PRONOUNS[g] || PARTNER_PRONOUNS.nonbinary),
+  };
+}
+
+// "bisexual", "lesbian", "attracted to men" and so on.
+export function loveLabel(c) {
+  const love = c.core.love;
+  if (!love) return "";
+  return orientationLabel({ id: love.orientation, target: love.target }, c.core.identity.pronouns, love.variant);
 }
 
 export const TemplateProvider = {
@@ -106,6 +132,7 @@ export const TemplateProvider = {
       voiceLine: f(vo.line),
       moral,
       gift: c.core.gift && !c.core.gift.none ? `${first} ${f(c.core.gift.t)}.` : null,
+      love: c.core.love ? `${first} ${f(c.core.love.note)}.` : null,
       archetypeLabel: ARCHETYPES[tt.archetype].label,
     };
   },

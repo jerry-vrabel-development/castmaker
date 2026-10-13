@@ -406,3 +406,31 @@ dialog.export::backdrop { background: rgb(10 15 13 / 0.45); }
 }
 .compass-text { display: flex; flex-direction: column; gap: 10px; min-width: 0; }
 .moral-name { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.1; margin: 0; }
+
+/* ---------- v0.4 reveal polish ---------- */
+.rarity-badge.charging { opacity: 0.4; animation: charge 0.35s ease-in-out infinite alternate; }
+.rarity-badge.charging.charge-0, .rarity-badge.charging.charge-1 { animation-duration: 0.5s; }
+.die.landed { animation: die-land 0.22s ease-out; }
+.spark.t3 { background: var(--t3); }
+.sheet.glow-3 .dossier-head { animation: hero-glow-3 1.8s ease-out; }
+.sheet.glow-4 .dossier-head { animation: hero-glow-4 2.6s ease-out; }
+@keyframes charge { from { transform: scale(0.96); } to { transform: scale(1.04); } }
+@keyframes die-land { 0% { transform: translateY(-6px) rotate(-6deg); } 70% { transform: translateY(1px); } 100% { transform: none; } }
+@keyframes hero-glow-3 {
+  0% { box-shadow: 0 0 0 0 transparent; }
+  20% { box-shadow: 0 0 0 2px var(--t3), 0 0 40px color-mix(in srgb, var(--t3) 45%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes hero-glow-4 {
+  0% { box-shadow: 0 0 0 0 transparent; }
+  15% { box-shadow: 0 0 0 3px var(--t4), 0 0 60px color-mix(in srgb, var(--t4) 55%, transparent); }
+  60% { box-shadow: 0 0 0 2px var(--t4), 0 0 30px color-mix(in srgb, var(--t4) 30%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rarity-badge.charging, .die.landed, .sheet.glow-3 .dossier-head, .sheet.glow-4 .dossier-head { animation: none; }
+}
+.rarity-zone .rarity-story, .rarity-zone .rarity-meta { transition: opacity 0.3s; }
+.rarity-zone.awaiting .rarity-story, .rarity-zone.awaiting .rarity-meta { opacity: 0; }
+.rarity-badge.charging { color: transparent; border-color: var(--muted); background: transparent; box-shadow: none; }
+.rarity-badge.charging svg { opacity: 0; }

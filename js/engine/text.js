@@ -1,9 +1,9 @@
 // Token filling, pronoun agreement and small text helpers.
 
 export const PRONOUNS = {
-  she: { label: "she/her", they: "she", them: "her", their: "her", theirs: "hers", themself: "herself", was: "was", is: "is", has: "has", does: "does" },
-  he: { label: "he/him", they: "he", them: "him", their: "his", theirs: "his", themself: "himself", was: "was", is: "is", has: "has", does: "does" },
-  they: { label: "they/them", they: "they", them: "them", their: "their", theirs: "theirs", themself: "themself", was: "were", is: "are", has: "have", does: "do" },
+  she: { label: "she/her", they: "she", them: "her", their: "her", theirs: "hers", themself: "herself", was: "was", is: "is", has: "has", does: "does", s: "s", es: "es" },
+  he: { label: "he/him", they: "he", them: "him", their: "his", theirs: "his", themself: "himself", was: "was", is: "is", has: "has", does: "does", s: "s", es: "es" },
+  they: { label: "they/them", they: "they", them: "them", their: "their", theirs: "theirs", themself: "themself", was: "were", is: "are", has: "have", does: "do", s: "", es: "" },
 };
 
 // Replace {token} with ctx values. {Token} capitalizes the result.

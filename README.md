@@ -1,7 +1,5 @@
 # Castmaker
 
-https://jerry-vrabel-development.github.io/castmaker/
-
 **A deep, universal generator for original characters — one character core, many modes.**
 
 Castmaker creates original characters that feel like people rather than random trait combinations. A single shared character model sits at the center, and mode-specific layers shape that character for whoever is using it: a Dungeon Master who needs an NPC in thirty seconds, a novelist building a protagonist's inner life, an artist looking for a design prompt, and more.
@@ -173,10 +171,10 @@ The first prototype proves the shared-core-plus-layers architecture with the two
 
 ---
 
-## Grades, Reveal & Moral Compass (v0.3 prototype)
+## Grades, Reveal & Moral Compass
 
-### Grade: from background extra to hero of legend
-Every character is rolled **grade first**. Six ability scores are rolled with real dice (4d6, drop the lowest), and their total sets the grade, so the odds are the exact odds of rolling that well:
+### One rarity per character: the grade
+A character has exactly one rarity, its **grade**. Nothing else is labeled. Six ability scores are rolled with real dice (4d6, drop the lowest), and their total sets the grade, so each grade's chance is the exact chance of rolling that well:
 
 | Grade | Story weight | Dice total | Chance |
 |---|---|---|---|
@@ -187,22 +185,40 @@ Every character is rolled **grade first**. Six ability scores are rolled with re
 | Legendary | Hero of legend | 88+ | 1.8% (1 in 55) |
 
 The grade then shapes the whole character:
-- **Ability scores:** the rolled dice become the D&D 5e scores, and the system-agnostic strengths flatten for extras and peak for heroes.
+- **Ability scores:** the rolled dice become the D&D 5e scores; the system-agnostic strengths flatten for extras and peak for heroes.
 - **Gift:** none for Common; a knack, a talent, a rare power, or (at Legendary) a destiny. In the modern genre, Legendary gifts are superpowers.
-- **Stakes:** secrets, wants and defining events are steered toward the grade. Extras have small secrets; heroes carry world-shaking ones.
-- **Story depth:** background characters get a role and a want; named NPCs add a lie and a wound; supporting characters and up get a full arc. Epic and Legendary characters are cast as protagonists, antagonists or rivals.
-- **Moral extremes:** higher grades sit further toward the edges of the moral compass, so heroes and villains are paragons and monsters.
+- **Stakes:** secrets, wants and defining events each have hidden stakes from 0 to 4, and entries close to the grade are much more likely. Extras have small secrets; heroes carry world-shaking ones.
+- **Story depth:** background characters get a role and a want; named NPCs add a lie and a wound; supporting characters and up get a full arc.
+- **Moral extremes:** higher grades sit further toward the edges of the moral compass.
 
-**Lock grade** keeps a hero and rerolls everything else. `node tools/rarity-sim.js` confirms simulated grades match the exact dice odds.
+**Lock grade** keeps a hero and rerolls everything else.
 
 ### The reveal
-The name spins like a slot reel, the six dice tumble and land one by one, the grade stamps in, and then the sections flip in, with chimes for rare pieces. Legendary rolls get a shimmer and a burst of sparks. Click anywhere or roll again to skip; **Reveal → Fast** skips the animation, and reduced-motion settings skip it automatically.
+The name spins like a slot reel, the six dice tumble and land one by one, tension builds (longer when the dice run hot), the grade stamps in, and the sections flip in. Epic and Legendary rolls get a glow and sparks. A full roll jumps back to the top of the page. Click anywhere or roll again to skip; **Reveal → Fast** skips the animation, and reduced-motion settings skip it automatically.
+
+**Sound** is synthesized with the Web Audio API (no audio files): reel ticks, dice rattles and clacks that brighten with higher rolls, a riser and drumroll, and a sting per grade, from a muted thud for Common to a full fanfare with brass, choir and bells for Legendary. All of it runs through a compressor and a soft reverb. Recorded CC0 samples could replace any cue later without changing the reveal.
+
+### Variety: less repetition
+- Every table is several times larger than in v0.3 (for example 72 traits, 70 quirks, 50 wants, 57 hand-written secrets, about 26 events and 32 gifts per genre).
+- Smaller secrets are also **built from parts** (an act, a person, a twist), about 3,000 combinations.
+- **No-repeat memory:** anything you've seen in the last several rolls is held back. The window scales with each table's size.
+- `node tools/variety.js` measures repeated lines in batches of 20 rolls. v0.3 averaged about 260 per batch; v0.4 averages about 37.
+
+### Orientation and love life
+Orientation is part of identity, like pronouns. It is never part of the grade and never influences personality, jobs or anything else; it only shapes the **love life** section (orientation, relationship status, and a partner where there is one).
+- **Real** (default): odds from Gallup's 2025 survey of U.S. adults: 86% straight, 5.3% bisexual, 1.6% gay, 1.4% lesbian, 0.5% other (such as pansexual or queer), with no-answer responses set aside. Gallup doesn't report asexual identity separately, so 1% is used as a marked estimate.
+- **Even:** every orientation equally likely.
+- **Hide:** the love life isn't shown or exported.
+
+Relationship status by age uses designed odds, not statistics.
 
 ### Moral compass
-Every character sits on two axes: **Order ↔ Freedom** and **Mercy ↔ Ruthlessness**, built from their traits, history and wants. The nine regions are named (Guardian, Good Samaritan, Rebel with a cause, Rule keeper, Pragmatist, Free agent, Iron fist, Mercenary, Wildfire). Each character also has **a line they won't cross** and **what would push them over it**. Adapters translate the compass: D&D 5e gets one of the nine alignments.
+Every character sits on two axes, **Order ↔ Freedom** and **Mercy ↔ Ruthlessness**, built from their traits, history and wants. The nine regions are named (Guardian, Good Samaritan, Rebel with a cause, Rule keeper, Pragmatist, Free agent, Iron fist, Mercenary, Wildfire). Each character also has **a line they won't cross** and **what would push them over it**. D&D 5e gets one of the nine alignments from the compass.
 
 ### Real-world data
-Modern occupations still come up in proportion to real U.S. job counts (Bureau of Labor Statistics, 2025, square-root damped), and the "How the grade works" panel shows each piece's tier and source. Name, culture, pronouns, ancestry and age are never rated.
+- Modern occupations turn up in proportion to real U.S. job counts (Bureau of Labor Statistics, 2025, square-root damped), now covering 29 jobs. They are never labeled with a rarity.
+- Orientation odds come from Gallup (2025).
+- Name, culture, pronouns, orientation, ancestry and age never affect the grade.
 
 ### Guardrails
 - Randomness is never tied to money: no paid rolls, rerolls or odds boosts.
@@ -212,7 +228,6 @@ Modern occupations still come up in proportion to real U.S. job counts (Bureau o
 ### Next for gamification (not built yet)
 - Collection log ("37 of 120 secrets discovered")
 - Achievements (first Legendary, a full cast, every genre)
-- Real statistics for modern life events
 
 ---
 
@@ -221,7 +236,7 @@ Modern occupations still come up in proportion to real U.S. job counts (Bureau o
 | Phase | Goal |
 |---|---|
 | **v0.1** | Core + D&D + Writer modes, local save, export |
-| **v0.2** | Grades, slot-style reveal and moral compass (prototype built), collection log, achievements, constructed beings (robots, androids, AIs) in the core, D&D 3.5e adapter, bring-your-own-key AI prose, Artist mode, more genres, larger curated tables |
+| **v0.2** | Grades, reveal, moral compass, orientation and variety work (prototype built), collection log, achievements, constructed beings (robots, androids, AIs) in the core, D&D 3.5e adapter, bring-your-own-key AI prose, Artist mode, more genres, larger curated tables |
 | **v0.2.5** | **AI Persona mode**: persona briefs for real chatbots, assistants, and AI-driven NPCs |
 | **v0.3** | Worldbuilding mode: linked casts and relationship maps |
 | **v0.4** | Accounts, cloud library, sharing |
@@ -353,10 +368,12 @@ manifest.webmanifest, sw.js     PWA install and offline cache
 js/app.js                       interface
 js/storage.js                   local cast library (IndexedDB, in-memory fallback)
 js/export.js                    Markdown and JSON export
-js/reveal.js                    slot-style reveal and synthesized sounds
+js/reveal.js                    slot-style reveal
+js/audio.js                     synthesized sound engine and cues
+js/data/orientation.js          orientation odds and love-life tables
 js/engine/dice.js               real dice: 4d6-drop-lowest odds and grade bands
-js/engine/rarity.js             grade summary and piece rarity
-js/data/rarity.js               rarity tiers and real-world statistics
+js/engine/rarity.js             grade summary
+js/data/rarity.js               grades, stakes and real job statistics
 js/engine/rng.js                seeded random numbers (same seed, same character)
 js/engine/generate.js           rules engine: sections, tag-weighted picks, locks, rerolls
 js/engine/text.js               pronoun agreement and text tokens
@@ -367,6 +384,7 @@ js/data/shared.js               genre-neutral tables
 js/data/genres/*.js             fantasy, modern and sci-fi tables
 tools/smoke-test.js             automated generation checks
 tools/rarity-sim.js             grade, role and morality simulator
+tools/variety.js                repetition measurement
 ```
 
 ### How coherence works
@@ -374,4 +392,4 @@ Each section records the tags of what it picked (`loss`, `crime`, `faith`, …).
 
 ## Status
 
-**v0.3 prototype:** all v0.1 scope items are in place, plus grade-first rolling, the slot-style reveal and the moral compass. Name is still a working title.
+**v0.4 prototype:** one rarity per character (the grade), much larger tables with no-repeat memory, orientation and love life, redesigned sound, and scroll-to-top after a roll. Name is still a working title.

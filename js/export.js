@@ -1,13 +1,13 @@
 // Markdown and JSON export.
 
 import { renderProse, } from "./prose/provider.js";
-import { textContext } from "./prose/templates.js";
+import { textContext, loveLabel } from "./prose/templates.js";
 import { fill, cap, stripArticle } from "./engine/text.js";
 import { toDnd5e, signed, ABILITIES, ATTRIBUTION } from "./engine/adapters/dnd5e.js";
 import { STRENGTHS } from "./engine/generate.js";
 import { PRONOUNS } from "./engine/text.js";
 import { GENRES } from "./data/genres/index.js";
-import { computeRarity, TIERS } from "./engine/rarity.js";
+import { computeRarity } from "./engine/rarity.js";
 import { oneIn } from "./engine/dice.js";
 
 const signedNum = (n) => (n >= 0 ? `+${n.toFixed(2)}` : n.toFixed(2));
@@ -17,7 +17,7 @@ export function toJSON(c) {
   return JSON.stringify(strip(c), null, 2);
 }
 
-export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1 } = {}) {
+export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1, showLove = true } = {}) {
   const p = renderProse(c);
   const x = textContext(c);
   const f = (s) => fill(s, x);
@@ -29,8 +29,9 @@ export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1 }
   L.push(`**${cap(id.peopleLabel)}, ${id.age}** · ${PRONOUNS[id.pronouns].label} · ${cap(stripArticle(id.occupation.t))} · ${GENRES[c.genre].label}`, "");
 
   const r = computeRarity(c);
-  L.push(`**Grade: ${r.tierInfo.label}** (${r.tierInfo.story}) · rolled ${r.rolls.join(", ")} = ${r.total}, ${oneIn(r.gradeOdds)} rolls land in this grade${r.theme ? ` · resonant: ${r.theme}` : ""}`, "");
+  L.push(`**Grade: ${r.tierInfo.label}** (${r.tierInfo.story}) · rolled ${r.rolls.join(", ")} = ${r.total}, ${oneIn(r.gradeOdds)} rolls land in this grade`, "");
   if (p.gift) L.push(`**Gift:** ${p.gift}`, "");
+  if (p.love && showLove) L.push(`**Love life:** ${cap(loveLabel(c))}. ${p.love}`, "");
   L.push("## Background", "", p.backstory, "");
   L.push("## Personality", "");
   L.push(`- **Traits:** ${c.core.personality.traits.map((t) => t.t).join(", ")}`);

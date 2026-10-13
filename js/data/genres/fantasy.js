@@ -1,21 +1,22 @@
 // High fantasy tables. Original Castmaker content — CC BY 4.0.
 // Peoples map to SRD 5.1 ancestries in the D&D 5e adapter.
 
-export default {
+const G = {
   id: "fantasy",
   label: "High fantasy",
-  vocab: { coin: "silver", drink: "ale", package: "sealed letter", messages: "letters", city: "town" },
+  vocab: { coin: "silver", drink: "ale", package: "sealed letter", messages: "letters", city: "town", authority: "the town watch", ruler: "the duke" },
 
+  // Name lists are filled in from NAMES at the bottom of this file.
   cultures: {
-    valemark: { people: "human", first: ["Aldric", "Bryn", "Corwin", "Edda", "Garrick", "Hesper", "Isolde", "Joren", "Maren", "Osric", "Rowena", "Tamsin", "Wendel", "Yara"], last: ["Ashdown", "Blackwood", "Corrin", "Fairweather", "Holloway", "Marsh", "Pellam", "Thorne", "Underhill", "Wexley"] },
-    elf: { people: "elf", first: ["Ithrael", "Saevyn", "Calennor", "Mirethel", "Aelindra", "Thalorin", "Venarion", "Ilmaren", "Sethiel", "Naeris", "Orivane"], last: ["Moonbrook", "Thaelorn", "Silverfrond", "Duskwhisper", "Aerendyl", "Starhollow"] },
-    dwarf: { people: "dwarf", first: ["Borrik", "Hedda", "Kazrin", "Magda", "Torvald", "Gunnhild", "Dorrik", "Ragna", "Brumli", "Sigrun"], last: ["Stonehollow", "Ironmantle", "Deepdelver", "Coppervein", "Hammerfall", "Granitebrow"] },
-    halfling: { people: "halfling", first: ["Tobin", "Marigold", "Ned", "Posy", "Wendell", "Lila", "Barnaby", "Clover", "Fenn", "Dilly"], last: ["Goodbarrel", "Thistledown", "Hollowell", "Applebrook", "Tealeaf", "Bramblefoot"] },
-    orc: { people: "halforc", first: ["Draka", "Ushka", "Korg", "Varga", "Thokk", "Shara", "Brug", "Yenna", "Morra", "Gash"], last: ["Ashfang", "Redmaw", "Stonejaw", "Ironhide", "Bloodriver"] },
-    freecity: { people: "tiefling", first: ["Vesper", "Mordai", "Ishara", "Kallista", "Nemeia", "Rieven", "Sorrow", "Ember", "Quill", "Malachar", "Patience"], last: ["Ashdown", "Vane", "Corrin", "Morrow", "Sable", "Pellam"] },
-    gnome: { people: "gnome", first: ["Bimble", "Tannifer", "Orla", "Quillo", "Nissa", "Sprocket", "Fennimore", "Wizzle"], last: ["Gearwhistle", "Tumblebrook", "Copperpot", "Nackle", "Fizzbang"] },
-    dragonborn: { people: "dragonborn", first: ["Vorsaar", "Khesra", "Tazhul", "Rhoska", "Szarith", "Kaelix", "Daarvos", "Iyrsha"], last: ["Ysthrak", "Valdorr", "Kharash", "Thurrix"] },
-    halfelf: { people: "halfelf", first: ["Aldric", "Saevyn", "Isolde", "Thalorin", "Maren", "Naeris", "Corwin", "Mirethel"], last: ["Blackwood", "Moonbrook", "Fairweather", "Silverfrond", "Thorne"] },
+    valemark: { people: "human", first: [], last: [] },
+    elf: { people: "elf", first: [], last: [] },
+    dwarf: { people: "dwarf", first: [], last: [] },
+    halfling: { people: "halfling", first: [], last: [] },
+    orc: { people: "halforc", first: [], last: [] },
+    freecity: { people: "tiefling", first: [], last: [] },
+    gnome: { people: "gnome", first: [], last: [] },
+    dragonborn: { people: "dragonborn", first: [], last: [] },
+    halfelf: { people: "halfelf", first: [], last: [] },
   },
 
   peoples: {
@@ -138,3 +139,164 @@ export default {
     wild: ["tracks over bare stone", "calms wild animals"],
   },
 };
+
+// ---------- Expanded content (v0.4) ----------
+const more = (list, ...items) => list.push(...items);
+
+// Original names only. (Earlier versions borrowed some names from non-SRD
+// books; every fantasy name list is now Castmaker's own.)
+const NAMES = {
+  valemark: {
+    first: ["Aldric", "Alys", "Benedict", "Bryn", "Corwin", "Cressida", "Dunstan", "Edda", "Elric", "Fenna", "Garrick", "Gwendolyn", "Harlan", "Hesper", "Isolde", "Ivo", "Joren", "Linnet", "Maren", "Merrick", "Nell", "Osric", "Rowena", "Sabine", "Tamsin", "Wendel", "Yara", "Ottoline", "Piers", "Wynne"],
+    last: ["Ashdown", "Ashcombe", "Blackwood", "Brightwater", "Coldridge", "Corrin", "Fairweather", "Fennick", "Greaves", "Holloway", "Larkspur", "Mallory", "Marsh", "Oakhart", "Pellam", "Rowntree", "Stroud", "Thorne", "Underhill", "Wexley"],
+  },
+  elf: {
+    first: ["Ithrael", "Saevyn", "Calennor", "Mirethel", "Aelindra", "Thalorin", "Venarion", "Ilmaren", "Sethiel", "Naeris", "Orivane", "Caerwen", "Elunara", "Faerion", "Ilvasse", "Lorendhil", "Nyriel", "Sylvaine", "Taerith", "Voryndel"],
+    last: ["Thaelorn", "Duskwhisper", "Aerendyl", "Starhollow", "Dawnmere", "Fernshade", "Hollowmere", "Mistvale", "Rainsong", "Sunreach", "Willowend", "Lumeris"],
+  },
+  dwarf: {
+    first: ["Borrik", "Hedda", "Kazrin", "Magda", "Torvald", "Gunnhild", "Dorrik", "Ragna", "Brumli", "Sigrun", "Agna", "Bodvar", "Dagny", "Grimma", "Haldor", "Ketla", "Morgrim", "Rosvi", "Thyrna", "Volund"],
+    last: ["Stonehollow", "Ironmantle", "Deepdelver", "Coppervein", "Hammerfall", "Granitebrow", "Anvilmar", "Blackforge", "Cragborn", "Emberbeard", "Flintheart", "Stoutbelly", "Orehand", "Slatecrown"],
+  },
+  halfling: {
+    first: ["Tobin", "Marigold", "Ned", "Posy", "Wendell", "Lila", "Barnaby", "Clover", "Fenn", "Dilly", "Bramble", "Daisy", "Eddo", "Hilda", "Pim", "Rosie", "Tansy", "Wilbur", "Mabel", "Otto"],
+    last: ["Thistledown", "Hollowell", "Applebrook", "Bramblefoot", "Butterby", "Hearthkettle", "Mossbottom", "Puddingham", "Sweetwater", "Toadstool", "Warmhollow", "Pebblefoot"],
+  },
+  orc: {
+    first: ["Draka", "Ushka", "Korg", "Varga", "Shara", "Brug", "Yenna", "Morra", "Gash", "Durga", "Grisha", "Kesh", "Mog", "Ruk", "Ugrin", "Zarra", "Torvok", "Hruna", "Skara", "Bolgra"],
+    last: ["Ashfang", "Redmaw", "Stonejaw", "Ironhide", "Bloodriver", "Bonebreaker", "Duskhowl", "Greyfang", "Thunderhide", "Wolfscar", "Emberhand"],
+  },
+  freecity: {
+    first: ["Vesper", "Ishara", "Rieven", "Ember", "Quill", "Malachar", "Patience", "Blessing", "Reverie", "Solace", "Cinder", "Lament", "Halcyon", "Valerian", "Zethar", "Morwenna", "Ashbel", "Seraphine", "Tobiah", "Verity"],
+    last: ["Ashdown", "Vane", "Corrin", "Morrow", "Sable", "Pellam", "Ashgrave", "Blackthorn", "Cindermoor", "Grimsby", "Lantern", "Nightingale", "Crowe"],
+  },
+  gnome: {
+    first: ["Bimble", "Tannifer", "Quillo", "Sprocket", "Fennimore", "Wizzle", "Dibbin", "Fizzwick", "Gimmeny", "Lottie", "Nibsy", "Pockle", "Rindle", "Tamsy", "Widget", "Zibbet"],
+    last: ["Gearwhistle", "Tumblebrook", "Copperpot", "Fizzbang", "Brasswinkle", "Cogsworth", "Fiddlefuse", "Sparkletoe", "Tinkerton", "Whirligig"],
+  },
+  dragonborn: {
+    first: ["Vorsaar", "Khesra", "Tazhul", "Rhoska", "Szarith", "Kaelix", "Daarvos", "Iyrsha", "Arrakh", "Brennix", "Coryth", "Drasha", "Haldrex", "Ixara", "Mezhul", "Pyrrha", "Sarvok", "Vaelith"],
+    last: ["Ysthrak", "Valdorr", "Kharash", "Thurrix", "Azhkarn", "Draxvel", "Kethrion", "Sorrovan", "Vyrmorr"],
+  },
+  halfelf: {
+    first: ["Aldric", "Saevyn", "Isolde", "Thalorin", "Maren", "Naeris", "Corwin", "Mirethel", "Caerwen", "Ivo", "Linnet", "Sylvaine", "Rowan", "Elowyn", "Tarian", "Wren"],
+    last: ["Blackwood", "Fairweather", "Thorne", "Dawnmere", "Fernshade", "Larkspur", "Oakhart", "Mistvale", "Willowend"],
+  },
+};
+for (const [id, n] of Object.entries(NAMES)) Object.assign(G.cultures[id], n);
+
+
+more(G.origins,
+  { t: "a fishing village on the Saltmarsh coast", short: "the Saltmarsh", cultures: ["valemark", "halfling", "halfelf"], tags: ["family", "travel", "poverty"] },
+  { t: "a pilgrim town that grew around a shrine", short: "the shrine town", cultures: ["valemark", "halfelf", "dwarf", "dragonborn"], tags: ["faith", "order"] },
+  { t: "a mining camp in the Ashen Hills", short: "the Ashen Hills", cultures: ["dwarf", "orc", "valemark", "gnome"], tags: ["craft", "poverty", "violence"] },
+  { t: "a wandering caravan that never stops for long", short: "the caravan", cultures: ["valemark", "halfling", "halfelf", "freecity", "orc"], tags: ["travel", "wild", "family"] },
+  { t: "a ruined university city, half-flooded", short: "the drowned university", cultures: ["elf", "gnome", "valemark", "freecity"], tags: ["learning", "loss"] },
+  { t: "a cliffside monastery above the clouds", short: "the cliff monastery", cultures: ["valemark", "elf", "dragonborn", "dwarf"], tags: ["faith", "isolation", "order"] },
+);
+
+more(G.upbringings,
+  { t: "in a fishing family that measured years by storms", tags: ["family", "travel", "poverty"] },
+  { t: "as a ward of a minor lord who forgot {them} most days", tags: ["wealth", "isolation"] },
+  { t: "in a monastery, after being left at the gate", tags: ["faith", "order", "loss"] },
+  { t: "in a mercenary camp, raised by whoever was sober", tags: ["violence", "travel"] },
+  { t: "in a herbalist's cottage at the edge of the woods", tags: ["healing", "wild"] },
+  { t: "among the beggars of the cathedral steps", tags: ["poverty", "faith", "crime"] },
+  { t: "as the heir to a crumbling inn", tags: ["family", "craft", "poverty"] },
+  { t: "between two parents from peoples who hated each other", tags: ["family", "betrayal"] },
+  { t: "in the mines, working since {they} {was} seven", tags: ["craft", "poverty", "duty"] },
+  { t: "in a library tower, as a copyist's apprentice", tags: ["learning", "order"] },
+);
+
+more(G.occupations,
+  { t: "a fisher", tags: ["travel", "poverty"], arch: ["wild"], skills: ["reading weather", "knots and nets"] },
+  { t: "a midwife", tags: ["healing", "family"], arch: ["healer"], skills: ["delivering children", "herbal remedies"] },
+  { t: "a stablehand", tags: ["wild", "poverty"], arch: ["wild"], skills: ["handling horses", "hearing trouble coming"] },
+  { t: "a miner", tags: ["craft", "poverty"], arch: ["warrior"], skills: ["stonework", "working in the dark"] },
+  { t: "a baker", tags: ["craft", "family"], arch: ["face"], skills: ["baking", "knowing the town's gossip"] },
+  { t: "a gravedigger", tags: ["loss", "isolation"], arch: ["warrior", "sage"], skills: ["digging", "recognizing causes of death"] },
+  { t: "a town crier", tags: ["art", "order"], arch: ["face"], skills: ["a carrying voice", "knowing the latest news"] },
+  { t: "a rat-catcher", tags: ["poverty", "wild"], arch: ["skulker"], skills: ["traps", "the sewer routes"] },
+  { t: "a tax collector", tags: ["order", "wealth"], arch: ["face", "sage"], skills: ["arithmetic", "spotting hidden wealth"] },
+  { t: "a bounty hunter", tags: ["violence", "crime"], arch: ["warrior", "skulker"], skills: ["tracking people", "manacles and rope"], w: 0.3 },
+  { t: "a ship's navigator", tags: ["travel", "learning"], arch: ["sage", "wild"], skills: ["navigating by stars", "reading currents"], w: 0.55 },
+  { t: "a court jester", tags: ["art", "secrecy"], arch: ["face"], skills: ["juggling", "saying the unsayable"], w: 0.15 },
+  { t: "a herald of the royal court", tags: ["order", "duty"], arch: ["face", "sage"], skills: ["heraldry", "diplomatic forms"], w: 0.3 },
+  { t: "a temple guardian", tags: ["faith", "duty", "violence"], arch: ["warrior", "healer"], skills: ["standing watch", "rites of protection"], w: 0.55 },
+);
+
+more(G.events,
+  { t: "{they} spent a year as the village's only healer after the old one died", short: "the year of healing", tier: 0, tags: ["healing", "duty"], wound: "being needed by everyone and helped by no one" },
+  { t: "{their} parents' inn burned down the winter {they} turned twelve", short: "the inn fire", tier: 0, tags: ["family", "loss", "poverty"], wound: "watching {their} home burn" },
+  { t: "{they} {was} jilted on {their} wedding day in front of the whole village", short: "the wedding", tier: 0, tags: ["family", "betrayal"], wound: "being humiliated in front of everyone {they} knew" },
+  { t: "{they} lost {their} savings to a traveling swindler", short: "the swindle", tier: 0, tags: ["poverty", "crime"], wound: "being made a fool of" },
+  { t: "{their} father drank away the family farm", short: "the lost farm", tier: 0, tags: ["family", "poverty"], wound: "watching a parent fail" },
+  { t: "{they} {was} accused of witchcraft and barely escaped the village", short: "the witch trial", tier: 1, tags: ["faith", "violence", "isolation"], wound: "being hunted by neighbors" },
+  { t: "a plague ship arrived and {they} {was} one of the few who didn't fall sick", short: "the plague ship", tier: 1, tags: ["healing", "loss"], wound: "surviving while everyone around {them} died" },
+  { t: "{they} fought in a border war that no one remembers now", short: "the forgotten war", tier: 1, tags: ["violence", "duty", "loss"], wound: "killing for a cause that didn't matter" },
+  { t: "{they} {was} captured by slavers and escaped after two years", short: "the slave caravan", tier: 2, tags: ["violence", "crime", "poverty"], wound: "being owned" },
+  { t: "{they} found a dying knight who pressed a ring into {their} hand", short: "the knight's ring", tier: 2, tags: ["duty", "secrecy", "loss"], wound: "inheriting a stranger's unfinished oath" },
+  { t: "{they} {was} the sole survivor when the mine collapsed", short: "the collapse", tier: 2, tags: ["craft", "loss", "isolation"], wound: "hearing the others call for help" },
+  { t: "{they} saw a dragon burn {their} city, and saw its rider", short: "the burning of the city", tier: 3, tags: ["violence", "loss", "secrecy"], wound: "knowing who did it when no one else does" },
+  { t: "{they} {was} stolen away by the fey for what felt like a night and was seven years", short: "the lost seven years", tier: 3, tags: ["wild", "loss", "isolation"], wound: "coming home to a world that moved on" },
+  { t: "{they} {was} chosen by a dying god to carry its last spark", short: "the god's last spark", tier: 4, tags: ["faith", "duty"], wound: "being chosen without being asked" },
+  { t: "{they} {was} born during an eclipse that the priests had prophesied for a thousand years", short: "the eclipse birth", tier: 4, tags: ["faith", "family"], wound: "never being allowed to be ordinary" },
+);
+
+more(G.gifts,
+  { t: "can make anyone laugh, even at a funeral", tier: 1, tags: ["art", "loss"] },
+  { t: "has a nose for herbs and poisons", tier: 1, tags: ["healing", "wild"] },
+  { t: "never gets lost in a city", tier: 1, tags: ["travel", "crime"] },
+  { t: "can carry loads that would stagger a mule", tier: 1, tags: ["craft", "poverty"] },
+  { t: "senses lies as a cold prickle on the neck", tier: 2, tags: ["secrecy", "faith"] },
+  { t: "has a shadow that sometimes moves on its own", tier: 2, tags: ["secrecy", "chaos"] },
+  { t: "can call birds to {their} hand", tier: 2, tags: ["wild"] },
+  { t: "was blessed at birth by a wandering saint", tier: 2, tags: ["faith", "healing"] },
+  { t: "can walk unseen when no one is thinking of {them}", tier: 3, tags: ["secrecy", "crime"] },
+  { t: "is bonded to a griffin that answers only to {them}", tier: 3, tags: ["wild", "travel"] },
+  { t: "can read the memories trapped in old objects", tier: 3, tags: ["learning", "loss"] },
+  { t: "heals from wounds overnight, as long as {they} sleep{s} on earth", tier: 3, tags: ["healing", "wild"] },
+  { t: "is the reincarnation of a legendary queen, and is beginning to remember", tier: 4, tags: ["family", "order", "secrecy"] },
+  { t: "can speak the true names of things, and they obey", tier: 4, tags: ["learning", "faith"] },
+  { t: "carries a sword that once killed a god", tier: 4, tags: ["violence", "faith"] },
+  { t: "was raised by dragons and can take their form, once", tier: 4, tags: ["wild", "violence"] },
+);
+
+more(G.appearance.features,
+  "a nose broken and badly set twice", "a missing fingertip", "eyes of two different colors", "a long scar through one eyebrow",
+  "hands stained green from herb-work", "ears pierced a dozen times", "a sun-weathered face", "rings on every finger",
+  "a tattoo of a ship on one forearm", "a limp from an old injury", "unusually pale eyes", "hair braided with copper wire",
+  "a voice hoarse from shouting", "a missing front tooth", "a neat, carefully trimmed beard", "deep laugh lines",
+);
+more(G.appearance.styles,
+  "a fur-trimmed coat far too warm for the season", "a priest's robe worn over chainmail", "faded court finery, carefully mended",
+  "a fisher's oilskin", "a soldier's coat with the insignia cut off", "bright scarves in clashing colors", "an apron that never comes off",
+  "a hooded traveling cloak, always up",
+);
+more(G.appearance.items,
+  "a wooden flute carved by a dead friend", "a key to a door that no longer exists", "a jar of honey from home", "a cracked spyglass",
+  "a child's drawing, folded small", "a silver bell with no clapper", "a dried rose pressed in a prayer book", "a tin cup dented by an arrow",
+  "a lock of someone's hair in a locket", "a wanted poster with {their} own face on it", "a lucky rabbit's foot, much handled",
+  "a heavy iron ring too big for any finger", "a book of poems with every page annotated", "a seashell from a sea {they} {has} never seen",
+  "a broken compass that always points home", "a ribbon from a festival long ago",
+);
+for (const [k, list] of Object.entries({
+  warrior: ["axe and shield, patient as a wall", "fists first, weapons when sober"],
+  skulker: ["poisoned darts and a fast exit", "fights dirty: sand, chairs, anything"],
+  caster: ["frost and lightning, carefully aimed", "illusions that make enemies fight each other"],
+  face: ["talks the enemy into surrender", "a thrown dagger and a dazzling smile"],
+  healer: ["a staff and a steady prayer", "shields the fallen with {their} own body"],
+  sage: ["sets traps before the fight starts", "reads the enemy's weakness from old books"],
+  wild: ["spear and hunting hounds", "ambush from the treeline, then gone"],
+})) G.combat[k].push(...list);
+for (const [k, list] of Object.entries({
+  warrior: ["fights well in armor", "intimidates with a look"],
+  skulker: ["climbs sheer walls", "spots traps"],
+  caster: ["reads magical scripts", "lights fires with a word"],
+  face: ["haggles prices down", "forges seals and signatures"],
+  healer: ["treats disease", "recognizes curses"],
+  sage: ["deciphers lost languages", "knows royal bloodlines"],
+  wild: ["forages enough to feed a group", "moves silently in forests"],
+})) G.abilities[k].push(...list);
+
+export default G;

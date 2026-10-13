@@ -13,7 +13,7 @@ const fail = (msg) => { failures++; if (failures <= 15) console.error("FAIL:", m
 for (const genre of GENRE_ORDER) {
   const names = new Set();
   for (let i = 0; i < N; i++) {
-    let c = rollCharacter({ genre, seed: `${genre}-${i}` });
+    let c = rollCharacter({ genre, seed: `${genre}-${i}`, orientation: i % 2 ? "even" : "realistic" });
     names.add(c.core.identity.name);
     for (const [mode, system, level] of [["tabletop", "dnd5e", 1 + (i % 20)], ["tabletop", "agnostic", 1], ["writer", "", 1]]) {
       const md = toMarkdown(c, { mode, system, level });
@@ -21,7 +21,7 @@ for (const genre of GENRE_ORDER) {
       if (bad) fail(`${genre} #${i} ${mode}: "${bad[0]}" in ...${md.slice(Math.max(0, bad.index - 80), bad.index + 40)}`);
     }
     // determinism
-    const again = rollCharacter({ genre, seed: `${genre}-${i}` });
+    const again = rollCharacter({ genre, seed: `${genre}-${i}`, orientation: i % 2 ? "even" : "realistic" });
     if (JSON.stringify(again.core) !== JSON.stringify(c.core)) fail(`${genre} #${i}: same seed gave a different character`);
     // lock + reroll keeps the locked section
     c = toggleLock(c, "identity");

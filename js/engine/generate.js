@@ -8,20 +8,53 @@
 import * as T from "../data/shared.js";
 import { GENRES } from "../data/genres/index.js";
 import { makeRng, newSeed } from "./rng.js";
-import { rollWeight, rarityOf, GRADE_MATCH } from "../data/rarity.js";
+import { stakeOf, occupationWeight, GRADE_MATCH } from "../data/rarity.js";
 import { roll4d6DropLowest, gradeOfTotal } from "./dice.js";
+import { ORIENTATIONS, STATUS_BY_STAGE, LOVE_NOTES } from "../data/orientation.js";
 
-// Combine coherence (tags) with real-world or designed odds.
-const odds = (w, kind, genre, keyOf) => (item) => w(item) * rollWeight(kind, genre, keyOf(item));
-
-// Combine coherence with the character's grade: entries whose tier is close
-// to the grade are much more likely. Heroes get heroic stakes.
-const graded = (w, kind, genre, keyOf, grade) => (item) =>
-  w(item) * GRADE_MATCH[Math.abs(rarityOf(kind, genre, keyOf(item)).tier - grade)];
+// Combine coherence with the character's grade: entries whose stakes are
+// close to the grade are much more likely. Heroes get heroic stakes.
+const graded = (w, kind, keyOf, grade) => (item) =>
+  w(item) * GRADE_MATCH[Math.abs(stakeOf(kind, item, keyOf(item)) - grade)];
 
 const gradeOf = (c) => c.core.grade?.tier ?? 0;
 
-export const CORE_SECTIONS = ["grade", "identity", "background", "personality", "flaws", "motivation", "morality", "gift", "appearance", "voice", "hook", "relationships"];
+// ---------- no-repeat memory ----------
+// When avoidRepeats is on (the app turns it on; tests leave it off so seeds
+// stay reproducible), anything picked in the last few rolls is made 50x less
+// likely. The window scales with the size of each table.
+let AVOID = false;
+let ROLL_N = 0;
+const SEEN = new Map();
+
+export function resetRecent() { SEEN.clear(); ROLL_N = 0; }
+
+function fresh(kind, keyOf, poolLen, perRoll = 1, windowOverride) {
+  if (!AVOID) return () => 1;
+  const windowSize = windowOverride ?? Math.max(2, Math.min(40, Math.floor((poolLen * 0.6) / perRoll)));
+  return (item) => {
+    const last = SEEN.get(kind + "|" + keyOf(item));
+    return last != null && ROLL_N - last < windowSize ? 0.02 : 1;
+  };
+}
+function mark(kind, key) { if (AVOID) SEEN.set(kind + "|" + key, ROLL_N); }
+const both = (...fns) => (item) => fns.reduce((p, f) => p * f(item), 1);
+const T_ = (x) => x.t;
+const ID = (x) => x;
+
+// Pick one, preferring entries not seen recently, and remember it.
+function pickFresh(rng, kind, arr, keyOf = ID, weight = () => 1, windowOverride) {
+  const item = rng.weighted(arr, both(weight, fresh(kind, keyOf, arr.length, 1, windowOverride)));
+  mark(kind, keyOf(item));
+  return item;
+}
+function sampleFresh(rng, kind, arr, n, keyOf = ID, weight = () => 1, allow) {
+  const items = rng.sample(arr, n, both(weight, fresh(kind, keyOf, arr.length, n)), allow);
+  for (const it of items) mark(kind, keyOf(it));
+  return items;
+}
+
+export const CORE_SECTIONS = ["grade", "identity", "love", "background", "personality", "flaws", "motivation", "morality", "gift", "appearance", "voice", "hook", "relationships"];
 export const LAYER_SECTIONS = ["tabletop", "writer"];
 export const SECTIONS = [...CORE_SECTIONS, ...LAYER_SECTIONS];
 
@@ -29,7 +62,7 @@ export const SECTIONS = [...CORE_SECTIONS, ...LAYER_SECTIONS];
 // character stays consistent.
 const DEPENDENTS = {
   grade: ["gift", "background", "motivation", "hook", "morality", "tabletop", "writer"],
-  identity: ["tabletop"],
+  identity: ["love", "tabletop"],
   background: ["writer", "morality"],
   personality: ["voice", "morality", "tabletop"],
   motivation: ["morality"],
@@ -116,18 +149,18 @@ const GEN = {
   },
 
   identity(c, rng, bag, G) {
-    const origin = rng.weighted(G.origins, weigher(bag, 1));
+    const origin = pickFresh(rng, "origin", G.origins, T_, weigher(bag, 1));
     const cultureId = rng.pick(origin.cultures);
     const culture = G.cultures[cultureId];
     const people = G.peoples[culture.people];
-    const first = rng.pick(culture.first);
-    const last = rng.pick(culture.last);
+    const first = pickFresh(rng, "first", culture.first);
+    const last = pickFresh(rng, "last", culture.last);
     const [lo, hi] = people.age;
     const age = lo + Math.floor((hi - lo) * Math.pow(rng.float(), 1.6));
     const pronouns = rng.weighted(["she", "he", "they"], (p) => (p === "they" ? 1 : 2));
     const originBag = { ...bag };
     for (const t of origin.tags) originBag[t] = (originBag[t] || 0) + 1;
-    const occ = rng.weighted(G.occupations, odds(weigher(originBag, 2), "occupation", G.id, (o) => o.t));
+    const occ = pickFresh(rng, "occupation", G.occupations, T_, (o) => weigher(originBag, 2)(o) * occupationWeight(G.id, o));
     return {
       name: `${first} ${last}`, first, last, age, pronouns,
       people: culture.people, peopleLabel: people.label, culture: cultureId,
@@ -138,11 +171,11 @@ const GEN = {
   },
 
   background(c, rng, bag, G) {
-    const up = rng.weighted(G.upbringings, weigher(bag));
+    const up = pickFresh(rng, "upbringing", G.upbringings, T_, weigher(bag));
     const bag2 = { ...bag };
     for (const t of up.tags) bag2[t] = (bag2[t] || 0) + 1;
-    const ev = rng.weighted(G.events, graded(weigher(bag2), "event", G.id, (e) => e.short, gradeOf(c)));
-    const turn = rng.weighted(T.TURNING_POINTS, weigher(bag2, 1));
+    const ev = pickFresh(rng, "event", G.events, (e) => e.short, graded(weigher(bag2), "event", (e) => e.short, gradeOf(c)));
+    const turn = pickFresh(rng, "turn", T.TURNING_POINTS, T_, weigher(bag2, 1));
     return {
       upbringing: up.t,
       event: { t: ev.t, short: ev.short, wound: ev.wound, tags: ev.tags },
@@ -152,10 +185,10 @@ const GEN = {
   },
 
   personality(c, rng, bag) {
-    const traits = rng.sample(T.TRAITS, 3, weigher(bag, 2.5), (item, chosen) =>
+    const traits = sampleFresh(rng, "trait", T.TRAITS, 3, T_, weigher(bag, 2.5), (item, chosen) =>
       !chosen.some((x) => x.opp === item.t || item.opp === x.t));
-    const temp = rng.weighted(T.TEMPERAMENTS, weigher(bag, 2));
-    const quirks = rng.sample(T.QUIRKS, 2, weigher(bag, 2));
+    const temp = pickFresh(rng, "temperament", T.TEMPERAMENTS, T_, weigher(bag, 2));
+    const quirks = sampleFresh(rng, "quirk", T.QUIRKS, 2, T_, weigher(bag, 2));
     return {
       traits: traits.map((x) => ({ t: x.t, law: x.law || 0, good: x.good || 0 })),
       temperament: { t: temp.t, phrase: temp.phrase, voices: temp.voices },
@@ -165,8 +198,8 @@ const GEN = {
   },
 
   flaws(c, rng, bag) {
-    const weaknesses = rng.sample(T.FLAWS, 2, weigher(bag, 2.5));
-    const fears = rng.sample(T.FEARS, 2, weigher(bag, 2.5));
+    const weaknesses = sampleFresh(rng, "flaw", T.FLAWS, 2, T_, weigher(bag, 2.5));
+    const fears = sampleFresh(rng, "fear", T.FEARS, 2, T_, weigher(bag, 2.5));
     return {
       weaknesses: weaknesses.map((x) => x.t),
       fears: fears.map((x) => x.t),
@@ -175,7 +208,7 @@ const GEN = {
   },
 
   motivation(c, rng, bag, G) {
-    const want = rng.weighted(T.WANTS, graded(weigher(bag, 2.5), "want", G.id, (w) => w.short, gradeOf(c)));
+    const want = pickFresh(rng, "want", T.WANTS, (w) => w.short, graded(weigher(bag, 2.5), "want", (w) => w.short, gradeOf(c)));
     return { want: want.t, short: want.short, why: rng.pick(want.why), _tags: want.tags };
   },
 
@@ -194,8 +227,8 @@ const GEN = {
     // The -0.15 offsets the tables, which lean slightly toward order.
     const order = clamp((traits.reduce((s, t) => s + t.law, 0) * 0.35 + pull("order") * 0.09 - 0.15 + noise()) * k);
     const mercy = clamp((traits.reduce((s, t) => s + t.good, 0) * 0.4 + pull("mercy") * 0.09 + noise()) * k);
-    const line = rng.weighted(T.MORAL_LINES, (l) => weigher(bag, 2)(l) * (l.mercy != null && mercy < l.mercy - 0.6 ? 0.3 : 1));
-    const breaking = rng.weighted(T.BREAKING_POINTS, weigher(bag, 2));
+    const line = pickFresh(rng, "moralLine", T.MORAL_LINES, T_, (l) => weigher(bag, 2)(l) * (l.mercy != null && mercy < l.mercy - 0.6 ? 0.3 : 1));
+    const breaking = pickFresh(rng, "breaking", T.BREAKING_POINTS, T_, weigher(bag, 2));
     return {
       order: Math.round(order * 100) / 100,
       mercy: Math.round(mercy * 100) / 100,
@@ -210,7 +243,7 @@ const GEN = {
     const grade = gradeOf(c);
     if (grade === 0) return { none: true, tier: 0, _tags: [] };
     const options = G.gifts.filter((g) => g.tier === grade);
-    const g = rng.weighted(options, weigher(bag, 2));
+    const g = pickFresh(rng, "gift", options, T_, weigher(bag, 2));
     return { t: g.t, tier: g.tier, _tags: g.tags };
   },
 
@@ -218,9 +251,9 @@ const GEN = {
     const A = G.appearance;
     return {
       build: rng.pick(A.builds),
-      features: rng.sample(A.features, 2),
-      style: rng.pick(A.styles),
-      item: rng.pick(A.items),
+      features: sampleFresh(rng, "feature", A.features, 2),
+      style: pickFresh(rng, "style", A.styles),
+      item: pickFresh(rng, "item", A.items),
       _tags: [],
     };
   },
@@ -230,23 +263,70 @@ const GEN = {
     const options = Object.keys(T.VOICES);
     const style = temp && rng.chance(0.8) ? rng.pick(temp.voices) : rng.pick(options);
     const v = T.VOICES[style];
-    return { style, desc: v.desc, habits: rng.sample(v.habits, 2), line: rng.pick(v.lines), _tags: [] };
+    return { style, desc: v.desc, habits: sampleFresh(rng, "habit", v.habits, 2), line: pickFresh(rng, "line", v.lines), _tags: [] };
   },
 
-  hook(c, rng, bag, G) {
-    const h = rng.weighted(T.HOOKS, graded(weigher(bag, 2), "hook", G.id, (x) => x.t, gradeOf(c)));
+  // Secrets: hand-written ones at every scale, plus, for smaller characters,
+  // secrets built from parts (an act, a person, a twist) so they rarely repeat.
+  hook(c, rng, bag) {
+    const grade = gradeOf(c);
+    if (grade <= 2 && rng.chance(0.55)) {
+      const P = T.SECRET_PARTS;
+      const act = pickFresh(rng, "secretAct", P.acts, T_, (a) => GRADE_MATCH[Math.abs(a.tier - grade)]);
+      const whom = pickFresh(rng, "secretWhom", P.whom);
+      const twist = rng.pick(P.twists);
+      const t = `${act.t} ${whom}${twist}.`;
+      mark("hook", t);
+      return { t, built: true, _tags: [] };
+    }
+    const h = pickFresh(rng, "hook", T.HOOKS, T_, graded(weigher(bag, 2), "hook", T_, grade));
     return { t: h.t, _tags: [] };
+  },
+
+  // Love life. Orientation follows real-world odds (Gallup 2025) or an even
+  // spread, and never feeds the tag bag: it shapes the love life only.
+  love(c, rng, bag, G) {
+    const id = c.core.identity;
+    const mode = c.options?.orientation === "even" ? "even" : "realistic";
+    const o = rng.weighted(ORIENTATIONS, (x) => x[mode]);
+    const gender = { she: "woman", he: "man", they: "nonbinary" }[id.pronouns] || "nonbinary";
+    const other = gender === "woman" ? "man" : gender === "man" ? "woman" : null;
+    let target = null;
+    if (o.kind === "different") target = other || rng.pick(["man", "woman"]);
+    if (o.kind === "same") target = gender !== "nonbinary" ? gender : rng.pick(["man", "woman"]);
+    const variant = o.id === "pan-queer" ? rng.pick(["pansexual", "queer"]) : null;
+
+    const [lo, hi] = (G.peoples[id.people] || { age: [18, 70] }).age;
+    const f = (id.age - lo) / Math.max(1, hi - lo);
+    const stage = f < 0.15 ? "young" : f > 0.6 ? "older" : "middle";
+    const status = rng.weighted(Object.keys(STATUS_BY_STAGE[stage]), (s) =>
+      STATUS_BY_STAGE[stage][s] * (o.kind === "none" && s === "single" ? 2.5 : 1));
+
+    let partner = null;
+    let years = 0;
+    if (status !== "single") {
+      const pg = target || rng.weighted(["man", "woman", "nonbinary"], (g) => (g === "nonbinary" ? 1 : 4.5));
+      const culture = G.cultures[id.culture] || Object.values(G.cultures)[0];
+      const pname = pickFresh(rng, "first", culture.first.filter((n) => n !== id.first));
+      partner = { name: pname, gender: pg };
+      const span = Math.max(2, Math.min(60, Math.floor((id.age - lo) * 0.8)));
+      years = status === "dating" ? 0 : rng.int(1, span);
+    }
+    const pool = o.kind === "none" && status === "single" && rng.chance(0.5) ? LOVE_NOTES.asexualSingle : LOVE_NOTES[status];
+    const note = pickFresh(rng, "love-" + status, pool);
+    return { orientation: o.id, kind: o.kind, target, variant, status, partner, years, note, _tags: [] };
   },
 
   relationships(c, rng, bag, G) {
     const id = c.core.identity;
     const culture = G.cultures[id?.culture] || Object.values(G.cultures)[0];
-    const types = rng.sample(T.RELATIONSHIP_TYPES, 3, weigher(bag, 1.5));
+    const types = sampleFresh(rng, "relType", T.RELATIONSHIP_TYPES, 3, (r) => r.type, weigher(bag, 1.5));
+    const famLast = ["Sibling", "Parent", "Child"];
     return {
       list: types.map((r) => {
-        const first = rng.pick(culture.first.filter((n) => n !== id?.first));
-        const last = r.type === "Sibling" && id ? id.last : rng.pick(culture.last);
-        return { type: r.type, name: `${first} ${last}`, note: rng.pick(r.notes) };
+        const first = pickFresh(rng, "first", culture.first.filter((n) => n !== id?.first));
+        const last = famLast.includes(r.type) && id ? id.last : rng.pick(culture.last);
+        return { type: r.type, name: `${first} ${last}`, note: pickFresh(rng, "relNote", r.notes, ID, () => 1, 20) };
       }),
       _tags: [],
     };
@@ -289,9 +369,9 @@ const GEN = {
     return {
       archetype: archKey,
       strengths,
-      combatStyle: rng.pick(G.combat[archKey]),
+      combatStyle: pickFresh(rng, "combat", G.combat[archKey]),
       abilities: uniq([...occ.skills, ...G.abilities[archKey]]),
-      partyHook: rng.pick(T.PARTY_HOOKS),
+      partyHook: pickFresh(rng, "partyHook", T.PARTY_HOOKS),
       systems: { dnd5e: { class: dndClass } },
       _tags: [],
     };
@@ -300,7 +380,7 @@ const GEN = {
   writer(c, rng, bag, G) {
     const evBag = { ...bag };
     for (const t of c.core.background?._tags || []) evBag[t] = (evBag[t] || 0) + 2;
-    const lie = rng.weighted(T.LIES, odds(weigher(evBag, 2), "lie", G.id, (x) => x.lie));
+    const lie = pickFresh(rng, "lie", T.LIES, (x) => x.lie, weigher(evBag, 2));
     const m = c.core.morality || { order: 0, mercy: 0 };
     const good = m.mercy;
     const chaos = m.order < -0.2;
@@ -328,7 +408,7 @@ const GEN = {
     return {
       lie: lie.lie, need: lie.need, never: lie.never, lieTags: lie.tags,
       role: role.t, arcType,
-      turn: rng.pick(T.ARC_TURNS).t,
+      turn: pickFresh(rng, "arcTurn", T.ARC_TURNS, T_).t,
       _tags: [],
     };
   },
@@ -349,13 +429,14 @@ function uuid() {
 }
 
 // Roll a whole character. Locked sections of `prev` are kept when the genre matches.
-export function rollCharacter({ genre = "fantasy", seed = newSeed(), prev = null, locks = [] } = {}) {
+export function rollCharacter({ genre = "fantasy", seed = newSeed(), prev = null, locks = [], avoidRepeats = false, orientation = "realistic" } = {}) {
   const keep = prev && prev.genre === genre ? locks.filter((s) => getSection(prev, s)) : [];
   const c = {
     id: uuid(),
-    version: 1,
+    version: 2,
     genre,
     nature: "living",
+    options: { orientation },
     seed,
     nonces: {},
     locks: keep.slice(),
@@ -364,28 +445,40 @@ export function rollCharacter({ genre = "fantasy", seed = newSeed(), prev = null
     created: new Date().toISOString(),
   };
   for (const s of keep) setSection(c, s, structuredCloneSafe(getSection(prev, s)));
-  for (const s of SECTIONS) {
-    if (keep.includes(s)) continue;
-    runSection(c, s, sectionRng(c, s));
-  }
+  withMemory(avoidRepeats, () => {
+    for (const s of SECTIONS) {
+      if (keep.includes(s)) continue;
+      runSection(c, s, sectionRng(c, s));
+    }
+  });
   c.updated = c.created;
   return c;
 }
 
+function withMemory(on, fn) {
+  if (!on) return fn();
+  AVOID = true;
+  ROLL_N++;
+  try { return fn(); } finally { AVOID = false; }
+}
+
 // Reroll one section (and any unlocked sections that depend on it).
-export function rerollSection(prev, s) {
+export function rerollSection(prev, s, { avoidRepeats = false, orientation } = {}) {
   const c = structuredCloneSafe(prev);
+  if (orientation) c.options = { ...(c.options || {}), orientation };
   const queue = [s, ...(DEPENDENTS[s] || []).filter((d) => !c.locks.includes(d))];
-  for (const sec of queue) {
-    c.nonces[sec] = (c.nonces[sec] || 0) + 1;
-    runSection(c, sec, sectionRng(c, sec));
-  }
+  withMemory(avoidRepeats, () => {
+    for (const sec of queue) {
+      c.nonces[sec] = (c.nonces[sec] || 0) + 1;
+      runSection(c, sec, sectionRng(c, sec));
+    }
+  });
   c.updated = new Date().toISOString();
   return c;
 }
 
 // Fill in any sections a character saved by an older version is missing
-// (for example grade, gift and morality, added in v0.3).
+// (for example grade, gift and morality in v0.3, love life in v0.4).
 export function upgradeCharacter(prev) {
   const missing = SECTIONS.filter((s) => !getSection(prev, s));
   if (!missing.length) return prev;

@@ -1,9 +1,9 @@
-// Castmaker v0.1 — interface.
+// Castmaker — interface.
 
 import { rollCharacter, rerollSection, toggleLock, upgradeCharacter, STRENGTHS } from "./engine/generate.js";
 import { GENRES, GENRE_ORDER } from "./data/genres/index.js";
 import { renderProse } from "./prose/provider.js";
-import { textContext } from "./prose/templates.js";
+import { textContext, loveLabel } from "./prose/templates.js";
 import { fill, cap, stripArticle, PRONOUNS } from "./engine/text.js";
 import { oneIn } from "./engine/dice.js";
 import { MORAL_NAMES } from "./data/shared.js";
@@ -11,15 +11,17 @@ import { toDnd5e, signed, ABILITIES } from "./engine/adapters/dnd5e.js";
 import { toMarkdown, toJSON } from "./export.js";
 import { storage } from "./storage.js";
 import { computeRarity, TIERS } from "./engine/rarity.js";
-import { REAL_SOURCE } from "./data/rarity.js";
+import { ORIENTATION_SOURCE } from "./data/orientation.js";
 import { sfx, reducedMotion, playReveal, skipReveal, isRevealing, flashSection } from "./reveal.js";
+
+const SMOOTH = () => (reducedMotion() ? "auto" : "smooth");
 
 // ---------- state ----------
 
 const SETTINGS_KEY = "castmaker.settings.v1";
 const CURRENT_KEY = "castmaker.current.v1";
 
-const defaults = { genre: "fantasy", mode: "tabletop", depth: "full", system: "dnd5e", level: 1, format: "md", reveal: "animated", sound: "on" };
+const defaults = { genre: "fantasy", mode: "tabletop", depth: "full", system: "dnd5e", level: 1, format: "md", reveal: "animated", sound: "on", orient: "realistic" };
 const state = {
   settings: { ...defaults, ...readLocal(SETTINGS_KEY, {}) },
   current: null,
@@ -66,6 +68,7 @@ const GROUPS = {
   format: { el: "#format-group", options: [["md", "Markdown"], ["json", "JSON"]] },
   reveal: { el: "#reveal-group", options: [["animated", "Spin"], ["instant", "Fast"]] },
   sound: { el: "#sound-group", options: [["on", "On"], ["off", "Off"]] },
+  orient: { el: "#orient-group", options: [["realistic", "Real"], ["even", "Even"], ["off", "Hide"]] },
 };
 
 function renderGroups() {
@@ -88,8 +91,16 @@ function setSetting(key, value) {
   sfx.enabled = state.settings.sound === "on";
   if (key === "reveal") return;
   if (key === "sound") { if (value === "on") sfx.land(); return; }
+  if (key === "orient") {
+    // Switching between real-world and even odds rerolls only the love life.
+    if (value !== "off" && state.current && state.current.options?.orientation !== value) {
+      setCurrent(rerollSection(state.current, "love", { avoidRepeats: true, orientation: value }));
+    } else renderSheet();
+    return;
+  }
   if (key === "genre") {
-    setCurrent(rollCharacter({ genre: value }), true);
+    setCurrent(rollCharacter({ genre: value, avoidRepeats: true, orientation: orientMode() }), true);
+    scrollToTop();
     toast(`New ${GENRES[value].label.toLowerCase()} character`);
   } else if (key === "format") {
     fillExport();
@@ -111,23 +122,30 @@ function setCurrent(c, animate = false) {
 function roll() {
   if (isRevealing()) { skipReveal(); return; }
   const prev = state.current;
-  const c = rollCharacter({ genre: state.settings.genre, prev, locks: prev?.locks || [] });
+  const c = rollCharacter({ genre: state.settings.genre, prev, locks: prev?.locks || [], avoidRepeats: true, orientation: orientMode() });
   // Keep the same identity record when the person's identity is locked, so it stays one character.
   if (prev && prev.locks.includes("identity")) c.id = prev.id;
   state.savedSnapshot = c.id === prev?.id ? state.savedSnapshot : null;
   setCurrent(c, true);
+  scrollToTop();
+}
+
+const orientMode = () => (state.settings.orient === "even" ? "even" : "realistic");
+
+// After a full roll, jump back to the top so the reveal is in view.
+function scrollToTop() {
+  try { window.scrollTo({ top: 0, behavior: SMOOTH() }); } catch { window.scrollTo(0, 0); }
 }
 
 function reroll(section) {
   if (isRevealing()) skipReveal();
-  setCurrent(rerollSection(state.current, section), false);
+  setCurrent(rerollSection(state.current, section, { avoidRepeats: true }), false);
   if (state.settings.reveal !== "animated" || reducedMotion()) return;
-  const el = document.querySelector(`#sheet [data-section-key="${section}"]`);
-  const tiers = el ? [...el.querySelectorAll("[data-tier]")].map((n) => Number(n.dataset.tier)) : [];
-  flashSection(el, tiers.length ? Math.max(...tiers) : 0);
+  flashSection(document.querySelector(`#sheet [data-section-key="${section}"]`));
 }
 
 function lock(section) {
+  sfx.ui();
   setCurrent(toggleLock(state.current, section));
 }
 
@@ -214,7 +232,7 @@ async function deleteSaved(id) {
 const LABELS = {
   background: "Background", personality: "Personality", flaws: "Flaws & fears", motivation: "Motivation",
   appearance: "Appearance", voice: "Voice", hook: "Secret / hook", relationships: "Relationships",
-  tabletop: "Tabletop", writer: "Story", gift: "Gift", morality: "Moral compass",
+  tabletop: "Tabletop", writer: "Story", gift: "Gift", morality: "Moral compass", love: "Love life",
 };
 
 function sectionShell(key, title, body, c) {
@@ -235,21 +253,10 @@ function tools(key, title, locked) {
   </div>`;
 }
 
-// A rarity gem. Only rare-or-better gets a visible label; common pieces stay quiet.
-const gem = (piece) => piece ? `<span class="gem t${piece.tier}" data-tier="${piece.tier}" title="${esc(TIERS[piece.tier].label)}${piece.source === "real" ? " · real-world data" : ""}">${esc(TIERS[piece.tier].label)}</span>` : "";
-
-const kv = (k, v, piece) => `<div class="kv ${piece ? `has-tier t${piece.tier}` : ""}"><span class="k">${esc(k)}${gem(piece)}</span><p class="v">${v}</p></div>`;
+const kv = (k, v) => `<div class="kv"><span class="k">${esc(k)}</span><p class="v">${v}</p></div>`;
 
 function rarityZone(r, c) {
-  const fmt = (n) => n.toLocaleString("en-US");
   const locked = c.locks.includes("grade");
-  const rows = r.pieces.map((p) => `<tr>
-      <th scope="row">${esc(p.label)}</th>
-      <td>${p.none ? "None" : `<span class="gem t${p.tier}">${esc(TIERS[p.tier].label)}</span>`}</td>
-      <td>${p.source === "real"
-        ? `${fmt(p.count)} U.S. jobs (${esc(p.basis)}), <a href="${esc(p.url)}" target="_blank" rel="noopener">${esc(REAL_SOURCE.short)}</a>`
-        : p.kind === "gift" ? (p.none ? "Background characters have no gift" : "Matches the grade") : "Designed rarity, steered toward the grade"}</td>
-    </tr>`).join("");
   return `<div class="rarity-zone ${locked ? "is-locked" : ""}" data-reveal>
     <div class="dice" aria-label="Ability rolls: ${r.rolls.join(", ")}, total ${r.total}">
       ${r.rolls.map((v) => `<span class="die ${v >= 17 ? "hot" : v <= 7 ? "cold" : ""}" data-v="${v}">${v}</span>`).join("")}
@@ -258,20 +265,12 @@ function rarityZone(r, c) {
     <div class="rarity-row">
       <span class="rarity-badge t${r.tier}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.6 1.9 7.1L12 17l-6.3 4 1.9-7.1L2 9.3l7.4-.4z"/></svg>${esc(r.tierInfo.label)}</span>
       <span class="rarity-story">${esc(r.tierInfo.story)}</span>
-      <span class="rarity-meta">${esc(oneIn(r.gradeOdds))} rolls${r.theme ? ` · Resonant: <b>${esc(r.theme)}</b>` : ""}</span>
+      <span class="rarity-meta">${esc(oneIn(r.gradeOdds))} rolls</span>
       <button type="button" class="icon-btn grade-lock" data-action="lock" data-section="grade" aria-pressed="${locked}" aria-label="${locked ? "Unlock" : "Lock"} grade">${locked ? ICON.lock : ICON.unlock}<span class="lbl">${locked ? "Grade locked" : "Lock grade"}</span></button>
     </div>
     <details class="odds">
       <summary>How the grade works</summary>
-      <p class="odds-note">The grade comes from real dice: six ability scores rolled 4d6, dropping the lowest die. The total sets the grade (Common up to 73, Uncommon 74+, Rare 79+, Epic 84+, Legendary 88+), so the chance of each grade is the exact chance of rolling that well. This total of ${r.total} or better comes up ${esc(oneIn(r.atLeast))} rolls. Lock the grade to keep a hero and reroll everything else.</p>
-      <div class="odds-scroll"><table>
-        <thead><tr><th scope="col">Piece</th><th scope="col">Tier</th><th scope="col">Basis</th></tr></thead>
-        <tbody>
-          <tr><th scope="row">Grade</th><td><span class="gem t${r.tier}">${esc(r.tierInfo.label)}</span></td><td>${(100 * r.gradeOdds).toFixed(1)}% of all rolls (${esc(oneIn(r.gradeOdds))})</td></tr>
-          ${rows}
-          <tr><th scope="row">Resonance</th><td>${r.theme ? "Yes" : "—"}</td><td>${r.theme ? `Event, want and lie share the theme “${esc(r.theme)}”` : "Event, want and lie don't share a theme"}</td></tr>
-        </tbody>
-      </table></div>
+      <p class="odds-note">A character has one rarity: its grade. It comes from real dice: six ability scores rolled 4d6, dropping the lowest die. The total sets the grade (Common up to 73, Uncommon 74+, Rare 79+, Epic 84+, Legendary 88+), so each grade's chance is the exact chance of rolling that well. This total of ${r.total} or better comes up ${esc(oneIn(r.atLeast))} rolls. The grade decides how much story the character carries: gifts, the size of their secrets and wants, and how deep their arc goes. Lock the grade to keep a hero and reroll everything else.</p>
     </details>
   </div>`;
 }
@@ -317,7 +316,7 @@ function renderSheet(animate = false) {
   const first = esc(id.first);
   const quick = mode === "tabletop" && depth === "quick";
   const r = computeRarity(c);
-  const P = Object.fromEntries(r.pieces.map((pc) => [pc.kind, pc]));
+  const showLove = state.settings.orient !== "off" && c.core.love;
 
   const B = {};
 
@@ -335,7 +334,8 @@ function renderSheet(animate = false) {
       <span class="chip">${esc(cap(id.peopleLabel))}</span>
       <span class="chip">Age ${id.age}</span>
       <span class="chip">${esc(PRONOUNS[id.pronouns].label)}</span>
-      <span class="chip chip-tier t${P.occupation.tier}" data-tier="${P.occupation.tier}">${esc(cap(stripArticle(id.occupation.t)))}${P.occupation.tier >= 1 ? ` · ${esc(TIERS[P.occupation.tier].label)}` : ""}</span>
+      ${showLove ? `<span class="chip">${esc(cap(loveLabel(c)))}</span>` : ""}
+      <span class="chip">${esc(cap(stripArticle(id.occupation.t)))}</span>
       <span class="chip">From ${f(id.originShort)}</span>
     </div>
     ${rarityZone(r, c)}
@@ -347,7 +347,7 @@ function renderSheet(animate = false) {
     <p>${esc(p.backstory)}</p>
     <div class="grid-2">
       ${kv("Grew up", f(bg.upbringing))}
-      ${kv("Defining event", esc(cap(fill(bg.event.t, x))), P.event)}
+      ${kv("Defining event", esc(cap(fill(bg.event.t, x))))}
       ${kv("Turning point", esc(cap(fill(bg.turningPoint, x))))}
     </div>`, c);
 
@@ -365,7 +365,7 @@ function renderSheet(animate = false) {
 
   const mo = c.core.motivation;
   B.motivation = sectionShell("motivation", LABELS.motivation, `
-    ${kv("Wants", `${f(cap(mo.want))}`, P.want)}
+    ${kv("Wants", `${f(cap(mo.want))}`)}
     ${kv("Why", f(cap(mo.why)) + ".")}`, c);
 
   const ap = c.core.appearance;
@@ -378,9 +378,17 @@ function renderSheet(animate = false) {
     <blockquote class="line">“${esc(p.voiceLine)}”</blockquote>
     <p>Speaks ${f(vo.desc)}. ${quick ? "" : vo.habits.map((h) => `${first} ${f(h)}.`).join(" ")}</p>`, c);
 
-  B.hook = sectionShell("hook", LABELS.hook, kv("Secret", esc(p.hook), P.hook), c);
+  B.hook = sectionShell("hook", LABELS.hook, `<p>${esc(p.hook)}</p>`, c);
 
-  B.gift = c.core.gift?.none ? "" : sectionShell("gift", LABELS.gift, kv("Gift", esc(p.gift), P.gift), c);
+  B.gift = c.core.gift?.none ? "" : sectionShell("gift", LABELS.gift, `<p>${esc(p.gift)}</p>`, c);
+  B.love = !showLove ? "" : sectionShell("love", LABELS.love, `<div class="grid-2">
+      ${kv("Orientation", esc(cap(loveLabel(c))))}
+      ${kv("Status", esc(cap(c.core.love.status)))}
+    </div>
+    <p>${esc(p.love)}</p>
+    <p class="note">${c.options?.orientation === "even"
+      ? "Orientation drawn with even odds."
+      : `Orientation drawn with real-world odds from <a href="${ORIENTATION_SOURCE.url}" target="_blank" rel="noopener">${ORIENTATION_SOURCE.short}</a>. It never affects the grade.`}</p>`, c);
   B.morality = sectionShell("morality", LABELS.morality, compassBody(c, p, x, system, level), c);
 
   const rels = quick ? c.core.relationships.list.slice(0, 2) : c.core.relationships.list;
@@ -389,15 +397,16 @@ function renderSheet(animate = false) {
   </ul>`, c);
 
   B.tabletop = sectionShell("tabletop", system === "dnd5e" ? "Tabletop · D&D 5e" : "Tabletop · Any system", tabletopBody(c, p, x, { quick, system, level }), c);
-  B.writer = sectionShell("writer", LABELS.writer, writerBody(c, p, x, P.lie), c);
+  B.writer = sectionShell("writer", LABELS.writer, writerBody(c, p, x), c);
 
   const order = mode === "writer"
-    ? ["identity", "gift", "writer", "morality", "background", "motivation", "personality", "flaws", "voice", "appearance", "relationships", "hook"]
+    ? ["identity", "gift", "writer", "morality", "background", "motivation", "love", "personality", "flaws", "voice", "appearance", "relationships", "hook"]
     : quick
       ? ["identity", "gift", "tabletop", "personality", "morality", "motivation", "hook", "voice"]
-      : ["identity", "gift", "tabletop", "morality", "background", "personality", "flaws", "motivation", "voice", "appearance", "hook", "relationships"];
+      : ["identity", "gift", "tabletop", "morality", "background", "personality", "flaws", "motivation", "love", "voice", "appearance", "hook", "relationships"];
 
   const sheet = $("#sheet");
+  sheet.classList.remove("glow-3", "glow-4");
   sheet.innerHTML = order.map((k) => B[k]).join("");
   if (animate) {
     if (state.settings.reveal === "animated" && !reducedMotion()) {
@@ -449,7 +458,7 @@ function tabletopBody(c, p, x, { quick, system, level }) {
   return out;
 }
 
-function writerBody(c, p, x, piece) {
+function writerBody(c, p, x) {
   const wr = c.layers.writer;
   const f = (s) => esc(fill(s, x));
   const grade = c.core.grade?.tier ?? 2;
@@ -467,7 +476,7 @@ function writerBody(c, p, x, piece) {
         ${kv("Story role", esc(cap(wr.role)))}
         ${kv("Wants", f(cap(c.core.motivation.want)))}
       </div>
-      ${kv("The lie they believe", `<span class="lie">“${esc(wr.lie)}”</span>`, piece)}
+      ${kv("The lie they believe", `<span class="lie">“${esc(wr.lie)}”</span>`)}
       ${kv("The wound", esc(p.wound) + ".")}
       <p class="note">Named NPCs carry a lie and a wound, but not a full arc.</p>`;
   }
@@ -478,7 +487,7 @@ function writerBody(c, p, x, piece) {
       ${kv("Wants", f(cap(c.core.motivation.want)))}
       ${kv("Needs", f(cap(wr.need)))}
     </div>
-    ${kv("The lie they believe", `<span class="lie">“${esc(wr.lie)}”</span>`, piece)}
+    ${kv("The lie they believe", `<span class="lie">“${esc(wr.lie)}”</span>`)}
     ${kv("The wound", esc(p.wound) + ".")}
     ${kv("Would never say", `“${esc(wr.never)}”`)}
     <ol class="arc">
@@ -492,7 +501,7 @@ function writerBody(c, p, x, piece) {
 
 function exportText() {
   const { mode, system, level, format } = state.settings;
-  return format === "json" ? toJSON(state.current) : toMarkdown(state.current, { mode, system, level });
+  return format === "json" ? toJSON(state.current) : toMarkdown(state.current, { mode, system, level, showLove: state.settings.orient !== "off" });
 }
 
 function fillExport() {

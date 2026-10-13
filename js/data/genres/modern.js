@@ -2,10 +2,10 @@
 
 const anyCulture = ["american", "latino", "westafrican", "southasian", "eastasian", "easteuro", "arabic", "quebecois"];
 
-export default {
+const G = {
   id: "modern",
   label: "Modern",
-  vocab: { coin: "cash", drink: "coffee", package: "sealed envelope", messages: "texts", city: "the city" },
+  vocab: { coin: "cash", drink: "coffee", package: "sealed envelope", messages: "texts", city: "the city", authority: "the police", ruler: "the mayor" },
 
   cultures: {
     american: { people: "human", first: ["Danny", "Kayla", "Marcus", "Jenna", "Travis", "Brooke", "Cody", "Megan", "Darnell", "Tasha"], last: ["Miller", "Hayes", "Brooks", "Carter", "Sullivan", "Parker", "Reed", "Walsh"] },
@@ -122,3 +122,142 @@ export default {
     wild: ["drives anything", "survives outdoors"],
   },
 };
+
+// ---------- Expanded content (v0.4) ----------
+const more = (list, ...items) => list.push(...items);
+
+more(G.cultures.american.first, "Austin", "Brianna", "Chase", "Destiny", "Garrett", "Holly", "Jamal", "Lacey", "Shane", "Whitney", "Ronnie", "Dolores");
+more(G.cultures.american.last, "Bennett", "Coleman", "Dawson", "Fletcher", "Grant", "Jennings", "Lawson", "Pruitt", "Tucker", "Wheeler");
+more(G.cultures.latino.first, "Alejandro", "Beatriz", "Emilio", "Guadalupe", "Ignacio", "Marisol", "Rodrigo", "Soledad", "Tomás", "Yesenia");
+more(G.cultures.latino.last, "Aguilar", "Cervantes", "Espinoza", "Guerrero", "Morales", "Salazar", "Vargas", "Zamora");
+more(G.cultures.westafrican.first, "Ama", "Babajide", "Chiamaka", "Emeka", "Ifeoma", "Kojo", "Nana", "Obinna", "Yaw", "Zainab");
+more(G.cultures.westafrican.last, "Adebayo", "Asante", "Danso", "Nwosu", "Ogunleye", "Okeke", "Quaye");
+more(G.cultures.southasian.first, "Aditya", "Divya", "Farhan", "Lakshmi", "Neel", "Pooja", "Ravi", "Shreya", "Vikram", "Zara");
+more(G.cultures.southasian.last, "Bose", "Chatterjee", "Desai", "Gupta", "Joshi", "Nair", "Qureshi", "Rao");
+more(G.cultures.eastasian.first, "Bao", "Haruki", "Jia", "Ji-ho", "Ken", "Linh", "Ming", "Sora", "Tae-yang", "Xiu");
+more(G.cultures.eastasian.last, "Choi", "Hoang", "Ito", "Lee", "Ma", "Pham", "Suzuki", "Wong");
+more(G.cultures.easteuro.first, "Bogdan", "Dorota", "Goran", "Jana", "Marek", "Natasha", "Radek", "Vesna", "Yuri", "Agnieszka");
+more(G.cultures.easteuro.last, "Babić", "Ivanova", "Kovač", "Lewandowski", "Morozov", "Popescu", "Szabo");
+more(G.cultures.arabic.first, "Amira", "Bilal", "Dina", "Faris", "Hana", "Jamil", "Leena", "Nabil", "Salma", "Youssef");
+more(G.cultures.arabic.last, "Abboud", "Darwish", "Farah", "Habib", "Issa", "Nasr", "Sabbagh");
+more(G.cultures.quebecois.first, "Benoît", "Chloé", "Étienne", "Geneviève", "Hugo", "Isabelle", "Louis", "Rosalie", "Simon", "Valérie");
+more(G.cultures.quebecois.last, "Bélanger", "Bergeron", "Gauthier", "Lefebvre", "Morin", "Pelletier", "Thibault");
+
+more(G.origins,
+  { t: "a desert town built around a prison", short: "the prison town", cultures: anyCulture, tags: ["order", "crime", "isolation"] },
+  { t: "a ski resort town that empties every spring", short: "the resort town", cultures: anyCulture, tags: ["wealth", "isolation"] },
+  { t: "a river delta parish", short: "the delta", cultures: anyCulture, tags: ["family", "faith", "wild"] },
+  { t: "a gated community with a dark history", short: "the gated community", cultures: anyCulture, tags: ["wealth", "secrecy"] },
+);
+
+more(G.upbringings,
+  { t: "in a trailer park where everyone looked out for everyone", tags: ["poverty", "family"] },
+  { t: "touring with a parent's band", tags: ["art", "travel"] },
+  { t: "as a child actor, which ended badly", tags: ["art", "wealth", "loss"] },
+  { t: "on a family farm that was always one bad year from failing", tags: ["family", "craft", "poverty"] },
+  { t: "in a boarding school, mostly alone", tags: ["wealth", "isolation", "learning"] },
+  { t: "translating for immigrant parents from age six", tags: ["family", "duty", "learning"] },
+  { t: "in a cop family with a code of silence", tags: ["order", "secrecy", "family"] },
+  { t: "in a strict religious community {they} later left", tags: ["faith", "order", "betrayal"] },
+  { t: "with grandparents after the custody fight", tags: ["family", "loss"] },
+  { t: "in the back room of a pawn shop", tags: ["crime", "poverty", "craft"] },
+  { t: "as the oldest of five, raising the others", tags: ["family", "duty", "poverty"] },
+  { t: "in a house full of books and very little money", tags: ["learning", "poverty"] },
+);
+
+more(G.occupations,
+  { t: "an electrician", tags: ["craft", "tech"], arch: ["sage", "warrior"], skills: ["wiring", "fixing what others break"] },
+  { t: "a firefighter", tags: ["duty", "violence", "healing"], arch: ["warrior", "healer"], skills: ["search and rescue", "staying calm in smoke"] },
+  { t: "a pharmacist", tags: ["healing", "learning"], arch: ["healer", "sage"], skills: ["drug interactions", "noticing who's overdoing it"] },
+  { t: "a plumber", tags: ["craft", "poverty"], arch: ["warrior", "sage"], skills: ["pipework", "getting into tight spaces"] },
+  { t: "a real estate agent", tags: ["wealth", "ambition"], arch: ["face"], skills: ["closing deals", "knowing every house's secrets"] },
+  { t: "a night-shift security guard", tags: ["duty", "isolation"], arch: ["warrior"], skills: ["patrol routes", "staying awake"] },
+  { t: "a farmer", tags: ["wild", "family", "craft"], arch: ["wild", "warrior"], skills: ["animal care", "fixing machinery"] },
+  { t: "a librarian", tags: ["learning", "order"], arch: ["sage"], skills: ["research", "finding anything"] },
+  { t: "a veterinarian", tags: ["healing", "wild"], arch: ["healer"], skills: ["surgery", "calming frightened animals"] },
+  { t: "a commercial pilot", tags: ["travel", "duty"], arch: ["wild", "sage"], skills: ["flying", "decisions under pressure"] },
+  { t: "an accountant", tags: ["order", "wealth"], arch: ["sage"], skills: ["following money", "tax law"] },
+  { t: "a flight attendant", tags: ["travel", "art"], arch: ["face", "healer"], skills: ["de-escalation", "first aid at altitude"] },
+  { t: "a funeral director", tags: ["loss", "faith"], arch: ["sage", "healer"], skills: ["comforting the grieving", "embalming"] },
+  { t: "a chef", tags: ["craft", "art", "ambition"], arch: ["face", "warrior"], skills: ["running a kitchen", "knife work"] },
+  { t: "a carpenter", tags: ["craft"], arch: ["warrior"], skills: ["building anything", "reading a structure"] },
+  { t: "a street magician", tags: ["art", "crime"], arch: ["face", "skulker"], skills: ["sleight of hand", "reading a crowd"], w: 0.08 },
+  { t: "a professional poker player", tags: ["chaos", "wealth", "crime"], arch: ["face", "sage"], skills: ["odds in {their} head", "reading tells"], w: 0.06 },
+  { t: "a stunt performer", tags: ["violence", "art"], arch: ["warrior", "skulker"], skills: ["falls and fights", "stunt driving"], w: 0.05 },
+);
+
+more(G.events,
+  { t: "{they} {was} laid off three weeks before Christmas", short: "the layoff", tier: 0, tags: ["poverty", "betrayal"], wound: "being disposable" },
+  { t: "{their} best friend moved across the country without saying goodbye", short: "the move", tier: 0, tags: ["loss", "betrayal"], wound: "being left without a word" },
+  { t: "{they} failed the exam {they} studied two years for", short: "the exam", tier: 0, tags: ["learning", "ambition"], wound: "working hard and still failing" },
+  { t: "a long engagement ended a month before the wedding", short: "the broken engagement", tier: 0, tags: ["family", "loss"], wound: "planning a life that didn't happen" },
+  { t: "{their} parents lost the house to foreclosure", short: "the foreclosure", tier: 0, tags: ["poverty", "family"], wound: "watching {their} parents lose everything" },
+  { t: "{they} got sober after a decade of drinking", short: "getting sober", tier: 1, tags: ["healing", "loss"], wound: "the years {they} can't get back" },
+  { t: "{they} spent eighteen months in prison for something {they} did do", short: "the prison stretch", tier: 1, tags: ["crime", "order"], wound: "being defined by {their} worst year" },
+  { t: "{they} {was} the whistleblower at {their} last job", short: "the whistleblowing", tier: 1, tags: ["betrayal", "order", "secrecy"], wound: "doing the right thing and losing everything" },
+  { t: "{they} survived a mass shooting", short: "the shooting", tier: 2, tags: ["violence", "loss"], wound: "the sound that still makes {them} flinch" },
+  { t: "{they} {was} kidnapped as a child and returned with no memory of the missing week", short: "the missing week", tier: 2, tags: ["secrecy", "loss", "family"], wound: "a gap in {their} life that nobody can explain" },
+  { t: "{they} won the lottery and lost it all within two years", short: "the lottery win", tier: 2, tags: ["wealth", "chaos", "loss"], wound: "having everything and losing it" },
+  { t: "{they} {was} the only survivor of a plane crash", short: "the crash", tier: 3, tags: ["loss", "isolation", "faith"], wound: "being chosen to live without knowing why" },
+  { t: "{they} discovered {their} father was a serial killer", short: "the discovery", tier: 3, tags: ["family", "secrecy", "violence"], wound: "loving a monster" },
+  { t: "{they} died on an operating table for four minutes and came back changed", short: "the four minutes", tier: 3, tags: ["healing", "faith"], wound: "remembering something from those four minutes" },
+  { t: "a meteor struck {their} hometown and {they} {was} standing at the edge of the crater", short: "the impact", tier: 4, tags: ["loss", "tech", "chaos"], wound: "being the only one who walked out of the light" },
+  { t: "{they} {was} part of a government experiment {they} {was} told was a summer camp", short: "the summer program", tier: 4, tags: ["secrecy", "order", "tech"], wound: "being made into something without consent" },
+  { t: "{they} woke up in a hospital with a stranger's name on {their} wristband and powers {they} couldn't explain", short: "the wrong name", tier: 4, tags: ["secrecy", "chaos"], wound: "not knowing who {they} really {is}" },
+);
+
+more(G.gifts,
+  { t: "can parallel park anything, first try", tier: 1, tags: ["travel"] },
+  { t: "makes anyone feel at ease within a minute", tier: 1, tags: ["art", "healing"] },
+  { t: "has a perfect sense of direction", tier: 1, tags: ["travel"] },
+  { t: "cooks like a professional", tier: 1, tags: ["craft", "family"] },
+  { t: "can do complex math in {their} head faster than a calculator", tier: 2, tags: ["learning", "tech"] },
+  { t: "has never lost a fight", tier: 2, tags: ["violence"] },
+  { t: "can mimic any voice after hearing it once", tier: 2, tags: ["art", "crime"] },
+  { t: "always knows when someone is about to die", tier: 2, tags: ["loss", "faith"] },
+  { t: "is a chess grandmaster who plays in parks for {coin}", tier: 3, tags: ["learning", "poverty"] },
+  { t: "remembers every face {they} {has} ever seen", tier: 3, tags: ["secrecy", "learning"] },
+  { t: "survived three things that should have killed {them}", tier: 3, tags: ["violence", "faith"] },
+  { t: "can hack any system given ten minutes and a cable", tier: 3, tags: ["tech", "crime"] },
+  { t: "can move objects with {their} mind, and is still learning how far", tier: 4, tags: ["chaos", "secrecy"] },
+  { t: "can see a few seconds into the future in moments of danger", tier: 4, tags: ["violence", "faith"] },
+  { t: "can make {themself} unseen by cameras and crowds", tier: 4, tags: ["secrecy", "tech"] },
+  { t: "absorbs electricity and can throw it back", tier: 4, tags: ["tech", "violence"] },
+);
+
+more(G.appearance.features,
+  "a neck tattoo {they} got at eighteen", "a nose ring", "a prosthetic left hand", "deep acne scars", "a shaved head",
+  "a wedding ring tan line", "a hearing aid", "gold-rimmed glasses", "a crooked, charming smile", "chipped nail polish",
+  "a sunburned neck", "dreadlocks tied back", "grey roots showing through dyed hair", "a gap in {their} eyebrow from a scar",
+);
+more(G.appearance.styles,
+  "a hospital ID badge on a lanyard, even off shift", "a leather jacket older than {they} {is}", "a sharp blazer over a band shirt",
+  "fishing gear and a faded cap", "a church dress, always", "black on black on black", "a high-visibility vest", "a tracksuit and gold chain",
+);
+more(G.appearance.items,
+  "a phone case covered in stickers", "a pack of gum {they} never share", "a flask engraved with someone else's initials",
+  "a set of keys to a car {they} sold", "a burner phone", "a laminated prayer card", "a pocketknife from {their} grandfather",
+  "a stack of unpaid parking tickets", "a backpack that's always half-packed", "a cassette tape with no label",
+  "earbuds in, always, playing nothing", "a dog-eared address book", "a coffee-stained notebook", "a photo of a dog that died years ago",
+  "a bus pass for a city {they} left", "a bottle of pills {they} won't explain",
+);
+for (const [k, list] of Object.entries({
+  warrior: ["a tire iron and nothing to lose", "wrestling, the dirty kind"],
+  skulker: ["vanishes into crowds", "a knife {they} {has} never used, yet"],
+  caster: ["shuts down a building's power grid", "turns phones into tracking beacons"],
+  face: ["talks the gun down", "calls in a favor at the worst moment"],
+  healer: ["drags the wounded out of the line of fire", "a fire extinguisher, used creatively"],
+  sage: ["plans every exit before the fight", "knows where the cameras can't see"],
+  wild: ["drives a truck through the wall", "a crossbow from hunting season"],
+})) G.combat[k].push(...list);
+for (const [k, list] of Object.entries({
+  warrior: ["takes a punch", "carries injured people for miles"],
+  skulker: ["shoplifts anything", "blends into any crowd"],
+  caster: ["clones key cards", "recovers deleted files"],
+  face: ["gets into any party", "lies to police convincingly"],
+  healer: ["stitches wounds", "talks people down from panic"],
+  sage: ["finds anyone's address", "reads contracts for traps"],
+  wild: ["tracks in the woods", "fixes a car with junk"],
+})) G.abilities[k].push(...list);
+
+export default G;
