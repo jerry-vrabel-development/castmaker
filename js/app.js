@@ -3,15 +3,14 @@
 import { rollCharacter, rerollSection, toggleLock, upgradeCharacter, STRENGTHS } from "./engine/generate.js";
 import { GENRES, GENRE_ORDER } from "./data/genres/index.js";
 import { renderProse } from "./prose/provider.js";
-import { textContext, loveLabel } from "./prose/templates.js";
+import { textContext, loveLabel, giftList } from "./prose/templates.js";
 import { fill, cap, stripArticle, PRONOUNS } from "./engine/text.js";
 import { oneIn } from "./engine/dice.js";
-import { MORAL_NAMES } from "./data/shared.js";
+import { BIG5, FOUNDATIONS, VALUES } from "./data/psyche.js";
 import { toDnd5e, signed, ABILITIES } from "./engine/adapters/dnd5e.js";
 import { toMarkdown, toJSON } from "./export.js";
 import { storage } from "./storage.js";
 import { computeRarity, TIERS } from "./engine/rarity.js";
-import { ORIENTATION_SOURCE } from "./data/orientation.js";
 import { sfx, reducedMotion, playReveal, skipReveal, isRevealing, flashSection } from "./reveal.js";
 
 const SMOOTH = () => (reducedMotion() ? "auto" : "smooth");
@@ -21,7 +20,7 @@ const SMOOTH = () => (reducedMotion() ? "auto" : "smooth");
 const SETTINGS_KEY = "castmaker.settings.v1";
 const CURRENT_KEY = "castmaker.current.v1";
 
-const defaults = { genre: "fantasy", mode: "tabletop", depth: "full", system: "dnd5e", level: 1, format: "md", reveal: "animated", sound: "on", orient: "realistic" };
+const defaults = { genre: "fantasy", mode: "tabletop", depth: "full", system: "dnd5e", level: 1, format: "md", reveal: "animated", sound: "on", orient: "realistic", ethics: "both" };
 const state = {
   settings: { ...defaults, ...readLocal(SETTINGS_KEY, {}) },
   current: null,
@@ -69,6 +68,7 @@ const GROUPS = {
   reveal: { el: "#reveal-group", options: [["animated", "Spin"], ["instant", "Fast"]] },
   sound: { el: "#sound-group", options: [["on", "On"], ["off", "Off"]] },
   orient: { el: "#orient-group", options: [["realistic", "Real"], ["even", "Even"], ["off", "Hide"]] },
+  ethics: { el: "#ethics-group", options: [["foundations", "Foundations"], ["values", "Values"], ["both", "Both"]] },
 };
 
 function renderGroups() {
@@ -90,6 +90,7 @@ function setSetting(key, value) {
   renderGroups();
   sfx.enabled = state.settings.sound === "on";
   if (key === "reveal") return;
+  if (key === "ethics") { renderSheet(); return; }
   if (key === "sound") { if (value === "on") sfx.land(); return; }
   if (key === "orient") {
     // Switching between real-world and even odds rerolls only the love life.
@@ -232,7 +233,7 @@ async function deleteSaved(id) {
 const LABELS = {
   background: "Background", personality: "Personality", flaws: "Flaws & fears", motivation: "Motivation",
   appearance: "Appearance", voice: "Voice", hook: "Secret / hook", relationships: "Relationships",
-  tabletop: "Tabletop", writer: "Story", gift: "Gift", morality: "Moral compass", love: "Love life",
+  tabletop: "Tabletop", writer: "Story", gift: "Gift", morality: "Morality", love: "Love life",
 };
 
 function sectionShell(key, title, body, c) {
@@ -264,45 +265,83 @@ function rarityZone(r, c) {
     </div>
     <div class="rarity-row">
       <span class="rarity-badge t${r.tier}"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.6 6.9L22 9.3l-5.6 4.6 1.9 7.1L12 17l-6.3 4 1.9-7.1L2 9.3l7.4-.4z"/></svg>${esc(r.tierInfo.label)}</span>
-      <span class="rarity-story">${esc(r.tierInfo.story)}</span>
       <span class="rarity-meta">${esc(oneIn(r.gradeOdds))} rolls</span>
       <button type="button" class="icon-btn grade-lock" data-action="lock" data-section="grade" aria-pressed="${locked}" aria-label="${locked ? "Unlock" : "Lock"} grade">${locked ? ICON.lock : ICON.unlock}<span class="lbl">${locked ? "Grade locked" : "Lock grade"}</span></button>
     </div>
-    <details class="odds">
-      <summary>How the grade works</summary>
-      <p class="odds-note">A character has one rarity: its grade. It comes from real dice: six ability scores rolled 4d6, dropping the lowest die. The total sets the grade (Common up to 73, Uncommon 74+, Rare 79+, Epic 84+, Legendary 88+), so each grade's chance is the exact chance of rolling that well. This total of ${r.total} or better comes up ${esc(oneIn(r.atLeast))} rolls. The grade decides how much story the character carries: gifts, the size of their secrets and wants, and how deep their arc goes. Lock the grade to keep a hero and reroll everything else.</p>
-    </details>
   </div>`;
 }
 
-// Moral compass: order runs left (Order) to right (Freedom), mercy top (Mercy) to bottom (Ruthless).
-function compassBody(c, p, x, system, level) {
+// ---------- personality, flaws and morality ----------
+
+const fmt1 = (n) => Number(n).toFixed(1);
+const pct = (v) => (((v - 1) / 4) * 100).toFixed(1);
+
+// Big Five: each dimension as a scale between its two poles.
+function big5Body(big5) {
+  return `<div class="b5">${BIG5.map((d) => `
+    <div class="b5-row">
+      <span class="b5-low">${esc(d.low)}</span>
+      <span class="b5-track" role="img" aria-label="${esc(d.label)} ${fmt1(big5[d.id])} of 5"><span class="b5-dot" style="left:${pct(big5[d.id])}%"></span></span>
+      <span class="b5-high">${esc(d.high)}</span>
+      <span class="b5-name">${esc(d.label)}</span>
+    </div>`).join("")}</div>`;
+}
+
+function foundationsBlock(c, p) {
+  const sum = p.moral.foundations;
+  const f = c.core.morality.foundations;
+  return `<div class="moral-block">
+    <h3 class="moral-title">Moral Foundations</h3>
+    <p class="moral-sum">${esc(sum.text)}</p>
+    <div class="bars">${FOUNDATIONS.map((d) => `
+      <div class="bar-row ${d.id === sum.top.id ? "is-top" : d.id === sum.bottom.id ? "is-low" : ""}">
+        <span class="bar-label" title="${esc(d.desc)}">${esc(d.label)}</span>
+        <span class="bar"><span class="bar-fill" style="width:${pct(f[d.id])}%"></span></span>
+        <span class="bar-val">${fmt1(f[d.id])}</span>
+      </div>`).join("")}</div>
+  </div>`;
+}
+
+// Schwartz values as a ten-spoke wheel; neighbors are compatible, opposites conflict.
+function valuesBlock(c, p) {
+  const sum = p.moral.values;
+  const v = c.core.morality.values;
+  const n = VALUES.length;
+  const R = 78;
+  const top = new Set(sum.top.map((t) => t.id));
+  const pt = (i, r) => {
+    const a = (Math.PI * 2 * i) / n - Math.PI / 2;
+    return [Math.cos(a) * r, Math.sin(a) * r];
+  };
+  const rings = [0.25, 0.5, 0.75, 1].map((k) => `<polygon class="w-ring" points="${VALUES.map((_, i) => pt(i, R * k).map((q) => q.toFixed(1)).join(",")).join(" ")}"/>`).join("");
+  const spokes = VALUES.map((_, i) => { const [x, y] = pt(i, R); return `<line class="w-spoke" x1="0" y1="0" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}"/>`; }).join("");
+  const shape = VALUES.map((d, i) => pt(i, R * (0.15 + 0.85 * ((v[d.id] - 1) / 4))).map((q) => q.toFixed(1)).join(",")).join(" ");
+  const dots = VALUES.map((d, i) => { const [x, y] = pt(i, R * (0.15 + 0.85 * ((v[d.id] - 1) / 4))); return `<circle class="w-dot ${top.has(d.id) ? "is-top" : ""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${top.has(d.id) ? 4 : 2.5}"/>`; }).join("");
+  const labels = VALUES.map((d, i) => {
+    const [x, y] = pt(i, R + 12);
+    const anchor = Math.abs(x) < 6 ? "middle" : x > 0 ? "start" : "end";
+    return `<text class="w-label ${top.has(d.id) ? "is-top" : ""}" x="${x.toFixed(1)}" y="${(y + 4).toFixed(1)}" text-anchor="${anchor}">${esc(d.label)}</text>`;
+  }).join("");
+  return `<div class="moral-block">
+    <h3 class="moral-title">Values</h3>
+    <p class="moral-sum">${esc(sum.text)}</p>
+    <div class="wheel-wrap"><svg class="wheel" viewBox="-170 -108 340 216" role="img" aria-label="Values: ${esc(sum.top.map((t) => t.label).join(", "))} highest">
+      ${rings}${spokes}<polygon class="w-shape" points="${shape}"/>${dots}${labels}
+    </svg></div>
+  </div>`;
+}
+
+function moralityBody(c, p, x, system, level) {
   const m = c.core.morality;
   const f = (s) => esc(fill(s, x));
-  // Kept inside the frame so a character at an extreme still shows fully.
-  const left = 8 + ((1 - m.order) / 2) * 84;
-  const top = 8 + ((1 - m.mercy) / 2) * 84;
-  const band = (v) => (v >= 0.33 ? 0 : v <= -0.33 ? 2 : 1);
-  const cells = MORAL_NAMES.flatMap((row, ri) => row.map((name, ci) =>
-    `<span class="cell ${ri === band(m.mercy) && ci === band(m.order) ? "on" : ""}">${esc(name)}</span>`)).join("");
-  return `<div class="compass-wrap">
-    <div class="compass-frame">
-      <span class="axis ax-top">Mercy</span>
-      <span class="axis ax-bottom">Ruthlessness</span>
-      <span class="axis ax-left">Order</span>
-      <span class="axis ax-right">Freedom</span>
-      <div class="compass" role="img" aria-label="Moral compass: ${esc(p.moral.label)}. Order ${m.order}, mercy ${m.mercy}.">
-        ${cells}
-        <span class="compass-dot" style="left:${left.toFixed(1)}%;top:${top.toFixed(1)}%"></span>
-      </div>
-    </div>
-    <div class="compass-text">
-      <p class="moral-name">${esc(p.moral.label)}</p>
+  const view = state.settings.ethics;
+  const blocks = [view !== "values" ? foundationsBlock(c, p) : "", view !== "foundations" ? valuesBlock(c, p) : ""].filter(Boolean);
+  return `<div class="moral-grid ${blocks.length > 1 ? "two" : ""}">${blocks.join("")}</div>
+    <div class="grid-2">
       ${kv("The line", f(cap(m.line)) + ".")}
       ${kv("Would cross it", f(cap(m.breakingPoint)) + ".")}
-      ${system === "dnd5e" ? kv("D&D 5e alignment", esc(toDnd5e(c, level).alignment)) : ""}
-    </div>
-  </div>`;
+      ${system === "dnd5e" && state.settings.mode === "tabletop" ? kv("D&D 5e alignment", esc(toDnd5e(c, level).alignment)) : ""}
+    </div>`;
 }
 
 function renderSheet(animate = false) {
@@ -352,16 +391,35 @@ function renderSheet(animate = false) {
     </div>`, c);
 
   const pe = c.core.personality;
+  const sentence = (s) => esc(cap(fill(s, x))) + ".";
   B.personality = sectionShell("personality", LABELS.personality, `
     <div class="trait-list">${pe.traits.map((t) => `<span class="trait">${esc(t.t)}</span>`).join("")}</div>
     ${kv("Temperament", `${esc(cap(pe.temperament.t))}: ${f(pe.temperament.phrase)}`)}
-    ${quick ? "" : kv("Quirks", pe.quirks.map((q) => `${first} ${f(q)}.`).join(" "))}`, c);
+    ${quick ? kv("Under stress", sentence(pe.stress)) : `
+    ${big5Body(pe.big5)}
+    <div class="grid-2">
+      ${kv("Strengths", pe.strengths.map(sentence).join(" "))}
+      ${kv("Under stress", sentence(pe.stress))}
+      ${kv("In conflict", sentence(pe.conflict))}
+      ${kv("With strangers", sentence(pe.strangers))}
+      ${kv("Sense of humor", sentence(pe.humor))}
+      ${kv("Daily habit", sentence(pe.habit))}
+      ${kv("Likes", esc(cap(pe.likes.map((l) => fill(l, x)).join(", "))) + ".")}
+      ${kv("Dislikes", esc(cap(pe.dislikes.map((l) => fill(l, x)).join(", "))) + ".")}
+    </div>
+    ${kv("Quirks", pe.quirks.map((q) => `${first} ${f(q)}.`).join(" "))}`}`, c);
 
   const fl = c.core.flaws;
-  B.flaws = sectionShell("flaws", LABELS.flaws, `<div class="grid-2">
-    ${kv("Flaws", fl.weaknesses.map((w) => esc(cap(fill(w, x)))).join(". ") + ".")}
-    ${kv("Fears", fl.fears.map((w) => esc(cap(fill(w, x)))).join(". ") + ".")}
-  </div>`, c);
+  B.flaws = sectionShell("flaws", LABELS.flaws, `
+    <div class="defining">${kv("Defining flaw", sentence(fl.defining))}</div>
+    <div class="grid-2">
+      ${kv("Other flaws", fl.minor.map(sentence).join(" "))}
+      ${kv("Vice", sentence(fl.vice))}
+      ${kv("Deep fear", `${sentence(fl.deepFear)}${fl.rooted ? ` <span class="note">Rooted in ${f(bg.event.short)}.</span>` : ""}`)}
+      ${kv("Phobia", sentence(fl.phobia))}
+      ${kv("Social fear", sentence(fl.socialFear))}
+      ${kv("When afraid", `${first} ${f(fl.coping)}.`)}
+    </div>`, c);
 
   const mo = c.core.motivation;
   B.motivation = sectionShell("motivation", LABELS.motivation, `
@@ -380,16 +438,15 @@ function renderSheet(animate = false) {
 
   B.hook = sectionShell("hook", LABELS.hook, `<p>${esc(p.hook)}</p>`, c);
 
-  B.gift = c.core.gift?.none ? "" : sectionShell("gift", LABELS.gift, `<p>${esc(p.gift)}</p>`, c);
+  const gifts = giftList(c);
+  B.gift = !gifts.length ? "" : sectionShell("gift", gifts.length > 1 ? "Gifts" : "Gift", `<ul class="gifts">${gifts.map((g) =>
+    `<li class="gift-item g${g.tier}"><span class="gift-power" aria-label="Strength ${g.tier} of 4">${"◆".repeat(g.tier)}<span class="dim">${"◆".repeat(4 - g.tier)}</span></span><span>${first} ${f(g.t)}.</span></li>`).join("")}</ul>`, c);
   B.love = !showLove ? "" : sectionShell("love", LABELS.love, `<div class="grid-2">
       ${kv("Orientation", esc(cap(loveLabel(c))))}
       ${kv("Status", esc(cap(c.core.love.status)))}
     </div>
-    <p>${esc(p.love)}</p>
-    <p class="note">${c.options?.orientation === "even"
-      ? "Orientation drawn with even odds."
-      : `Orientation drawn with real-world odds from <a href="${ORIENTATION_SOURCE.url}" target="_blank" rel="noopener">${ORIENTATION_SOURCE.short}</a>. It never affects the grade.`}</p>`, c);
-  B.morality = sectionShell("morality", LABELS.morality, compassBody(c, p, x, system, level), c);
+    <p>${esc(p.love)}</p>`, c);
+  B.morality = sectionShell("morality", LABELS.morality, moralityBody(c, p, x, system, level), c);
 
   const rels = quick ? c.core.relationships.list.slice(0, 2) : c.core.relationships.list;
   B.relationships = sectionShell("relationships", LABELS.relationships, `<ul class="rels">
@@ -406,7 +463,8 @@ function renderSheet(animate = false) {
       : ["identity", "gift", "tabletop", "morality", "background", "personality", "flaws", "motivation", "love", "voice", "appearance", "hook", "relationships"];
 
   const sheet = $("#sheet");
-  sheet.classList.remove("glow-3", "glow-4");
+  sheet.classList.remove("landed", "rolling", "tier-0", "tier-1", "tier-2", "tier-3", "tier-4");
+  sheet.classList.add("card", `tier-${r.tier}`);
   sheet.innerHTML = order.map((k) => B[k]).join("");
   if (animate) {
     if (state.settings.reveal === "animated" && !reducedMotion()) {
@@ -461,25 +519,6 @@ function tabletopBody(c, p, x, { quick, system, level }) {
 function writerBody(c, p, x) {
   const wr = c.layers.writer;
   const f = (s) => esc(fill(s, x));
-  const grade = c.core.grade?.tier ?? 2;
-  // Story depth follows grade: extras get a role and a want, named NPCs add
-  // the lie and wound, supporting characters and up get a full arc.
-  if (grade === 0) {
-    return `<div class="grid-2">
-        ${kv("Story role", esc(cap(wr.role)))}
-        ${kv("Wants", f(cap(c.core.motivation.want)))}
-      </div>
-      <p class="note">Background characters don't carry an arc. Lock anything you like and roll again for a bigger part.</p>`;
-  }
-  if (grade === 1) {
-    return `<div class="grid-2">
-        ${kv("Story role", esc(cap(wr.role)))}
-        ${kv("Wants", f(cap(c.core.motivation.want)))}
-      </div>
-      ${kv("The lie they believe", `<span class="lie">“${esc(wr.lie)}”</span>`)}
-      ${kv("The wound", esc(p.wound) + ".")}
-      <p class="note">Named NPCs carry a lie and a wound, but not a full arc.</p>`;
-  }
   return `
     <div class="grid-2">
       ${kv("Story role", esc(cap(wr.role)))}
@@ -501,7 +540,7 @@ function writerBody(c, p, x) {
 
 function exportText() {
   const { mode, system, level, format } = state.settings;
-  return format === "json" ? toJSON(state.current) : toMarkdown(state.current, { mode, system, level, showLove: state.settings.orient !== "off" });
+  return format === "json" ? toJSON(state.current) : toMarkdown(state.current, { mode, system, level, showLove: state.settings.orient !== "off", ethics: state.settings.ethics });
 }
 
 function fillExport() {

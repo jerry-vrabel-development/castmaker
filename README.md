@@ -171,54 +171,79 @@ The first prototype proves the shared-core-plus-layers architecture with the two
 
 ---
 
-## Grades, Reveal & Moral Compass
+## The Character
 
-### One rarity per character: the grade
-A character has exactly one rarity, its **grade**. Nothing else is labeled. Six ability scores are rolled with real dice (4d6, drop the lowest), and their total sets the grade, so each grade's chance is the exact chance of rolling that well:
+Every character gets the same full depth, whatever its grade. A character is a character: a Common roll can still be a protagonist, an ordinary person in extraordinary trouble.
 
-| Grade | Story weight | Dice total | Chance |
-|---|---|---|---|
-| Common | Background character | up to 73 | 49.4% |
-| Uncommon | Named NPC | 74–78 | 26.6% |
-| Rare | Supporting character | 79–83 | 16.7% |
-| Epic | Protagonist | 84–87 | 5.4% |
-| Legendary | Hero of legend | 88+ | 1.8% (1 in 55) |
+### Grade: how exceptional a character is
+A character has exactly one rarity, its **grade**. Six ability scores are rolled with real dice (4d6, drop the lowest), and their total sets the grade, so each grade's chance is the exact chance of rolling that well:
 
-The grade then shapes the whole character:
-- **Ability scores:** the rolled dice become the D&D 5e scores; the system-agnostic strengths flatten for extras and peak for heroes.
-- **Gift:** none for Common; a knack, a talent, a rare power, or (at Legendary) a destiny. In the modern genre, Legendary gifts are superpowers.
-- **Stakes:** secrets, wants and defining events each have hidden stakes from 0 to 4, and entries close to the grade are much more likely. Extras have small secrets; heroes carry world-shaking ones.
-- **Story depth:** background characters get a role and a want; named NPCs add a lie and a wound; supporting characters and up get a full arc.
-- **Moral extremes:** higher grades sit further toward the edges of the moral compass.
+| Grade | Dice total | Chance |
+|---|---|---|
+| Common | up to 73 | 49.4% |
+| Uncommon | 74–78 | 26.6% |
+| Rare | 79–83 | 16.7% |
+| Epic | 84–87 | 5.4% |
+| Legendary | 88+ | 1.8% (1 in 55) |
 
-**Lock grade** keeps a hero and rerolls everything else.
+The grade measures how *exceptional* a character is, not how much story they get:
+- **Ability scores:** the rolled dice become the D&D 5e scores; the system-agnostic strengths flatten for ordinary people and peak for exceptional ones.
+- **Gifts:** a character can have none, one or several, each rated from 1 (a knack) to 4 (a destiny). Higher grades raise both the number and the strength. On average: Common 0.5, Uncommon 1.1, Rare 1.5, Epic 2.1, Legendary 2.4 gifts, with every Legendary holding at least one destiny-level gift. In the modern genre, top gifts are superpowers.
+- **Stakes:** secrets, wants and defining events have hidden stakes from 0 to 4; entries near the grade are much more likely. Ordinary people have personal secrets; legends carry world-shaking ones.
+- **Moral intensity:** higher grades sit further toward the extremes of their moral profile.
 
-### The reveal
-The name spins like a slot reel, the six dice tumble and land one by one, tension builds (longer when the dice run hot), the grade stamps in, and the sections flip in. Epic and Legendary rolls get a glow and sparks. A full roll jumps back to the top of the page. Click anywhere or roll again to skip; **Reveal → Fast** skips the animation, and reduced-motion settings skip it automatically.
+Nothing else about a character is ranked. Name, culture, pronouns, orientation, ancestry and age never affect the grade.
 
-**Sound** is synthesized with the Web Audio API (no audio files): reel ticks, dice rattles and clacks that brighten with higher rolls, a riser and drumroll, and a sting per grade, from a muted thud for Common to a full fanfare with brass, choir and bells for Legendary. All of it runs through a compressor and a soft reverb. Recorded CC0 samples could replace any cue later without changing the reveal.
+### Personality
+Built on the **Big Five** personality traits, the most widely used model in personality research: openness, conscientiousness, extraversion, agreeableness and neuroticism, each scored 1–5 from the character's history. The profile then steers everything else, so a reserved, anxious character gets reserved, anxious behavior:
+- Three traits and a temperament
+- Two strengths
+- How they act under stress, in conflict, and with strangers
+- Their sense of humor
+- Likes, dislikes, a daily habit and quirks
 
-### Variety: less repetition
-- Every table is several times larger than in v0.3 (for example 72 traits, 70 quirks, 50 wants, 57 hand-written secrets, about 26 events and 32 gifts per genre).
-- Smaller secrets are also **built from parts** (an act, a person, a twist), about 3,000 combinations.
-- **No-repeat memory:** anything you've seen in the last several rolls is held back. The window scales with each table's size.
-- `node tools/variety.js` measures repeated lines in batches of 20 rolls. v0.3 averaged about 260 per batch; v0.4 averages about 37.
+### Flaws & fears
+- **Flaws:** one defining flaw, two smaller ones, and a vice
+- **Fears:** a deep fear, usually rooted in their defining event; a phobia; and a social fear
+- **When afraid:** how they cope, chosen to fit their personality
+
+### Morality: two systems being compared
+The prototype builds both on every character so we can choose. The **Morality** setting shows Foundations, Values or both.
+- **Moral Foundations** (Haidt and colleagues): how much the character cares about care, fairness, loyalty, authority, sanctity and liberty. The summary pairs the strongest and weakest, for example "can't stand to see anyone suffer, but will bend the rules when it helps her side."
+- **Schwartz's basic human values:** ten values in a circle (independence, excitement, pleasure, achievement, power, security, conformity, tradition, kindness, universalism). Neighbors are compatible and opposites pull apart; when a character's top two values sit across the circle, the summary calls out the tension.
+- Every character also has **a line they won't cross** and **what would push them over it**.
+- D&D 5e alignment comes from the Foundations: care and fairness give good versus evil; authority and loyalty against liberty give law versus chaos.
 
 ### Orientation and love life
-Orientation is part of identity, like pronouns. It is never part of the grade and never influences personality, jobs or anything else; it only shapes the **love life** section (orientation, relationship status, and a partner where there is one).
-- **Real** (default): odds from Gallup's 2025 survey of U.S. adults: 86% straight, 5.3% bisexual, 1.6% gay, 1.4% lesbian, 0.5% other (such as pansexual or queer), with no-answer responses set aside. Gallup doesn't report asexual identity separately, so 1% is used as a marked estimate.
+Orientation is part of identity, like pronouns. It never affects the grade or any other trait; it only shapes the **love life** (orientation, relationship status and, where there is one, a partner). The **Orientation** setting offers:
+- **Real** (default): odds from Gallup's 2025 survey of 13,454 U.S. adults (published February 2026): 86% straight, 5.3% bisexual, 1.6% gay, 1.4% lesbian and 0.5% other (such as pansexual or queer), with no-answer responses set aside. Gallup doesn't report asexual identity separately, so 1% is used as a marked estimate.
 - **Even:** every orientation equally likely.
 - **Hide:** the love life isn't shown or exported.
 
 Relationship status by age uses designed odds, not statistics.
 
-### Moral compass
-Every character sits on two axes, **Order ↔ Freedom** and **Mercy ↔ Ruthlessness**, built from their traits, history and wants. The nine regions are named (Guardian, Good Samaritan, Rebel with a cause, Rule keeper, Pragmatist, Free agent, Iron fist, Mercenary, Wildfire). Each character also has **a line they won't cross** and **what would push them over it**. D&D 5e gets one of the nine alignments from the compass.
+## The Roll
+
+### The reveal
+The whole character sits on one card. During a roll:
+1. The name spins like a slot reel.
+2. The six dice tumble and land one by one, while the card's background cycles through every grade color, faster and brighter as high dice land.
+3. Tension builds (longer when the dice ran hot), then the grade stamps in and the card settles into that grade's color. Epic and Legendary cards glow, and Legendary keeps a slow gold shimmer.
+4. The sections flip in.
+
+A full roll jumps back to the top of the page. Click anywhere or roll again to skip; **Reveal → Fast** skips the animation, and reduced-motion settings skip it automatically.
+
+### Sound
+Synthesized with the Web Audio API, with no audio files: reel ticks, dice rattles and clacks that brighten with higher rolls, a riser and drumroll, and a sting per grade, from a muted thud for Common to a full fanfare with brass, choir and bells for Legendary, all through a compressor and soft reverb. Recorded CC0 samples could replace any cue later.
+
+### Variety
+- Large tables throughout (for example 72 traits, 70 quirks, 70 flaws, 57 hand-written secrets, about 26 events and 32 gifts per genre), plus secrets built from parts (about 3,000 combinations).
+- **No-repeat memory:** anything seen in the last several rolls is held back.
+- `node tools/variety.js` measures repeated lines in batches of 20 rolls.
 
 ### Real-world data
-- Modern occupations turn up in proportion to real U.S. job counts (Bureau of Labor Statistics, 2025, square-root damped), now covering 29 jobs. They are never labeled with a rarity.
+- Modern occupations turn up in proportion to real U.S. job counts (Bureau of Labor Statistics, 2025, square-root damped). They are never labeled with a rarity.
 - Orientation odds come from Gallup (2025).
-- Name, culture, pronouns, orientation, ancestry and age never affect the grade.
 
 ### Guardrails
 - Randomness is never tied to money: no paid rolls, rerolls or odds boosts.
@@ -371,6 +396,7 @@ js/export.js                    Markdown and JSON export
 js/reveal.js                    slot-style reveal
 js/audio.js                     synthesized sound engine and cues
 js/data/orientation.js          orientation odds and love-life tables
+js/data/psyche.js               Big Five, behavior, flaws, fears, Moral Foundations, Schwartz values
 js/engine/dice.js               real dice: 4d6-drop-lowest odds and grade bands
 js/engine/rarity.js             grade summary
 js/data/rarity.js               grades, stakes and real job statistics
@@ -383,7 +409,7 @@ js/prose/templates.js           built-in template prose
 js/data/shared.js               genre-neutral tables
 js/data/genres/*.js             fantasy, modern and sci-fi tables
 tools/smoke-test.js             automated generation checks
-tools/rarity-sim.js             grade, role and morality simulator
+tools/rarity-sim.js             grade, gift, role and morality simulator
 tools/variety.js                repetition measurement
 ```
 
@@ -392,4 +418,4 @@ Each section records the tags of what it picked (`loss`, `crime`, `faith`, …).
 
 ## Status
 
-**v0.4 prototype:** one rarity per character (the grade), much larger tables with no-repeat memory, orientation and love life, redesigned sound, and scroll-to-top after a roll. Name is still a working title.
+**Prototype v0.1.** Earlier internal iterations are folded into this version. Name is still a working title.

@@ -434,3 +434,106 @@ dialog.export::backdrop { background: rgb(10 15 13 / 0.45); }
 .rarity-zone.awaiting .rarity-story, .rarity-zone.awaiting .rarity-meta { opacity: 0; }
 .rarity-badge.charging { color: transparent; border-color: var(--muted); background: transparent; box-shadow: none; }
 .rarity-badge.charging svg { opacity: 0; }
+
+/* ---------- the character card ---------- */
+/* The whole character sits on one card. While the dice roll its background
+   cycles through every grade color, faster and brighter as hot dice land;
+   then it settles into the grade that was rolled. */
+.sheet.card {
+  position: relative; isolation: isolate;
+  padding: 14px; border-radius: 20px;
+  border: 2px solid var(--card-edge, var(--line));
+  background: var(--surface-2);
+  transition: border-color 0.6s ease, box-shadow 0.6s ease;
+}
+.sheet.card::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; border-radius: 18px;
+  background: var(--card-bg, transparent); opacity: 1; transition: opacity 0.6s ease;
+}
+@media (max-width: 860px) { .sheet.card { padding: 10px; border-radius: 16px; } .sheet.card::before { border-radius: 14px; } }
+
+.sheet.tier-0 { --card-edge: color-mix(in srgb, var(--t0) 55%, var(--line)); --card-bg: linear-gradient(160deg, color-mix(in srgb, var(--t0) 16%, var(--bg)), var(--surface-2)); }
+.sheet.tier-1 { --card-edge: var(--t1); --card-bg: linear-gradient(160deg, color-mix(in srgb, var(--t1) 24%, var(--bg)), color-mix(in srgb, var(--t1) 6%, var(--surface-2))); }
+.sheet.tier-2 { --card-edge: var(--t2); --card-bg: linear-gradient(160deg, color-mix(in srgb, var(--t2) 28%, var(--bg)), color-mix(in srgb, var(--t2) 8%, var(--surface-2))); }
+.sheet.tier-3 {
+  --card-edge: var(--t3);
+  --card-bg: linear-gradient(145deg, color-mix(in srgb, var(--t3) 34%, var(--bg)), color-mix(in srgb, var(--t2) 14%, var(--bg)) 55%, color-mix(in srgb, var(--t3) 26%, var(--bg)));
+  box-shadow: 0 0 28px color-mix(in srgb, var(--t3) 22%, transparent);
+}
+.sheet.tier-4 {
+  --card-edge: var(--t4);
+  --card-bg: linear-gradient(120deg,
+    color-mix(in srgb, var(--t4) 40%, var(--bg)), color-mix(in srgb, var(--t4) 14%, var(--bg)) 30%,
+    color-mix(in srgb, var(--t4) 48%, var(--bg)) 50%, color-mix(in srgb, var(--t4) 14%, var(--bg)) 70%,
+    color-mix(in srgb, var(--t4) 40%, var(--bg)));
+  box-shadow: 0 0 36px color-mix(in srgb, var(--t4) 30%, transparent);
+}
+.sheet.tier-4::before { background-size: 300% 100%; animation: legend-shimmer 7s linear infinite; }
+
+.sheet.rolling { --card-edge: transparent; box-shadow: none; }
+.sheet.rolling::before {
+  background: linear-gradient(115deg, var(--t0), var(--t1), var(--t2), var(--t3), var(--t4), var(--t2), var(--t0));
+  background-size: 400% 400%;
+  opacity: calc(0.35 + var(--heat, 0) * 0.5);
+  animation: roll-colors calc(2.4s - var(--heat, 0) * 1.6s) linear infinite;
+}
+.sheet.landed { animation: card-land 0.9s cubic-bezier(0.2, 0.9, 0.3, 1.2); }
+
+@keyframes roll-colors { from { background-position: 0% 50%; } to { background-position: 100% 50%; } }
+@keyframes legend-shimmer { from { background-position: 0% 0; } to { background-position: 300% 0; } }
+@keyframes card-land {
+  0% { box-shadow: 0 0 0 0 var(--card-edge); transform: scale(0.992); }
+  30% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--card-edge) 45%, transparent), 0 0 60px color-mix(in srgb, var(--card-edge) 40%, transparent); transform: scale(1.004); }
+  100% { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet.rolling::before, .sheet.tier-4::before, .sheet.landed { animation: none; }
+}
+
+/* ---------- Big Five ---------- */
+.b5 { display: flex; flex-direction: column; gap: 8px; padding-block: 4px; }
+.b5-row { display: grid; grid-template-columns: 7.5em minmax(0, 1fr) 7.5em; grid-template-areas: "low track high" "name name name"; column-gap: 10px; align-items: center; }
+.b5-low { grid-area: low; text-align: right; font-size: 0.9rem; color: var(--muted); }
+.b5-high { grid-area: high; font-size: 0.9rem; color: var(--muted); }
+.b5-name { grid-area: name; justify-self: center; font-family: var(--font-mono); font-size: 0.64rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
+.b5-track { grid-area: track; position: relative; height: 6px; border-radius: 999px; background: linear-gradient(90deg, var(--surface-2), var(--line), var(--surface-2)); }
+.b5-dot { position: absolute; top: 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border-radius: 50%; background: var(--accent); border: 2px solid var(--surface); box-shadow: 0 0 0 1px var(--accent); }
+@media (max-width: 520px) { .b5-row { grid-template-columns: 5.5em minmax(0, 1fr) 5.5em; } .b5-low, .b5-high { font-size: 0.8rem; } }
+
+/* ---------- flaws ---------- */
+.defining .v { font-family: var(--font-display); font-size: 1.15rem; }
+
+/* ---------- gifts ---------- */
+.gifts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.gift-item { display: grid; grid-template-columns: 4.6em minmax(0, 1fr); gap: 10px; align-items: baseline; }
+.gift-power { font-size: 0.8rem; letter-spacing: 1px; color: var(--accent); white-space: nowrap; }
+.gift-power .dim { color: var(--line); }
+.gift-item.g4 .gift-power { color: var(--t4); }
+.gift-item.g3 .gift-power { color: var(--t3); }
+.gift-item.g4 > span:last-child { font-weight: 500; }
+
+/* ---------- morality ---------- */
+.moral-grid { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); }
+.moral-grid.two { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.moral-block { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.moral-title { font-family: var(--font-display); font-weight: 400; font-size: 1.15rem; }
+.moral-sum { margin: 0; }
+.bars { display: flex; flex-direction: column; gap: 6px; }
+.bar-row { display: grid; grid-template-columns: 6.5em minmax(0, 1fr) 2.4em; gap: 10px; align-items: center; }
+.bar-label { font-size: 0.92rem; }
+.bar { height: 8px; border-radius: 999px; background: var(--surface-2); overflow: hidden; }
+.bar-fill { display: block; height: 100%; border-radius: inherit; background: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+.bar-val { font-family: var(--font-mono); font-size: 0.78rem; color: var(--muted); text-align: right; font-variant-numeric: tabular-nums; }
+.bar-row.is-top .bar-fill { background: var(--accent); }
+.bar-row.is-top .bar-label { font-weight: 700; }
+.bar-row.is-low .bar-label { color: var(--muted); }
+.wheel-wrap { overflow-x: auto; }
+.wheel { width: 100%; max-width: 380px; height: auto; display: block; margin-inline: auto; }
+.w-ring { fill: none; stroke: var(--line); stroke-width: 1; }
+.w-spoke { stroke: var(--line); stroke-width: 1; }
+.w-shape { fill: color-mix(in srgb, var(--accent) 22%, transparent); stroke: var(--accent); stroke-width: 1.5; stroke-linejoin: round; }
+.w-dot { fill: var(--accent); }
+.w-dot.is-top { stroke: var(--surface); stroke-width: 1.5; }
+.w-label { font-family: var(--font-body); font-size: 10.5px; fill: var(--muted); }
+.w-label.is-top { fill: var(--ink); font-weight: 700; }
+.segmented.tight button { font-size: 0.86rem; padding-inline: 4px; }

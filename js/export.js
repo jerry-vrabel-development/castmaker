@@ -9,15 +9,14 @@ import { PRONOUNS } from "./engine/text.js";
 import { GENRES } from "./data/genres/index.js";
 import { computeRarity } from "./engine/rarity.js";
 import { oneIn } from "./engine/dice.js";
-
-const signedNum = (n) => (n >= 0 ? `+${n.toFixed(2)}` : n.toFixed(2));
+import { BIG5, FOUNDATIONS, VALUES } from "./data/psyche.js";
 
 export function toJSON(c) {
   const strip = (o) => JSON.parse(JSON.stringify(o, (k, v) => (k === "_tags" ? undefined : v)));
   return JSON.stringify(strip(c), null, 2);
 }
 
-export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1, showLove = true } = {}) {
+export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1, showLove = true, ethics = "both" } = {}) {
   const p = renderProse(c);
   const x = textContext(c);
   const f = (s) => fill(s, x);
@@ -29,19 +28,44 @@ export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1, 
   L.push(`**${cap(id.peopleLabel)}, ${id.age}** · ${PRONOUNS[id.pronouns].label} · ${cap(stripArticle(id.occupation.t))} · ${GENRES[c.genre].label}`, "");
 
   const r = computeRarity(c);
-  L.push(`**Grade: ${r.tierInfo.label}** (${r.tierInfo.story}) · rolled ${r.rolls.join(", ")} = ${r.total}, ${oneIn(r.gradeOdds)} rolls land in this grade`, "");
-  if (p.gift) L.push(`**Gift:** ${p.gift}`, "");
+  L.push(`**Grade: ${r.tierInfo.label}** · rolled ${r.rolls.join(", ")} = ${r.total} · ${oneIn(r.gradeOdds)} rolls land in this grade`, "");
+  if (p.gifts.length) L.push(`**Gift${p.gifts.length > 1 ? "s" : ""}:** ${p.gifts.join(" ")}`, "");
   if (p.love && showLove) L.push(`**Love life:** ${cap(loveLabel(c))}. ${p.love}`, "");
   L.push("## Background", "", p.backstory, "");
+  const pe = c.core.personality;
   L.push("## Personality", "");
-  L.push(`- **Traits:** ${c.core.personality.traits.map((t) => t.t).join(", ")}`);
-  L.push(`- **Temperament:** ${c.core.personality.temperament.t}, ${f(c.core.personality.temperament.phrase)}`);
-  L.push(`- **Quirks:** ${c.core.personality.quirks.map((q) => `${first} ${f(q)}`).join("; ")}`);
-  L.push(`- **Flaws:** ${c.core.flaws.weaknesses.map(f).join("; ")}`);
-  L.push(`- **Fears:** ${c.core.flaws.fears.map(f).join("; ")}`, "");
+  L.push(`- **Big Five:** ${BIG5.map((d) => `${d.label} ${pe.big5[d.id].toFixed(1)}`).join(", ")} (1 to 5)`);
+  L.push(`- **Traits:** ${pe.traits.map((t) => t.t).join(", ")}`);
+  L.push(`- **Temperament:** ${pe.temperament.t}, ${f(pe.temperament.phrase)}`);
+  L.push(`- **Strengths:** ${pe.strengths.map(f).join("; ")}`);
+  L.push(`- **Under stress:** ${f(pe.stress)}`);
+  L.push(`- **In conflict:** ${f(pe.conflict)}`);
+  L.push(`- **With strangers:** ${f(pe.strangers)}`);
+  L.push(`- **Humor:** ${f(pe.humor)}`);
+  L.push(`- **Likes:** ${pe.likes.map(f).join(", ")} · **Dislikes:** ${pe.dislikes.map(f).join(", ")}`);
+  L.push(`- **Habit:** ${first} ${f(pe.habit)}`);
+  L.push(`- **Quirks:** ${pe.quirks.map((q) => `${first} ${f(q)}`).join("; ")}`, "");
+  const fl = c.core.flaws;
+  L.push("## Flaws & fears", "");
+  L.push(`- **Defining flaw:** ${f(fl.defining)}`);
+  L.push(`- **Other flaws:** ${fl.minor.map(f).join("; ")}`);
+  L.push(`- **Vice:** ${f(fl.vice)}`);
+  L.push(`- **Deep fear:** ${f(fl.deepFear)}${fl.rooted ? `, rooted in ${f(c.core.background.event.short)}` : ""}`);
+  L.push(`- **Phobia:** ${f(fl.phobia)}`);
+  L.push(`- **Social fear:** ${f(fl.socialFear)}`);
+  L.push(`- **When afraid:** ${first} ${f(fl.coping)}`, "");
   if (p.moral) {
     const m = c.core.morality;
-    L.push("## Moral compass", "", `**${p.moral.label}** · Order ${signedNum(m.order)} (freedom −1 to order +1) · Mercy ${signedNum(m.mercy)} (ruthless −1 to merciful +1)`, "", p.moral.line, "");
+    L.push("## Morality", "");
+    if (ethics !== "values" && p.moral.foundations) {
+      L.push(`**Moral Foundations:** ${p.moral.foundations.text}`, "");
+      L.push(`${FOUNDATIONS.map((d) => `${d.label} ${m.foundations[d.id].toFixed(1)}`).join(" · ")} (1 to 5)`, "");
+    }
+    if (ethics !== "foundations" && p.moral.values) {
+      L.push(`**Values:** ${p.moral.values.text}`, "");
+      L.push(`${VALUES.map((d) => `${d.label} ${m.values[d.id].toFixed(1)}`).join(" · ")} (1 to 5)`, "");
+    }
+    L.push(p.moral.line, "");
   }
 
   const ap = c.core.appearance;

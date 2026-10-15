@@ -1,0 +1,370 @@
+// Personality, flaws, fears and morality. Original Castmaker content — CC BY 4.0.
+//
+// Built on two well-established models from psychology research:
+//  - The Big Five personality traits (openness, conscientiousness,
+//    extraversion, agreeableness, neuroticism), scored 1-5. Scores steer
+//    which traits, behaviors and coping habits a character gets.
+//  - For morality, two options to compare:
+//      Moral Foundations Theory (Haidt and colleagues): six foundations of
+//      moral judgment, each scored 1-5.
+//      Schwartz's theory of basic human values: ten values arranged in a
+//      circle, where neighbors are compatible and opposites pull apart.
+//
+// Big Five codes in short strings: "A+ N-" means "favored when agreeableness
+// is high and neuroticism is low".
+
+export const BIG5 = [
+  { id: "O", label: "Openness", low: "Traditional", high: "Curious" },
+  { id: "C", label: "Conscientiousness", low: "Spontaneous", high: "Disciplined" },
+  { id: "E", label: "Extraversion", low: "Reserved", high: "Outgoing" },
+  { id: "A", label: "Agreeableness", low: "Challenging", high: "Accommodating" },
+  { id: "N", label: "Neuroticism", low: "Steady", high: "Sensitive" },
+];
+
+// How a character's history (tags) nudges each dimension.
+export const TAG_B5 = {
+  art: { O: 1, E: 0.5 }, learning: { O: 1, C: 0.3 }, travel: { O: 0.8, E: 0.3 }, tech: { O: 0.6, C: 0.3 },
+  wild: { O: 0.4, E: -0.4 }, order: { C: 1, O: -0.4 }, duty: { C: 1, A: 0.3 }, craft: { C: 0.8 },
+  chaos: { C: -1, O: 0.4 }, family: { A: 0.8, E: 0.3 }, healing: { A: 1 }, faith: { C: 0.4, O: -0.3, A: 0.3 },
+  violence: { A: -0.8, N: 0.3 }, crime: { A: -0.5, C: -0.3 }, betrayal: { A: -0.5, N: 0.6 }, loss: { N: 0.8, E: -0.3 },
+  isolation: { E: -1, N: 0.3 }, poverty: { N: 0.4 }, wealth: { E: 0.4 }, ambition: { E: 0.6, C: 0.4, A: -0.3 },
+  secrecy: { E: -0.6, A: -0.2 },
+};
+
+// Big Five lean for every trait in shared.js.
+export const TRAIT_B5 = {
+  watchful: "C+ E-", dutiful: "C+ A+", reckless: "C- E+", "tender-hearted": "A+ N+", calculating: "C+ A-",
+  devout: "O- C+", irreverent: "O+ A-", generous: "A+ E+", greedy: "A-", curious: "O+", stubborn: "A- C+",
+  charming: "E+ A+", blunt: "A- E+", secretive: "E- A-", loyal: "A+ C+", restless: "O+ C- N+", patient: "A+ N-",
+  vain: "E+ N+", protective: "A+ C+", cynical: "A- N+", idealistic: "O+ A+", meticulous: "C+", impulsive: "C- E+",
+  melancholy: "N+ E-", cheerful: "E+ N-", proud: "A- E+", humble: "A+ E-", ruthless: "A- N-", "self-reliant": "E- C+",
+  gregarious: "E+", suspicious: "A- N+", trusting: "A+ N-", inventive: "O+", wry: "O+ N-", vengeful: "A- N+",
+  principled: "C+ A+", ambitious: "C+ E+", gentle: "A+ N-", sly: "A- O+", earnest: "A+ C+", grumpy: "A- E-",
+  playful: "E+ O+", solemn: "E- C+", brave: "N- E+", timid: "N+ E-", nosy: "O+ E+", discreet: "C+ E-",
+  sentimental: "N+ A+", practical: "C+ O-", dreamy: "O+ C-", jealous: "N+ A-", forgiving: "A+", prickly: "A- N+",
+  competitive: "E+ A-", methodical: "C+", superstitious: "O- N+", skeptical: "O+ A-", flirtatious: "E+ O+",
+  shy: "E- N+", bossy: "E+ A- C+", easygoing: "A+ N- C-", honest: "A+ C+", manipulative: "A- C+", "hot-headed": "N+ A-",
+  resourceful: "O+ C+", weary: "N+ E-", hopeful: "N- A+", bookish: "O+ E-", kind: "A+", spiteful: "A- N+",
+  obsessive: "C+ N+", devoted: "A+ C+",
+};
+
+// ---------- behavior ----------
+// Each reads after the character's name, e.g. "Under stress, Mara ...".
+
+export const UNDER_STRESS = [
+  { t: "spirals, imagining every way it could go wrong", b5: "N+" },
+  { t: "goes very calm and very quiet", b5: "N-" },
+  { t: "makes a list and works through it, line by line", b5: "C+" },
+  { t: "does something reckless just to feel in control", b5: "C- N+" },
+  { t: "talks it out with anyone who'll listen", b5: "E+" },
+  { t: "disappears for a day and comes back with a plan", b5: "E- C+" },
+  { t: "snaps at the people closest to {them}", b5: "A- N+" },
+  { t: "takes care of everyone else and forgets {themself}", b5: "A+" },
+  { t: "cleans, fixes or sharpens something", b5: "C+ E-" },
+  { t: "makes jokes until someone tells {them} to stop", b5: "E+ O+" },
+  { t: "goes looking for a fight", b5: "A- E+" },
+  { t: "prays, or does the closest thing {they} {has} to praying", b5: "O- C+" },
+  { t: "eats, drinks, or both", b5: "N+ C-" },
+  { t: "works until {they} drop{s}", b5: "C+ N+" },
+  { t: "gets stubbornly, almost cheerfully, practical", b5: "N- C+" },
+  { t: "freezes, then overcorrects", b5: "N+ E-" },
+];
+
+export const IN_CONFLICT = [
+  { t: "looks for the compromise, even when there isn't one", b5: "A+" },
+  { t: "goes straight for the weak spot", b5: "A-" },
+  { t: "argues from the rules and the facts", b5: "C+" },
+  { t: "walks away and holds a grudge", b5: "E- N+" },
+  { t: "gets loud fast and forgives fast", b5: "E+ N+" },
+  { t: "stays polite and quietly wins", b5: "C+ E-" },
+  { t: "makes it personal", b5: "A- N+" },
+  { t: "laughs it off, which infuriates people", b5: "N- E+" },
+  { t: "gives in, then resents it for weeks", b5: "A+ N+" },
+  { t: "asks questions until the other side contradicts itself", b5: "O+ C+" },
+  { t: "refuses to engage at all", b5: "E- A+" },
+  { t: "escalates to make a point", b5: "A- E+" },
+  { t: "brings up something from years ago", b5: "N+ A-" },
+  { t: "proposes a bet to settle it", b5: "O+ C-" },
+];
+
+export const WITH_STRANGERS = [
+  { t: "warm, curious and a little nosy", b5: "E+ A+" },
+  { t: "polite, distant and watchful", b5: "E- C+" },
+  { t: "charming until {they} want{s} something", b5: "E+ A-" },
+  { t: "suspicious until proven otherwise", b5: "A- N+" },
+  { t: "shy, but kind once the ice breaks", b5: "E- A+" },
+  { t: "loud and instantly familiar", b5: "E+" },
+  { t: "formal and correct", b5: "C+ O-" },
+  { t: "openly uninterested", b5: "A- E-" },
+  { t: "full of questions", b5: "O+ E+" },
+  { t: "helpful to a fault", b5: "A+" },
+  { t: "testing, to see what they're made of", b5: "A- O+" },
+  { t: "awkward, then oddly candid", b5: "E- O+" },
+];
+
+export const HUMOR = [
+  { t: "dry and deadpan", b5: "N- E-" },
+  { t: "silly and physical", b5: "E+ C-" },
+  { t: "dark, the gallows kind", b5: "N+ O+" },
+  { t: "teasing, but never cruel", b5: "E+ A+" },
+  { t: "sharp-tongued and sometimes cruel", b5: "A- E+" },
+  { t: "terrible puns, delivered proudly", b5: "O+ E+" },
+  { t: "rarely makes jokes, but laughs easily", b5: "A+ E-" },
+  { t: "absurd and surreal", b5: "O+" },
+  { t: "self-deprecating", b5: "N+ A+" },
+  { t: "practically none, and {they} know{s} it", b5: "C+ O-" },
+  { t: "elaborate pranks", b5: "O+ C-" },
+  { t: "quiet one-liners nobody else catches", b5: "E- O+" },
+];
+
+export const LIKES = [
+  { t: "the smell of rain", tags: ["wild", "art"] }, { t: "a well-made tool", tags: ["craft"] }, { t: "old songs", tags: ["art", "family"] },
+  { t: "quiet mornings", tags: ["isolation", "faith"] }, { t: "a good argument", tags: ["learning", "ambition"] }, { t: "spicy food", tags: ["travel"] },
+  { t: "being right", tags: ["ambition", "learning"] }, { t: "children's laughter", tags: ["family", "healing"] }, { t: "maps", tags: ["travel", "learning"] },
+  { t: "fresh bread", tags: ["family", "craft"] }, { t: "gossip", tags: ["art", "secrecy"] }, { t: "high places", tags: ["wild", "isolation"] },
+  { t: "a fair fight", tags: ["violence", "duty"] }, { t: "cats", tags: ["isolation", "wild"] }, { t: "dogs", tags: ["family", "wild"] },
+  { t: "the sea", tags: ["travel", "wild"] }, { t: "strong {drink}", tags: ["craft", "chaos"] }, { t: "rainy days indoors", tags: ["isolation", "learning"] },
+  { t: "dancing badly", tags: ["art", "chaos"] }, { t: "puzzles and riddles", tags: ["learning", "tech"] }, { t: "gardens", tags: ["wild", "healing"] },
+  { t: "fine clothes", tags: ["wealth", "art"] }, { t: "ghost stories", tags: ["faith", "art"] }, { t: "the sound of a busy market", tags: ["wealth", "travel"] },
+  { t: "fixing broken things", tags: ["craft", "tech"] }, { t: "sunrise", tags: ["faith", "wild"] }, { t: "winning at cards", tags: ["crime", "chaos"] },
+  { t: "long walks alone", tags: ["isolation", "travel"] }, { t: "cooking for others", tags: ["family", "healing"] }, { t: "storms", tags: ["chaos", "wild"] },
+];
+
+export const DISLIKES = [
+  { t: "liars", tags: ["betrayal", "duty"] }, { t: "small talk", tags: ["isolation", "learning"] }, { t: "being rushed", tags: ["craft", "order"] },
+  { t: "crowds", tags: ["isolation"] }, { t: "the cold", tags: ["poverty"] }, { t: "bureaucrats", tags: ["chaos", "poverty"] },
+  { t: "loud chewing", tags: ["order"] }, { t: "being thanked", tags: ["healing", "duty"] }, { t: "surprises", tags: ["order", "secrecy"] },
+  { t: "waste", tags: ["poverty", "craft"] }, { t: "cowards", tags: ["violence", "duty"] }, { t: "boasting", tags: ["family", "faith"] },
+  { t: "early mornings", tags: ["chaos", "art"] }, { t: "nicknames", tags: ["order", "ambition"] }, { t: "the rich", tags: ["poverty", "crime"] },
+  { t: "priests", tags: ["chaos", "learning"] }, { t: "being touched without asking", tags: ["violence", "isolation"] }, { t: "silence", tags: ["art", "family"] },
+  { t: "boats", tags: ["travel"] }, { t: "sweet {drink}", tags: ["craft"] }, { t: "being told to calm down", tags: ["chaos", "violence"] },
+  { t: "people who don't finish what they start", tags: ["craft", "duty"] }, { t: "bad manners at the table", tags: ["order", "family"] },
+  { t: "being underestimated", tags: ["ambition"] }, { t: "anyone in uniform", tags: ["crime", "chaos"] }, { t: "sentimental songs", tags: ["isolation", "violence"] },
+];
+
+export const HABITS = [
+  { t: "rises before dawn, every day", tags: ["duty", "faith"] }, { t: "writes a letter every night and burns it", tags: ["loss", "secrecy"] },
+  { t: "walks the same route every evening", tags: ["order", "isolation"] }, { t: "keeps a journal in a private code", tags: ["secrecy", "learning"] },
+  { t: "cleans {their} tools every night, whatever happened that day", tags: ["craft", "duty"] }, { t: "makes tea the same precise way, every time", tags: ["order", "craft"] },
+  { t: "checks every lock twice before bed", tags: ["crime", "secrecy"] }, { t: "visits a grave once a week", tags: ["loss", "family"] },
+  { t: "sketches the people {they} meet", tags: ["art"] }, { t: "sings while working", tags: ["art", "craft"] },
+  { t: "counts {their} {coin} before sleep", tags: ["poverty", "wealth"] }, { t: "feeds the birds at noon", tags: ["wild", "healing"] },
+  { t: "trains at dawn, rain or shine", tags: ["violence", "duty"] }, { t: "reads the last page of the day's news aloud to no one", tags: ["learning", "isolation"] },
+  { t: "sends a message home every week, even when there's nothing to say", tags: ["family", "travel"] },
+  { t: "plays the same three songs whenever {they} {is} alone", tags: ["art", "loss"] }, { t: "naps exactly twenty minutes after lunch", tags: ["order"] },
+  { t: "says a blessing over every meal", tags: ["faith", "family"] }, { t: "keeps a running tally of who owes {them} what", tags: ["wealth", "crime"] },
+  { t: "takes a different way home every night", tags: ["secrecy", "crime"] }, { t: "stretches like a cat before any task", tags: ["wild", "craft"] },
+  { t: "writes down every dream", tags: ["faith", "learning"] }, { t: "brews something strong before any hard conversation", tags: ["craft", "family"] },
+  { t: "ends each day on the roof, watching the sky", tags: ["isolation", "wild"] },
+];
+
+export const STRENGTHS = [
+  { t: "fiercely loyal", b5: "A+" }, { t: "brave when it counts", b5: "N-" }, { t: "a patient teacher", b5: "A+ C+" },
+  { t: "a quick thinker", b5: "O+" }, { t: "cool-headed in a crisis", b5: "N-" }, { t: "good at reading people", b5: "O+ A+" },
+  { t: "a tireless worker", b5: "C+" }, { t: "honest to a fault", b5: "A+ C+" }, { t: "resourceful under pressure", b5: "O+ C+" },
+  { t: "generous with time", b5: "A+" }, { t: "funny when things are darkest", b5: "E+ N-" }, { t: "never gives up", b5: "C+" },
+  { t: "a great listener", b5: "A+ E-" }, { t: "sees the best in people", b5: "A+ N-" }, { t: "good with money", b5: "C+" },
+  { t: "endlessly curious", b5: "O+" }, { t: "protective of the weak", b5: "A+" }, { t: "able to inspire a crowd", b5: "E+" },
+  { t: "a keeper of secrets", b5: "C+ E-" }, { t: "a fair judge", b5: "C+ A+" }, { t: "a creative problem solver", b5: "O+" },
+  { t: "a steady presence", b5: "N- C+" }, { t: "quick to forgive", b5: "A+" }, { t: "a fast learner", b5: "O+" },
+  { t: "a natural peacemaker", b5: "A+ E+" }, { t: "knows when to walk away", b5: "N- C+" }, { t: "notices small details", b5: "C+" },
+  { t: "magnetic in a room", b5: "E+" }, { t: "humble about real skill", b5: "A+ E-" }, { t: "unshakably honest with {themself}", b5: "N- O+" },
+];
+
+// ---------- flaws and fears ----------
+
+export const VICES = [
+  { t: "drinks too much", tags: ["loss", "violence"] }, { t: "gambles", tags: ["chaos", "crime"] },
+  { t: "smokes, and won't quit", tags: ["poverty", "craft"] }, { t: "gossips", tags: ["art", "secrecy"] },
+  { t: "has a sweet tooth that borders on sin", tags: ["family", "wealth"] }, { t: "spends money {they} {does}n't have", tags: ["wealth", "poverty"] },
+  { t: "can't resist a pretty face", tags: ["art", "chaos"] }, { t: "lies for fun", tags: ["crime", "art"] },
+  { t: "sleeps through anything that matters before noon", tags: ["chaos"] }, { t: "stays up all night reading", tags: ["learning", "isolation"] },
+  { t: "picks at old wounds, literally and otherwise", tags: ["loss", "violence"] }, { t: "hoards useless trinkets", tags: ["poverty", "isolation"] },
+  { t: "collects grudges", tags: ["betrayal"] }, { t: "chases danger for the thrill", tags: ["chaos", "violence"] },
+  { t: "eats when sad, which is often", tags: ["loss", "family"] }, { t: "pockets small things that aren't {theirs}", tags: ["crime", "poverty"] },
+  { t: "bets on anything", tags: ["chaos", "crime"] }, { t: "can't leave a fight unfinished", tags: ["violence", "ambition"] },
+];
+
+export const PHOBIAS = [
+  "spiders", "snakes", "heights", "deep water", "the dark", "enclosed spaces", "thunder", "blood", "needles", "dogs",
+  "birds", "rats", "being buried alive", "masks", "bridges", "mirrors at night", "wide open fields", "horses", "fire",
+  "bees", "ice", "caves", "dolls", "the sound of bells",
+];
+
+export const SOCIAL_FEARS = [
+  { t: "being exposed as a fraud", tags: ["secrecy", "ambition"] }, { t: "being rejected by the people {they} love", tags: ["family", "loss"] },
+  { t: "being pitied", tags: ["poverty", "violence"] }, { t: "being forgotten", tags: ["art", "isolation"] },
+  { t: "looking foolish", tags: ["ambition", "art"] }, { t: "being ordinary", tags: ["ambition", "learning"] },
+  { t: "disappointing a parent", tags: ["family", "duty"] }, { t: "being found out", tags: ["crime", "secrecy"] },
+  { t: "being seen crying", tags: ["violence", "duty"] }, { t: "being a burden", tags: ["healing", "poverty"] },
+  { t: "being replaced", tags: ["craft", "betrayal"] }, { t: "losing the respect of {their} peers", tags: ["duty", "order"] },
+  { t: "being alone in a room full of people", tags: ["isolation", "art"] }, { t: "being owed nothing by anyone", tags: ["wealth", "family"] },
+  { t: "saying the wrong thing at the worst moment", tags: ["order", "art"] }, { t: "being seen as weak", tags: ["violence", "ambition"] },
+];
+
+// What the character does when a fear is triggered.
+export const COPING = [
+  { t: "pretends everything is fine, loudly", b5: "E+ N+" }, { t: "throws {themself} into work", b5: "C+" },
+  { t: "goes somewhere high and alone", b5: "E-" }, { t: "picks a fight to feel in control", b5: "A-" },
+  { t: "finds someone to help, so {they} {does}n't have to think", b5: "A+" }, { t: "drinks until it's quiet", b5: "N+ C-" },
+  { t: "makes a joke of it", b5: "E+" }, { t: "plans for every possible outcome", b5: "C+ N+" },
+  { t: "prays", b5: "O- C+" }, { t: "runs, sometimes literally", b5: "C- N+" },
+  { t: "goes to {their} oldest friend", b5: "E+ A+" }, { t: "writes it all down", b5: "O+ E-" },
+  { t: "goes very still and very quiet", b5: "N-" }, { t: "cleans until it passes", b5: "C+ E-" },
+  { t: "lashes out, then apologizes", b5: "N+ A+" }, { t: "sleeps it off", b5: "N- C-" },
+];
+
+// ---------- morality, option 1: Moral Foundations ----------
+
+export const FOUNDATIONS = [
+  { id: "care", label: "Care", desc: "protecting others from harm",
+    tags: { healing: 1, family: 0.6, faith: 0.3, violence: -0.6, ambition: -0.3 }, b5: { A: 0.6 },
+    high: "can't stand to see anyone suffer", low: "has little patience for weakness" },
+  { id: "fairness", label: "Fairness", desc: "justice, rights and playing fair",
+    tags: { order: 0.4, poverty: 0.5, betrayal: 0.4, duty: 0.3, crime: -0.4 }, b5: { A: 0.3, O: 0.2 },
+    high: "needs things to be fair", low: "will bend the rules when it helps {their} side" },
+  { id: "loyalty", label: "Loyalty", desc: "standing by family, friends and group",
+    tags: { family: 0.8, duty: 0.6, violence: 0.2, betrayal: 0.3, isolation: -0.6, travel: -0.2 }, b5: { E: 0.2, A: 0.2 },
+    high: "stands by {their} own, no matter what", low: "owes nothing to any group" },
+  { id: "authority", label: "Authority", desc: "respect for order, rank and tradition",
+    tags: { order: 1, duty: 0.8, faith: 0.4, chaos: -1, crime: -0.5 }, b5: { C: 0.4, O: -0.3 },
+    high: "respects rank, law and tradition", low: "has no respect for titles" },
+  { id: "sanctity", label: "Sanctity", desc: "purity, the sacred and the untouchable",
+    tags: { faith: 1, family: 0.3, wild: 0.2, chaos: -0.4, crime: -0.3 }, b5: { O: -0.4, C: 0.2 },
+    high: "holds some things sacred", low: "finds nothing sacred" },
+  { id: "liberty", label: "Liberty", desc: "freedom from control and domination",
+    tags: { chaos: 0.8, poverty: 0.4, travel: 0.4, isolation: 0.3, order: -0.8 }, b5: { O: 0.4, A: -0.2 },
+    high: "won't be told what to do", low: "is comfortable taking orders" },
+];
+
+// ---------- morality, option 2: Schwartz basic values ----------
+// In circle order: each value sits beside compatible ones and opposite the
+// value five places away.
+
+export const VALUES = [
+  { id: "selfDirection", label: "Independence", desc: "thinking and choosing for {themself}",
+    tags: { learning: 0.5, travel: 0.5, art: 0.5, isolation: 0.3, order: -0.5 }, b5: { O: 0.6 } },
+  { id: "stimulation", label: "Excitement", desc: "novelty, risk and challenge",
+    tags: { chaos: 0.8, travel: 0.6, violence: 0.2, order: -0.3 }, b5: { O: 0.3, E: 0.5 } },
+  { id: "hedonism", label: "Pleasure", desc: "enjoying life",
+    tags: { art: 0.4, wealth: 0.5, chaos: 0.3, duty: -0.4, faith: -0.3 }, b5: { E: 0.3, C: -0.3 } },
+  { id: "achievement", label: "Achievement", desc: "success and being good at things",
+    tags: { ambition: 1, craft: 0.5, learning: 0.3 }, b5: { C: 0.4, E: 0.3 } },
+  { id: "power", label: "Power", desc: "control, status and wealth",
+    tags: { ambition: 0.6, wealth: 0.8, order: 0.3, violence: 0.3, healing: -0.4 }, b5: { A: -0.5 } },
+  { id: "security", label: "Security", desc: "safety and stability",
+    tags: { poverty: 0.6, family: 0.4, order: 0.5, loss: 0.4, chaos: -0.5 }, b5: { N: 0.4, O: -0.3 } },
+  { id: "conformity", label: "Conformity", desc: "fitting in and keeping the rules",
+    tags: { order: 0.6, duty: 0.6, faith: 0.3, chaos: -0.8, crime: -0.4 }, b5: { C: 0.4, O: -0.4 } },
+  { id: "tradition", label: "Tradition", desc: "honoring the old ways",
+    tags: { faith: 0.8, family: 0.5, order: 0.3, tech: -0.4, travel: -0.3 }, b5: { O: -0.6 } },
+  { id: "benevolence", label: "Kindness", desc: "caring for the people close to {them}",
+    tags: { family: 0.8, healing: 0.8, betrayal: -0.3, violence: -0.3 }, b5: { A: 0.6 } },
+  { id: "universalism", label: "Universalism", desc: "fairness and care for everyone, strangers included",
+    tags: { healing: 0.5, learning: 0.4, wild: 0.5, faith: 0.2, violence: -0.4, ambition: -0.3 }, b5: { O: 0.5, A: 0.3 } },
+];
+
+// ---------- more depth ----------
+const more = (list, ...items) => list.push(...items);
+
+more(UNDER_STRESS,
+  { t: "gets bossy and starts giving everyone jobs", b5: "E+ C+" },
+  { t: "goes to bed early and pretends it isn't happening", b5: "N+ C-" },
+  { t: "picks apart every mistake, starting with {their} own", b5: "C+ N+" },
+  { t: "seeks out the one person who always calms {them} down", b5: "A+ E+" },
+  { t: "gets strangely cheerful, which worries everyone", b5: "E+ N-" },
+  { t: "walks for miles without noticing where", b5: "E- O+" },
+  { t: "starts counting things: steps, coins, breaths", b5: "C+ N+" },
+  { t: "turns cold and businesslike", b5: "A- C+" },
+  { t: "spends money {they} shouldn't", b5: "C- E+" },
+  { t: "loses {their} temper at something small and unrelated", b5: "N+ A-" },
+  { t: "sharpens {their} focus to a single point and ignores everything else", b5: "C+ N-" },
+  { t: "calls home", b5: "A+ N+" },
+);
+more(IN_CONFLICT,
+  { t: "goes silent and lets the silence do the work", b5: "E- N-" },
+  { t: "apologizes first, even when it isn't {their} fault", b5: "A+ N+" },
+  { t: "finds a third option nobody considered", b5: "O+ A+" },
+  { t: "quotes the other person's own words back at them", b5: "C+ A-" },
+  { t: "lets someone else fight it out for {them}", b5: "E- A-" },
+  { t: "turns it into a joke that also lands a hit", b5: "E+ A-" },
+  { t: "leaves the room and comes back with a better argument", b5: "C+ E-" },
+  { t: "fights fair, and expects the same", b5: "A+ C+" },
+  { t: "cries, and hates that {they} {does}", b5: "N+ E-" },
+  { t: "wins the argument and loses the friend", b5: "A- C+" },
+);
+more(WITH_STRANGERS,
+  { t: "sizing them up for a fight, just in case", b5: "A- N+" },
+  { t: "generous with food, stingy with names", b5: "A+ E-" },
+  { t: "flirtatious, more or less by default", b5: "E+ O+" },
+  { t: "talkative about everything except {themself}", b5: "E+ C+" },
+  { t: "gruff, then quietly helpful", b5: "A+ E-" },
+  { t: "eager to impress", b5: "E+ N+" },
+  { t: "patient and a little amused", b5: "N- A+" },
+  { t: "brisk and transactional", b5: "C+ A-" },
+  { t: "instantly protective of anyone smaller or weaker", b5: "A+ C+" },
+  { t: "visibly nervous", b5: "N+ E-" },
+  { t: "telling tall tales within the first five minutes", b5: "E+ O+" },
+  { t: "quietly noting exits and hands", b5: "C+ N+" },
+);
+more(HUMOR,
+  { t: "mock-heroic, narrating small tasks like epic battles", b5: "O+ E+" },
+  { t: "bleak and very funny about it", b5: "N+ E-" },
+  { t: "gentle, built for cheering others up", b5: "A+ N-" },
+  { t: "loud, bawdy and proud of it", b5: "E+ A-" },
+  { t: "impressions of everyone {they} know{s}", b5: "E+ O+" },
+  { t: "sarcasm, so subtle nobody's sure", b5: "E- A-" },
+  { t: "old jokes told over and over until they're funny again", b5: "A+ C+" },
+  { t: "laughs at {their} own jokes before the punchline", b5: "E+ N+" },
+  { t: "competitive: has to get the last laugh", b5: "A- E+" },
+  { t: "wordplay in three languages", b5: "O+ C+" },
+);
+more(STRENGTHS,
+  { t: "a superb cook", b5: "A+ C+" }, { t: "impossible to bribe", b5: "C+ A+" }, { t: "never forgets a face", b5: "C+ O+" },
+  { t: "brilliant at improvising", b5: "O+ C-" }, { t: "good with animals", b5: "A+ N-" }, { t: "quick to apologize and mean it", b5: "A+" },
+  { t: "calm with the dying and the grieving", b5: "N- A+" }, { t: "unafraid to say the hard thing", b5: "A- N-" },
+  { t: "a gifted storyteller", b5: "E+ O+" }, { t: "keeps promises, every time", b5: "C+" },
+);
+more(LIKES,
+  { t: "an honest day's work", tags: ["craft", "duty"] }, { t: "candlelight", tags: ["faith", "art"] }, { t: "trains, or whatever passes for them", tags: ["travel", "tech"] },
+  { t: "old maps of places that changed", tags: ["learning", "loss"] }, { t: "the first snow", tags: ["wild", "family"] }, { t: "a full larder", tags: ["poverty", "family"] },
+  { t: "being underestimated", tags: ["crime", "ambition"] }, { t: "festivals", tags: ["art", "family"] }, { t: "silence after a storm", tags: ["wild", "faith"] },
+  { t: "flowers nobody else notices", tags: ["wild", "art"] }, { t: "horses", tags: ["travel", "wild"] }, { t: "a good secret", tags: ["secrecy", "crime"] },
+  { t: "clean sheets", tags: ["order", "poverty"] }, { t: "machines that hum", tags: ["tech", "craft"] }, { t: "the company of old people", tags: ["family", "learning"] },
+);
+more(DISLIKES,
+  { t: "being pitied", tags: ["poverty", "violence"] }, { t: "unanswered letters", tags: ["family", "loss"] }, { t: "soft hands", tags: ["craft", "poverty"] },
+  { t: "fanatics", tags: ["learning", "chaos"] }, { t: "heat", tags: ["wild"] }, { t: "mirrors", tags: ["secrecy", "loss"] },
+  { t: "hypocrites", tags: ["faith", "betrayal"] }, { t: "debt", tags: ["poverty", "wealth"] }, { t: "the smell of hospitals", tags: ["healing", "loss"] },
+  { t: "being interrupted", tags: ["order", "learning"] }, { t: "machines that talk", tags: ["tech", "faith"] }, { t: "broken promises", tags: ["betrayal", "duty"] },
+  { t: "fancy food", tags: ["poverty", "family"] }, { t: "being kept waiting", tags: ["order", "ambition"] }, { t: "anyone who kicks a dog", tags: ["wild", "healing"] },
+);
+more(HABITS,
+  { t: "writes {their} enemies' names in a small black book", tags: ["betrayal", "secrecy"] }, { t: "hums while {they} think{s}", tags: ["art"] },
+  { t: "takes a cold bath every morning", tags: ["duty", "order"] }, { t: "tidies other people's rooms without asking", tags: ["order", "family"] },
+  { t: "talks to {their} plants by name", tags: ["wild", "isolation"] }, { t: "lights a candle for the dead every night", tags: ["faith", "loss"] },
+  { t: "rereads the same book every winter", tags: ["learning", "family"] }, { t: "sleeps with a weapon within reach", tags: ["violence", "crime"] },
+  { t: "keeps meticulous lists of everything {they} {has} ever read", tags: ["learning", "order"] }, { t: "never eats breakfast", tags: ["chaos", "poverty"] },
+);
+more(VICES,
+  { t: "can't stop buying books {they} never read", tags: ["learning", "wealth"] }, { t: "flirts with danger and everyone in it", tags: ["chaos", "art"] },
+  { t: "cheats at cards, even with friends", tags: ["crime", "chaos"] }, { t: "sulks magnificently", tags: ["art", "isolation"] },
+  { t: "drinks far too much coffee", tags: ["craft", "duty"] }, { t: "eavesdrops", tags: ["secrecy", "learning"] },
+  { t: "boasts", tags: ["ambition", "art"] }, { t: "sleeps with the wrong people", tags: ["chaos", "betrayal"] },
+);
+more(PHOBIAS,
+  "lightning", "being watched while asleep", "crowded markets", "the sea at night", "moths", "rotting food",
+  "wolves", "tight clothing", "large statues", "silence in a forest", "burns", "falling",
+);
+more(SOCIAL_FEARS,
+  { t: "being left out", tags: ["family", "isolation"] }, { t: "being talked about", tags: ["art", "secrecy"] },
+  { t: "being responsible for someone's death", tags: ["violence", "duty"] }, { t: "getting old before doing anything worthwhile", tags: ["ambition", "loss"] },
+  { t: "being loved for the wrong reasons", tags: ["wealth", "family"] }, { t: "having to ask for help", tags: ["poverty", "duty"] },
+  { t: "turning out exactly like {their} parents", tags: ["family", "violence"] }, { t: "being misunderstood forever", tags: ["isolation", "art"] },
+);
+more(COPING,
+  { t: "goes to the water and stays until it passes", b5: "E- N+" }, { t: "cooks an enormous meal", b5: "A+ C+" },
+  { t: "gets angry, because angry is easier than afraid", b5: "A- N+" }, { t: "picks up a dangerous hobby for a week", b5: "C- O+" },
+  { t: "trains until {their} body gives out", b5: "C+ E-" }, { t: "tells someone the whole truth, then regrets it", b5: "E+ N+" },
+  { t: "breathes and counts to a hundred, slowly", b5: "N- C+" }, { t: "throws a party", b5: "E+ C-" },
+);

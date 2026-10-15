@@ -5,7 +5,8 @@
 import { GENRES } from "../data/genres/index.js";
 import { PRONOUNS, fill, cap, article, stripArticle } from "../engine/text.js";
 import { ARCHETYPES } from "../engine/generate.js";
-import { MORAL_NAMES } from "../data/shared.js";
+import { FOUNDATIONS, VALUES } from "../data/psyche.js";
+import { joinList } from "../engine/text.js";
 import { orientationLabel, spouseWord } from "../data/orientation.js";
 
 const PARTNER_PRONOUNS = {
@@ -14,11 +15,41 @@ const PARTNER_PRONOUNS = {
   nonbinary: { pthey: "they", pthem: "them", ptheir: "their" },
 };
 
-// Name for a point on the moral compass.
-export function moralLabel(m) {
-  if (!m) return "Unknown";
-  const band = (v) => (v >= 0.33 ? 0 : v <= -0.33 ? 2 : 1);
-  return MORAL_NAMES[band(m.mercy)][band(m.order)];
+// Moral Foundations: strongest and weakest foundation.
+export function foundationSummary(c) {
+  const f = c.core.morality?.foundations;
+  if (!f) return null;
+  const ranked = FOUNDATIONS.map((d) => ({ ...d, v: f[d.id] })).sort((a, b) => b.v - a.v);
+  const top = ranked[0];
+  const bottom = ranked[ranked.length - 1];
+  const x = textContext(c);
+  return {
+    top, bottom, ranked,
+    text: `${c.core.identity.first} ${fill(top.high, x)}, but ${fill(bottom.low, x)}.`,
+  };
+}
+
+// Schwartz values: the top three, the least important, and any tension
+// between top values that sit on opposite sides of the circle.
+export function valuesSummary(c) {
+  const v = c.core.morality?.values;
+  if (!v) return null;
+  const ranked = VALUES.map((d, i) => ({ ...d, i, v: v[d.id] })).sort((a, b) => b.v - a.v);
+  const top = ranked.slice(0, 3);
+  const least = ranked[ranked.length - 1];
+  const dist = (a, b) => { const d = Math.abs(a.i - b.i); return Math.min(d, VALUES.length - d); };
+  const torn = dist(top[0], top[1]) >= 4 ? [top[0], top[1]] : null;
+  const first = c.core.identity.first;
+  let text = `${first} is driven by ${joinList(top.map((t) => t.label.toLowerCase()))}, and cares least about ${least.label.toLowerCase()}.`;
+  if (torn) text += ` ${torn[0].label} and ${torn[1].label.toLowerCase()} pull in opposite directions, and ${first} feels it.`;
+  return { top, least, torn, ranked, text };
+}
+
+export function giftList(c) {
+  const g = c.core.gift;
+  if (!g) return [];
+  if (Array.isArray(g.list)) return g.list;
+  return g.none ? [] : [{ t: g.t, tier: g.tier }];
 }
 
 export function textContext(c) {
@@ -74,28 +105,30 @@ export const TemplateProvider = {
     const first = id.first;
     const traits = pe.traits.map((t) => t.t);
     const occ = stripArticle(id.occupation.t);
+    const gifts = giftList(c);
 
     const pitch = `${cap(article(traits[0]))} ${traits[0]} ${occ} from ${f(id.originShort)} who wants to ${f(mo.short)}.`;
 
     const backstory = [
       `${first} comes from ${f(id.origin)} and grew up ${f(bg.upbringing)}.`,
-      (c.core.grade?.tier ?? 2) >= 2 ? `Everything changed when ${f(bg.event.t)}.` : `What shaped ${first} most: ${f(bg.event.t)}.`,
+      `Everything changed when ${f(bg.event.t)}.`,
       `Then came the turning point: ${f(bg.turningPoint)}.`,
       `Now ${first} is ${article(traits[0])} ${traits.join(", ")} ${occ}. ${f("{They} {is}")} ${f(pe.temperament.phrase)}.`,
-      c.core.gift && !c.core.gift.none ? `And ${first} ${f(c.core.gift.t)}.` : "",
+      gifts.length ? `And ${first} ${joinList(gifts.map((g) => f(g.t)))}.` : "",
       `What ${first} wants most is ${f(mo.want)}, ${f(mo.why)}.`,
-      `${f("{They}")} won't admit it, but ${f("{they} {is}")} afraid of ${f(fl.fears[0])}.`,
+      `${f("{They}")} won't admit it, but ${f("{they} {is}")} afraid of ${f(fl.deepFear || fl.fears?.[0] || "the dark")}.`,
     ].filter(Boolean).join(" ");
 
     const mo2 = c.core.morality;
     const moral = mo2 ? {
-      label: moralLabel(mo2),
+      foundations: foundationSummary(c),
+      values: valuesSummary(c),
       line: `${first} ${f(mo2.line)}, but would cross that line ${f(mo2.breakingPoint)}.`,
     } : null;
 
     const gmNotes = [
       `Play ${first} ${f(vo.desc)}. ${first} ${f(vo.habits[0])}.`,
-      `Under pressure, ${first} ${f(fl.weaknesses[0])}.`,
+      `Under pressure, ${first} ${f(fl.defining || fl.weaknesses?.[0] || "")}.`,
       `Bring up ${f(bg.event.short)} and watch ${f("{them}")} go quiet.`,
       moral ? moral.line : "",
     ].filter(Boolean).join(" ");
@@ -131,7 +164,7 @@ export const TemplateProvider = {
       hook: `${first} ${f(c.core.hook.t)}`,
       voiceLine: f(vo.line),
       moral,
-      gift: c.core.gift && !c.core.gift.none ? `${first} ${f(c.core.gift.t)}.` : null,
+      gifts: gifts.map((g) => `${first} ${f(g.t)}.`),
       love: c.core.love ? `${first} ${f(c.core.love.note)}.` : null,
       archetypeLabel: ARCHETYPES[tt.archetype].label,
     };

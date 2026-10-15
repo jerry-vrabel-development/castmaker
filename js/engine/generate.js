@@ -11,6 +11,33 @@ import { makeRng, newSeed } from "./rng.js";
 import { stakeOf, occupationWeight, GRADE_MATCH } from "../data/rarity.js";
 import { roll4d6DropLowest, gradeOfTotal } from "./dice.js";
 import { ORIENTATIONS, STATUS_BY_STAGE, LOVE_NOTES } from "../data/orientation.js";
+import * as P from "../data/psyche.js";
+
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const round1 = (v) => Math.round(v * 10) / 10;
+
+// Scores are widened so profiles feel distinct, then re-centered on 3 so no
+// dimension leans one way across all characters (measured by simulation).
+const SPREAD = 1.4;
+const CENTER = {
+  O: 0.43, C: 0.83, E: -0.1, A: 0.25, N: 0.53,
+  care: 0.4, fairness: 0.5, loyalty: 0.6, authority: 0.57, sanctity: 0.42, liberty: 0.27,
+  selfDirection: 0.44, stimulation: 0.27, hedonism: 0, achievement: 0.63, power: 0.5,
+  security: 0.83, conformity: 0.37, tradition: 0.51, benevolence: 0.48, universalism: 0.23,
+};
+
+// Weight for an entry tagged with a Big Five code like "A+ N-": higher when
+// the character's profile leans the same way.
+export function b5Weight(code, big5) {
+  if (!code || !big5) return 1;
+  let sum = 0;
+  for (const part of code.split(" ")) {
+    const d = part[0];
+    const sign = part[1] === "-" ? -1 : 1;
+    sum += sign * ((big5[d] ?? 3) - 3) / 2;
+  }
+  return Math.max(0.12, 1 + 1.6 * sum);
+}
 
 // Combine coherence with the character's grade: entries whose stakes are
 // close to the grade are much more likely. Heroes get heroic stakes.
@@ -63,14 +90,24 @@ export const SECTIONS = [...CORE_SECTIONS, ...LAYER_SECTIONS];
 const DEPENDENTS = {
   grade: ["gift", "background", "motivation", "hook", "morality", "tabletop", "writer"],
   identity: ["love", "tabletop"],
-  background: ["writer", "morality"],
-  personality: ["voice", "morality", "tabletop"],
+  background: ["writer", "morality", "flaws"],
+  personality: ["voice", "morality", "flaws", "tabletop"],
   motivation: ["morality"],
 };
 
 // Grade nudges: how far strengths move, and how extreme morality gets.
 const GRADE_STRENGTH = [-2, -1, 0, 1, 3];
-const GRADE_MORAL = [0.6, 0.8, 1, 1.25, 1.6];
+const GRADE_MORAL = [0.75, 0.9, 1, 1.2, 1.45];
+
+// Gift slots per grade: each slot has a chance to appear and odds for gift
+// strength 1-4 (knack, talent, rare power, destiny).
+const GIFT_SLOTS = [
+  [{ p: 0.5, tiers: [1, 0, 0, 0] }],
+  [{ p: 0.9, tiers: [3, 1, 0, 0] }, { p: 0.25, tiers: [1, 0, 0, 0] }],
+  [{ p: 1, tiers: [1, 3, 0.4, 0] }, { p: 0.5, tiers: [3, 1, 0, 0] }],
+  [{ p: 1, tiers: [0, 1, 4, 0] }, { p: 0.85, tiers: [2, 2, 0.5, 0] }, { p: 0.3, tiers: [1, 1, 0, 0] }],
+  [{ p: 1, tiers: [0, 0, 0, 1] }, { p: 1, tiers: [0, 1, 2, 0.2] }, { p: 0.45, tiers: [1, 2, 1, 0] }],
+];
 
 export const ARCHETYPES = {
   warrior: { label: "Warrior", tags: ["violence", "duty"], base: { might: 4, agility: 3, wits: 2, presence: 2, resolve: 4 } },
@@ -184,25 +221,59 @@ const GEN = {
     };
   },
 
+  // Personality rests on a Big Five profile built from the character's
+  // history. The profile then steers traits and behavior, so a reserved,
+  // anxious character gets reserved, anxious habits.
   personality(c, rng, bag) {
-    const traits = sampleFresh(rng, "trait", T.TRAITS, 3, T_, weigher(bag, 2.5), (item, chosen) =>
+    const big5 = {};
+    for (const d of P.BIG5) {
+      let v = 0;
+      for (const [t, w] of Object.entries(P.TAG_B5)) v += Math.min(bag[t] || 0, 2) * (w[d.id] || 0);
+      const noise = (rng.float() + rng.float() + rng.float() - 1.5) * 1.3;
+      big5[d.id] = round1(clamp(3 + (v * 0.35 + noise) * SPREAD - (CENTER[d.id] || 0), 1, 5));
+    }
+    const fit = (code) => b5Weight(code, big5);
+    const traits = sampleFresh(rng, "trait", T.TRAITS, 3, T_, (t) => weigher(bag, 2.5)(t) * fit(P.TRAIT_B5[t.t]), (item, chosen) =>
       !chosen.some((x) => x.opp === item.t || item.opp === x.t));
     const temp = pickFresh(rng, "temperament", T.TEMPERAMENTS, T_, weigher(bag, 2));
     const quirks = sampleFresh(rng, "quirk", T.QUIRKS, 2, T_, weigher(bag, 2));
+    const likes = sampleFresh(rng, "like", P.LIKES, 2, T_, weigher(bag, 2));
+    const dislikes = sampleFresh(rng, "dislike", P.DISLIKES, 2, T_, weigher(bag, 2));
     return {
+      big5,
       traits: traits.map((x) => ({ t: x.t, law: x.law || 0, good: x.good || 0 })),
       temperament: { t: temp.t, phrase: temp.phrase, voices: temp.voices },
-      quirks: quirks.map((q) => q.t),
+      stress: pickFresh(rng, "stress", P.UNDER_STRESS, T_, (x) => fit(x.b5)).t,
+      conflict: pickFresh(rng, "conflict", P.IN_CONFLICT, T_, (x) => fit(x.b5)).t,
+      strangers: pickFresh(rng, "strangers", P.WITH_STRANGERS, T_, (x) => fit(x.b5)).t,
+      humor: pickFresh(rng, "humor", P.HUMOR, T_, (x) => fit(x.b5)).t,
+      strengths: sampleFresh(rng, "strength", P.STRENGTHS, 2, T_, (x) => fit(x.b5)).map(T_),
+      likes: likes.map(T_),
+      dislikes: dislikes.map(T_),
+      habit: pickFresh(rng, "habit", P.HABITS, T_, weigher(bag, 2)).t,
+      quirks: quirks.map(T_),
       _tags: uniq([...traits.flatMap((x) => x.tags), ...temp.tags]),
     };
   },
 
+  // Flaws and fears in layers: one defining flaw, smaller ones, a vice; a deep
+  // fear rooted in the defining event, a phobia, a social fear, and how the
+  // character copes when afraid.
   flaws(c, rng, bag) {
-    const weaknesses = sampleFresh(rng, "flaw", T.FLAWS, 2, T_, weigher(bag, 2.5));
-    const fears = sampleFresh(rng, "fear", T.FEARS, 2, T_, weigher(bag, 2.5));
+    const big5 = c.core.personality?.big5 || { O: 3, C: 3, E: 3, A: 3, N: 3 };
+    const flaws = sampleFresh(rng, "flaw", T.FLAWS, 3, T_, weigher(bag, 2.5));
+    const evTags = c.core.background?.event?.tags || [];
+    const overlap = (f) => (f.tags || []).filter((t) => evTags.includes(t)).length;
+    const deep = pickFresh(rng, "fear", T.FEARS, T_, (f) => weigher(bag, 1)(f) * (overlap(f) ? 10 * overlap(f) : 1));
     return {
-      weaknesses: weaknesses.map((x) => x.t),
-      fears: fears.map((x) => x.t),
+      defining: flaws[0].t,
+      minor: flaws.slice(1).map(T_),
+      vice: pickFresh(rng, "vice", P.VICES, T_, weigher(bag, 2)).t,
+      deepFear: deep.t,
+      rooted: overlap(deep) > 0,
+      phobia: pickFresh(rng, "phobia", P.PHOBIAS),
+      socialFear: pickFresh(rng, "socialFear", P.SOCIAL_FEARS, T_, weigher(bag, 2)).t,
+      coping: pickFresh(rng, "coping", P.COPING, T_, (x) => b5Weight(x.b5, big5)).t,
       _tags: [],
     };
   },
@@ -212,39 +283,42 @@ const GEN = {
     return { want: want.t, short: want.short, why: rng.pick(want.why), _tags: want.tags };
   },
 
-  // Where the character sits on two axes, from their traits, history and
-  // wants. Higher grades are pushed toward the extremes: paragons and monsters.
+  // Morality, two ways (the app can show either or both while we compare):
+  // Moral Foundations scores and Schwartz basic values, both 1-5, built from
+  // history and personality. Higher grades are pushed toward the extremes.
   morality(c, rng, bag) {
-    const traits = c.core.personality?.traits || [];
-    const pull = (axis) => {
-      let v = 0;
-      for (const [t, w] of Object.entries(T.MORAL_PULL[axis])) v += Math.min(bag[t] || 0, 2) * w;
-      return v;
-    };
-    const noise = () => (rng.float() + rng.float() + rng.float() - 1.5) * 0.35;
+    const big5 = c.core.personality?.big5 || { O: 3, C: 3, E: 3, A: 3, N: 3 };
     const k = GRADE_MORAL[gradeOf(c)];
-    const clamp = (v) => Math.max(-1, Math.min(1, v));
-    // The -0.15 offsets the tables, which lean slightly toward order.
-    const order = clamp((traits.reduce((s, t) => s + t.law, 0) * 0.35 + pull("order") * 0.09 - 0.15 + noise()) * k);
-    const mercy = clamp((traits.reduce((s, t) => s + t.good, 0) * 0.4 + pull("mercy") * 0.09 + noise()) * k);
-    const line = pickFresh(rng, "moralLine", T.MORAL_LINES, T_, (l) => weigher(bag, 2)(l) * (l.mercy != null && mercy < l.mercy - 0.6 ? 0.3 : 1));
-    const breaking = pickFresh(rng, "breaking", T.BREAKING_POINTS, T_, weigher(bag, 2));
-    return {
-      order: Math.round(order * 100) / 100,
-      mercy: Math.round(mercy * 100) / 100,
-      line: line.t,
-      breakingPoint: breaking.t,
-      _tags: [],
+    const score = (def) => {
+      let v = 0;
+      for (const [t, w] of Object.entries(def.tags)) v += Math.min(bag[t] || 0, 2) * w;
+      for (const [d, w] of Object.entries(def.b5 || {})) v += (big5[d] - 3) * w;
+      const noise = (rng.float() + rng.float() + rng.float() - 1.5) * 1.2;
+      return round1(clamp(3 + (v * 0.35 + noise) * k * SPREAD - (CENTER[def.id] || 0), 1, 5));
     };
+    const foundations = Object.fromEntries(P.FOUNDATIONS.map((f) => [f.id, score(f)]));
+    const values = Object.fromEntries(P.VALUES.map((v) => [v.id, score(v)]));
+    const good = (foundations.care + foundations.fairness) / 2 - 3;
+    const line = pickFresh(rng, "moralLine", T.MORAL_LINES, T_, (l) => weigher(bag, 2)(l) * (l.mercy != null && good < l.mercy * 2 - 1 ? 0.3 : 1));
+    const breaking = pickFresh(rng, "breaking", T.BREAKING_POINTS, T_, weigher(bag, 2));
+    return { foundations, values, line: line.t, breakingPoint: breaking.t, _tags: [] };
   },
 
-  // Common characters have no gift. Higher grades draw from matching tiers.
+  // Gifts: a character can have none, one or several. Grade raises both how
+  // many and how strong.
   gift(c, rng, bag, G) {
-    const grade = gradeOf(c);
-    if (grade === 0) return { none: true, tier: 0, _tags: [] };
-    const options = G.gifts.filter((g) => g.tier === grade);
-    const g = pickFresh(rng, "gift", options, T_, weigher(bag, 2));
-    return { t: g.t, tier: g.tier, _tags: g.tags };
+    const slots = GIFT_SLOTS[gradeOf(c)];
+    const list = [];
+    for (const slot of slots) {
+      if (!rng.chance(slot.p)) continue;
+      const tier = 1 + rng.weighted([0, 1, 2, 3], (i) => slot.tiers[i]);
+      const options = G.gifts.filter((g) => g.tier === tier && !list.some((x) => x.t === g.t));
+      if (!options.length) continue;
+      const g = pickFresh(rng, "gift", options, T_, weigher(bag, 2));
+      list.push({ t: g.t, tier: g.tier });
+    }
+    list.sort((a, b) => b.tier - a.tier);
+    return { list, _tags: [] };
   },
 
   appearance(c, rng, bag, G) {
@@ -381,27 +455,19 @@ const GEN = {
     const evBag = { ...bag };
     for (const t of c.core.background?._tags || []) evBag[t] = (evBag[t] || 0) + 2;
     const lie = pickFresh(rng, "lie", T.LIES, (x) => x.lie, weigher(evBag, 2));
-    const m = c.core.morality || { order: 0, mercy: 0 };
-    const good = m.mercy;
-    const chaos = m.order < -0.2;
+    // Any character can fill any role; grade doesn't limit it.
+    const f = c.core.morality?.foundations || { care: 3, fairness: 3, liberty: 3, authority: 3 };
+    const good = ((f.care + f.fairness) / 2 - 3) / 2; // -1 .. +1
+    const chaos = f.liberty - f.authority > 1;
     const age = c.core.identity?.age || 30;
-    const grade = gradeOf(c);
-    // Story role follows grade: extras and minor parts at the bottom,
-    // protagonists and antagonists at the top.
-    const LEAD = ["protagonist", "antagonist"];
-    const role = grade === 0 ? { t: "background character" }
-      : grade === 1 ? { t: "minor character" }
-      : rng.weighted(T.ROLES, (r) => {
-        if (grade === 2 && LEAD.includes(r.t)) return 0;
-        if (grade === 4 && !LEAD.includes(r.t)) return 0;
-        if (grade === 3 && !LEAD.includes(r.t) && r.t !== "rival") return 0;
-        if (r.t === "protagonist" && good < -0.3) return 0.2;
-        if (r.t === "antagonist") return good < -0.2 ? 4 : 0.4;
-        if (r.minGood != null && good < r.minGood) return 0.3;
-        if (r.minAge && age < r.minAge) return 0.2;
-        if (r.chaos && !chaos) return 0.4;
-        return r.t === "protagonist" ? 3 : 1.5;
-      });
+    const role = rng.weighted(T.ROLES, (r) => {
+      if (r.t === "protagonist" && good < -0.3) return 0.3;
+      if (r.t === "antagonist") return good < -0.2 ? 4 : 0.4;
+      if (r.minGood != null && good < r.minGood) return 0.3;
+      if (r.minAge && age < r.minAge) return 0.2;
+      if (r.chaos && !chaos) return 0.4;
+      return r.t === "protagonist" ? 3 : 1.5;
+    });
     const arcType = role.t === "antagonist"
       ? rng.weighted(["positive", "negative", "flat"], (a) => ({ positive: 1, negative: 4, flat: 1 })[a])
       : rng.weighted(["positive", "negative", "flat"], (a) => ({ positive: 6, negative: 2, flat: 2 })[a]);
@@ -479,8 +545,15 @@ export function rerollSection(prev, s, { avoidRepeats = false, orientation } = {
 
 // Fill in any sections a character saved by an older version is missing
 // (for example grade, gift and morality in v0.3, love life in v0.4).
+const OUTDATED = {
+  personality: (x) => !x.big5,
+  flaws: (x) => !x.defining,
+  morality: (x) => !x.foundations,
+  gift: (x) => !Array.isArray(x.list),
+};
+
 export function upgradeCharacter(prev) {
-  const missing = SECTIONS.filter((s) => !getSection(prev, s));
+  const missing = SECTIONS.filter((s) => !getSection(prev, s) || OUTDATED[s]?.(getSection(prev, s)));
   if (!missing.length) return prev;
   const c = structuredCloneSafe(prev);
   c.locks = c.locks || [];

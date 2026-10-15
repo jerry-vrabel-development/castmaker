@@ -11,6 +11,7 @@ Every content pack records its source, license and attribution here.
 | Template prose | `js/prose/templates.js` | Original | CC BY 4.0 |
 | Rarity tiers | `js/data/rarity.js` | Original | CC BY 4.0 |
 | Modern job counts | `js/data/rarity.js` | U.S. Bureau of Labor Statistics, Occupational Outlook Handbook (2025 data) | U.S. public domain |
+| Personality, flaws and morality tables | `js/data/psyche.js` | Original text, organized around the Big Five, Moral Foundations Theory and Schwartz's basic human values (research models, not licensed content) | CC BY 4.0 |
 | Orientation odds | `js/data/orientation.js` | Gallup, LGBTQ+ identification survey (2025 data, published Feb 2026) | Statistics cited with attribution |
 | D&D 5e adapter rules values | `js/engine/adapters/dnd5e.js` | System Reference Document 5.1 | CC BY 4.0 |
 

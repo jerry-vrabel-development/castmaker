@@ -57,11 +57,17 @@ function armorClass(kind, m) {
   }
 }
 
-// The moral compass maps onto the nine 5e alignments.
-function alignment(c) {
-  const m = c.core.morality;
+// Moral Foundations map onto the nine 5e alignments: care and fairness give
+// good versus evil; authority and loyalty against liberty give law versus chaos.
+export function alignment(c) {
+  const f = c.core.morality?.foundations;
   let law, good;
-  if (m) { law = m.order >= 0.33 ? 1 : m.order <= -0.33 ? -1 : 0; good = m.mercy >= 0.33 ? 1 : m.mercy <= -0.33 ? -1 : 0; }
+  if (f) {
+    const g = (f.care + f.fairness) / 2 - 3;
+    const l = (f.authority + f.loyalty) / 2 - f.liberty;
+    good = g >= 0.6 ? 1 : g <= -0.6 ? -1 : 0;
+    law = l >= 0.8 ? 1 : l <= -0.8 ? -1 : 0;
+  }
   else {
     const traits = c.core.personality?.traits || [];
     law = traits.reduce((s, t) => s + (t.law || 0), 0);

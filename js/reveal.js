@@ -68,13 +68,19 @@ export async function playReveal(sheet, c, rarity) {
     if (nameEl) { nameEl.textContent = realName; nameEl.classList.remove("spinning"); }
     sheet.classList.remove("revealing");
     if (badge) { badge.classList.remove("charging"); badge.classList.add("stamped"); }
+    sheet.classList.remove("rolling");
+    sheet.classList.add(tierClass);
     sheet.querySelector(".rarity-zone")?.classList.remove("awaiting");
     finishFn = null;
   };
   finishFn = () => { runId++; finalState(); };
 
-  sheet.classList.remove("glow-3", "glow-4");
-  sheet.classList.add("revealing");
+  // The card cycles through every grade color while the dice roll, then
+  // settles on the one rolled.
+  const tierClass = `tier-${rarity.tier}`;
+  sheet.classList.remove("landed", ...["tier-0", "tier-1", "tier-2", "tier-3", "tier-4"]);
+  sheet.classList.add("revealing", "rolling");
+  sheet.style.setProperty("--heat", "0");
   steps.forEach((el) => el.classList.add("pending"));
   // Hide the result before anything fades in: blank dice, no total, no grade.
   const zone = sheet.querySelector(".rarity-zone");
@@ -112,7 +118,7 @@ export async function playReveal(sheet, c, rarity) {
     if (el.classList.contains("rarity-zone")) {
       el.classList.remove("pending");
       el.classList.add("awaiting");
-      await rollDice(el, alive);
+      await rollDice(el, alive, sheet);
       if (!alive()) return;
       // Tension, then the grade.
       if (badge) badge.classList.add("charging", `charge-${rarity.tier}`);
@@ -125,7 +131,9 @@ export async function playReveal(sheet, c, rarity) {
         el.classList.remove("awaiting");
         sfx.stamp(rarity.tier);
         if (rarity.tier >= 3) burst(badge, rarity.tier);
-        if (rarity.tier >= 3) sheet.classList.add(`glow-${rarity.tier}`);
+        sheet.classList.remove("rolling");
+        sheet.classList.add(tierClass, "landed");
+        setTimeout(() => sheet.classList.remove("landed"), 2200);
       }
       await sleep(450 + rarity.tier * 220);
       continue;
@@ -138,7 +146,8 @@ export async function playReveal(sheet, c, rarity) {
 }
 
 // The six ability dice tumble, then land one by one.
-async function rollDice(zone, alive) {
+async function rollDice(zone, alive, sheet) {
+  let landedSum = 0;
   const dice = [...zone.querySelectorAll(".die")];
   const total = zone.querySelector(".dice-total");
   if (total) total.classList.add("hidden-total");
@@ -155,6 +164,10 @@ async function rollDice(zone, alive) {
     dice[i].classList.remove("rolling");
     dice[i].classList.add("landed");
     sfx.dieLand(Number(dice[i].dataset.final));
+    // Heat rises as hot dice land: the card's colors speed up and brighten.
+    landedSum += Number(dice[i].dataset.final);
+    const avg = landedSum / (i + 1);
+    sheet?.style.setProperty("--heat", Math.max(0, Math.min(1, (avg - 10) / 6)).toFixed(2));
     await sleep(85);
   }
   if (total) total.classList.remove("hidden-total");

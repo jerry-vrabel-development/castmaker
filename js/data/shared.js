@@ -1027,3 +1027,26 @@ BREAKING_POINTS.push(
   { t: "if {they} {was} drunk enough", tags: ["chaos", "loss"] },
   { t: "to save the place {they} grew up", tags: ["family", "poverty"] },
 );
+
+FLAWS.push(
+  { t: "can't keep a secret", tags: ["art", "family"] },
+  { t: "is cruel when cornered", tags: ["violence", "betrayal"] },
+  { t: "never finishes what {they} start{s}", tags: ["chaos", "art"] },
+  { t: "is too proud to apologize", tags: ["ambition", "family"] },
+  { t: "hears criticism even in praise", tags: ["ambition", "loss"] },
+  { t: "takes on every problem alone", tags: ["isolation", "duty"] },
+  { t: "is late to everything that matters", tags: ["chaos"] },
+  { t: "sees enemies everywhere", tags: ["betrayal", "secrecy"] },
+  { t: "is too blunt to be kind", tags: ["violence", "craft"] },
+  { t: "can be bought, for the right price", tags: ["wealth", "crime"] },
+  { t: "gets bored with people quickly", tags: ["travel", "art"] },
+  { t: "clings to people who are leaving", tags: ["family", "loss"] },
+  { t: "worships the wrong heroes", tags: ["ambition", "faith"] },
+  { t: "says yes to everything and does half of it", tags: ["family", "chaos"] },
+  { t: "keeps old wounds open on purpose", tags: ["loss", "betrayal"] },
+  { t: "is petty about small things", tags: ["order", "ambition"] },
+  { t: "plays favorites", tags: ["family", "order"] },
+  { t: "refuses to learn from anyone younger", tags: ["learning", "order"] },
+  { t: "bottles everything up until it explodes", tags: ["violence", "secrecy"] },
+  { t: "mistakes control for care", tags: ["order", "family"] },
+);

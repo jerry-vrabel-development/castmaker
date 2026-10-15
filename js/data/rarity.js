@@ -14,11 +14,11 @@
 // affects the grade and is never ranked.
 
 export const TIERS = [
-  { id: "common", label: "Common", story: "Background character", blurb: "A face in the crowd: the barkeep, the gate guard, the clerk." },
-  { id: "uncommon", label: "Uncommon", story: "Named NPC", blurb: "Someone worth a name and one good scene." },
-  { id: "rare", label: "Rare", story: "Supporting character", blurb: "A companion, rival or mentor with a story of their own." },
-  { id: "epic", label: "Epic", story: "Protagonist", blurb: "Strong enough to carry a story." },
-  { id: "legendary", label: "Legendary", story: "Hero of legend", blurb: "The kind of figure stories are told about." },
+  { id: "common", label: "Common" },
+  { id: "uncommon", label: "Uncommon" },
+  { id: "rare", label: "Rare" },
+  { id: "epic", label: "Epic" },
+  { id: "legendary", label: "Legendary" },
 ];
 
 // How strongly an entry's stakes should match the character's grade.
