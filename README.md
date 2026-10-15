@@ -1,5 +1,7 @@
 # Castmaker
 
+https://jerry-vrabel-development.github.io/castmaker/
+
 **A deep, universal generator for original characters — one character core, many modes.**
 
 Castmaker creates original characters that feel like people rather than random trait combinations. A single shared character model sits at the center, and mode-specific layers shape that character for whoever is using it: a Dungeon Master who needs an NPC in thirty seconds, a novelist building a protagonist's inner life, an artist looking for a design prompt, and more.
