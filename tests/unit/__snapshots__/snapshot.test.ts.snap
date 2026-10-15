@@ -1,0 +1,300 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`snapshots > fantasy character snap-1 1`] = `
+"# Valerian Pellam
+
+*A bookish court scribe from the drowned university who wants to expose a powerful liar.*
+
+**Tiefling, 18** · he/him · Court scribe · High fantasy
+
+**Grade: Uncommon** · rolled 8, 14, 10, 12, 12, 18 = 74 · 1 in 3.8 rolls land in this grade
+
+**Gift:** Valerian has a way with animals that borders on uncanny.
+
+**Love life:** Straight. Valerian is single and too busy to think about it, or says so.
+
+## Background
+
+Valerian comes from a ruined university city, half-flooded and grew up in a temple orphanage, where kindness came with a schedule. Everything changed when his parents' inn burned down the winter he turned twelve. Then came the turning point: a promise made at a deathbed. Now Valerian is a bookish, ruthless, wry court scribe. He is quick to anger and quick to laugh. And Valerian has a way with animals that borders on uncanny. What Valerian wants most is to expose a powerful liar, because he helped tell it once. He won't admit it, but he is afraid of becoming like his parents.
+
+## Personality
+
+- **Big Five:** Openness 2.9, Conscientiousness 2.8, Extraversion 2.1, Agreeableness 1.2, Neuroticism 3.6 (1 to 5)
+- **Traits:** bookish, ruthless, wry
+- **Temperament:** fiery, quick to anger and quick to laugh
+- **Strengths:** unafraid to say the hard thing; cool-headed in a crisis
+- **Under stress:** eats, drinks, or both
+- **In conflict:** stays polite and quietly wins
+- **With strangers:** sizing them up for a fight, just in case
+- **Humor:** dark, the gallows kind
+- **Likes:** fresh bread, old maps of places that changed · **Dislikes:** being interrupted, loud chewing
+- **Habit:** Valerian walks the same route every evening
+- **Quirks:** Valerian won't eat anything he can't name; Valerian keeps a list of everyone who has ever lied to him
+
+## Flaws & fears
+
+- **Defining flaw:** is too blunt to be kind
+- **Other flaws:** believes the worst about strangers; can't say no to a friend in trouble
+- **Vice:** gambles
+- **Deep fear:** becoming like his parents, rooted in the inn fire
+- **Phobia:** tight clothing
+- **Social fear:** being exposed as a fraud
+- **When afraid:** Valerian runs, sometimes literally
+
+## Morality
+
+**Moral Foundations:** Valerian won't be told what to do, but owes nothing to any group.
+
+Care 2.6 · Fairness 3.8 · Loyalty 1.4 · Authority 2.3 · Sanctity 1.5 · Liberty 4.6 (1 to 5)
+
+**Values:** Valerian is driven by tradition, pleasure, and independence, and cares least about achievement. Tradition and pleasure pull in opposite directions, and Valerian feels it.
+
+Independence 3.9 · Excitement 3.8 · Pleasure 4.5 · Achievement 1.6 · Power 3.9 · Security 3.3 · Conformity 3.2 · Tradition 5.0 · Kindness 2.3 · Universalism 3.6 (1 to 5)
+
+Valerian never fights unarmed opponents, but would cross that line if it meant going home again.
+
+## Appearance
+
+Slight, with a burn scar along one forearm and a braid threaded with small charms. Wears an apron that never comes off. Never without a key to a door that no longer exists.
+
+## Voice
+
+Speaks theatrically, as though there is always an audience. Valerian gestures with whatever he is holding. Valerian gives everyone a nickname.
+
+> "Picture it: rain, a locked door, and me, magnificent as ever."
+
+## Hook
+
+Valerian is the only living witness to a crime that powerful people want forgotten.
+
+## Relationships
+
+- **Former partner: Reverie Nightingale** saved his life and has never let him forget it.
+- **Patron: Quill Nightingale** is quietly losing everything.
+- **Old flame: Lament Sable** never got the letter he wrote.
+
+## Tabletop
+
+- **Archetype:** Healer
+- **Strengths:** Might 3/5, Agility 2/5, Wits 2/5, Presence 3/5, Resolve 4/5
+- **Combat style:** mace and shield, keeping allies on their feet
+- **Abilities:** forging handwriting; court etiquette; closes wounds; eases pain and fear; treats disease; recognizes curses
+- **Party hook:** Valerian owes one of the party a favor and hates it.
+- **GM notes:** Play Valerian theatrically, as though there is always an audience. Valerian gestures with whatever he is holding. Under pressure, Valerian is too blunt to be kind. Bring up the inn fire and watch him go quiet. Valerian never fights unarmed opponents, but would cross that line if it meant going home again.
+
+### D&D 5e
+
+**Tiefling Cleric 3** · Medium · Chaotic Neutral
+
+| STR | DEX | CON | INT | WIS | CHA |
+|---|---|---|---|---|---|
+| 12 (+1) | 10 (+0) | 14 (+2) | 9 (-1) | 18 (+4) | 14 (+2) |
+
+- **AC** 16 (scale mail, shield) · **HP** 24 (3d8) · **Speed** 30 ft. · **Proficiency** +2
+- **Saving throws:** WIS +6, CHA +4
+
+<sub>This work includes material taken from the System Reference Document 5.1 ("SRD 5.1") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.</sub>
+
+---
+Generated by Castmaker · seed \`snap-1\`"
+`;
+
+exports[`snapshots > modern character snap-2 1`] = `
+"# Ngozi Adeyemi
+
+*A grumpy long-haul trucker from the resort town who wants to learn the truth about the past.*
+
+**Human, 23** · he/him · Long-haul trucker · Modern
+
+**Grade: Uncommon** · rolled 14, 15, 13, 14, 10, 9 = 75 · 1 in 3.8 rolls land in this grade
+
+**Gift:** Ngozi can parallel park anything, first try.
+
+**Love life:** Straight. Ngozi is single and prefers it that way.
+
+## Background
+
+Ngozi comes from a ski resort town that empties every spring and grew up in foster care, four homes in six years. Everything changed when he was the whistleblower at his last job. Then came the turning point: the night he watched someone he admired do something unforgivable. Now Ngozi is a grumpy, curious, ambitious long-haul trucker. He is composed in a way that unsettles people. And Ngozi can parallel park anything, first try. What Ngozi wants most is to find out what really happened, because someone keeps paying to keep it buried. He won't admit it, but he is afraid of being owned by someone.
+
+## Personality
+
+- **Big Five:** Openness 1.3, Conscientiousness 3.9, Extraversion 2.2, Agreeableness 2.0, Neuroticism 2.8 (1 to 5)
+- **Traits:** grumpy, curious, ambitious
+- **Temperament:** cool, composed in a way that unsettles people
+- **Strengths:** a superb cook; knows when to walk away
+- **Under stress:** picks apart every mistake, starting with his own
+- **In conflict:** wins the argument and loses the friend
+- **With strangers:** testing, to see what they're made of
+- **Humor:** rarely makes jokes, but laughs easily
+- **Likes:** high places, the sea · **Dislikes:** being pitied, being touched without asking
+- **Habit:** Ngozi ends each day on the roof, watching the sky
+- **Quirks:** Ngozi sleeps sitting up; Ngozi keeps a small jar of soil from home
+
+## Flaws & fears
+
+- **Defining flaw:** can't stand to be ignored
+- **Other flaws:** is easily flattered; is too blunt to be kind
+- **Vice:** can't stop buying books he never read
+- **Deep fear:** being owned by someone, rooted in the whistleblowing
+- **Phobia:** heights
+- **Social fear:** being pitied
+- **When afraid:** Ngozi goes to the water and stays until it passes
+
+## Morality
+
+**Moral Foundations:** Ngozi needs things to be fair, but owes nothing to any group.
+
+Care 1.7 · Fairness 3.0 · Loyalty 1.3 · Authority 2.7 · Sanctity 2.2 · Liberty 2.2 (1 to 5)
+
+**Values:** Ngozi is driven by pleasure, excitement, and independence, and cares least about universalism.
+
+Independence 4.0 · Excitement 4.2 · Pleasure 4.4 · Achievement 3.6 · Power 3.0 · Security 3.3 · Conformity 3.8 · Tradition 3.3 · Kindness 3.0 · Universalism 3.0 (1 to 5)
+
+Ngozi never kneels to anyone, but would cross that line to keep his past buried.
+
+## Appearance
+
+Heavyset, with deep acne scars and gold-rimmed glasses. Wears black on black on black. Never without a flask engraved with someone else's initials.
+
+## Voice
+
+Speaks sardonically, with a dry edge on everything. Ngozi raises one eyebrow instead of answering. Ngozi calls everyone 'friend' in a tone that suggests otherwise.
+
+> "I'd say I'm surprised, but I've met people."
+
+## Hook
+
+Ngozi sold information about a local priest, and has started to enjoy it.
+
+## Relationships
+
+- **Protégé: Kojo Okeke** worships him, which is a heavy thing to carry.
+- **Mentor: Ifeoma Adebayo** taught him everything useful and one thing that wasn't.
+- **Enemy: Chiamaka Quaye** is dying, and wants to make peace.
+
+## Tabletop
+
+- **Archetype:** Wilder
+- **Strengths:** Might 3/5, Agility 3/5, Wits 4/5, Presence 2/5, Resolve 2/5
+- **Combat style:** a crossbow from hunting season
+- **Abilities:** driving through anything; staying awake; drives anything; survives outdoors; tracks in the woods; fixes a car with junk
+- **Party hook:** Ngozi has information the party needs, and wants a promise first.
+- **GM notes:** Play Ngozi sardonically, with a dry edge on everything. Ngozi raises one eyebrow instead of answering. Under pressure, Ngozi can't stand to be ignored. Bring up the whistleblowing and watch him go quiet. Ngozi never kneels to anyone, but would cross that line to keep his past buried.
+
+### D&D 5e
+
+**Human Ranger 3** · Medium · Neutral Evil
+
+| STR | DEX | CON | INT | WIS | CHA |
+|---|---|---|---|---|---|
+| 14 (+2) | 16 (+3) | 11 (+0) | 15 (+2) | 15 (+2) | 10 (+0) |
+
+- **AC** 16 (scale mail) · **HP** 22 (3d10) · **Speed** 30 ft. · **Proficiency** +2
+- **Saving throws:** STR +4, DEX +5
+- *Non-fantasy character: built as a Human with a reskinned class.*
+
+<sub>This work includes material taken from the System Reference Document 5.1 ("SRD 5.1") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.</sub>
+
+---
+Generated by Castmaker · seed \`snap-2\`"
+`;
+
+exports[`snapshots > scifi character snap-3 1`] = `
+"# Aurelia Steiner-Park
+
+*An easygoing recycler from the pleasure station who wants to make a name in the city.*
+
+**Human, 19** · he/him · Recycler · Science fiction
+
+**Grade: Common** · rolled 18, 10, 10, 11, 12, 10 = 71 · 1 in 2 rolls land in this grade
+
+**Gift:** Aurelia can fix any engine with duct tape and swearing.
+
+**Love life:** Straight. Aurelia has been on three dates with Darius and can't stop thinking about her.
+
+## Background
+
+Aurelia comes from a pleasure station that caters to the rich and grew up in a dockside gang that ran the cargo bays. Everything changed when he failed the pilot exam twice and was grounded. Then came the turning point: a debt called in at the worst possible moment. Now Aurelia is an easygoing, blunt, vain recycler. He is always braced for the next bad thing. And Aurelia can fix any engine with duct tape and swearing. What Aurelia wants most is to make a name in the big city, because it's the only dream he has ever had. He won't admit it, but he is afraid of growing old alone.
+
+## Personality
+
+- **Big Five:** Openness 3.6, Conscientiousness 1.5, Extraversion 2.9, Agreeableness 2.8, Neuroticism 3.7 (1 to 5)
+- **Traits:** easygoing, blunt, vain
+- **Temperament:** anxious, always braced for the next bad thing
+- **Strengths:** magnetic in a room; a fast learner
+- **Under stress:** eats, drinks, or both
+- **In conflict:** lets someone else fight it out for him
+- **With strangers:** quietly noting exits and hands
+- **Humor:** laughs at his own jokes before the punchline
+- **Likes:** ghost stories, dancing badly · **Dislikes:** the rich, the cold
+- **Habit:** Aurelia writes his enemies' names in a small black book
+- **Quirks:** Aurelia cooks huge meals for anyone nearby; Aurelia blows on dice before every roll, including other people's
+
+## Flaws & fears
+
+- **Defining flaw:** gets bored with people quickly
+- **Other flaws:** needs everyone to like him; holds grudges for years
+- **Vice:** drinks far too much coffee
+- **Deep fear:** growing old alone
+- **Phobia:** rats
+- **Social fear:** being talked about
+- **When afraid:** Aurelia writes it all down
+
+## Morality
+
+**Moral Foundations:** Aurelia needs things to be fair, but has little patience for weakness.
+
+Care 1.2 · Fairness 3.7 · Loyalty 2.4 · Authority 2.2 · Sanctity 2.7 · Liberty 2.9 (1 to 5)
+
+**Values:** Aurelia is driven by power, pleasure, and achievement, and cares least about conformity.
+
+Independence 2.8 · Excitement 2.0 · Pleasure 3.5 · Achievement 3.0 · Power 3.7 · Security 2.7 · Conformity 1.4 · Tradition 2.2 · Kindness 2.8 · Universalism 2.8 (1 to 5)
+
+Aurelia never lets a debt go unpaid, in either direction, but would cross that line to save more lives than it cost.
+
+## Appearance
+
+Tall and stooped, with a vacuum-burn scar across one cheek and a breathing mask scar around the mouth. Wears a patched flight suit covered in mission patches. Never without a dog tag from a ship that was lost.
+
+## Voice
+
+Speaks plainly, with short words and no decoration. Aurelia uses old sayings from home. Aurelia spits before making a promise.
+
+> "Say it plain or don't say it."
+
+## Hook
+
+Aurelia is secretly related to his business partner, and has started to enjoy it.
+
+## Relationships
+
+- **Parent: Indira Steiner-Park** never approved of a single choice he made.
+- **Rival: Saoirse Brandt** used to be his closest friend.
+- **Protégé: Sebastian Steiner-Park** will soon be good enough to leave.
+
+## Tabletop
+
+- **Archetype:** Face
+- **Strengths:** Might 2/5, Agility 3/5, Wits 3/5, Presence 3/5, Resolve 2/5
+- **Combat style:** talks the boarding party into leaving
+- **Abilities:** finding value in trash; crawling ducts; negotiates with anyone; forges credentials; talks past customs; plays corporate politics
+- **Party hook:** Aurelia wants to join, and is very persistent about it.
+- **GM notes:** Play Aurelia plainly, with short words and no decoration. Aurelia uses old sayings from home. Under pressure, Aurelia gets bored with people quickly. Bring up the grounding and watch him go quiet. Aurelia never lets a debt go unpaid, in either direction, but would cross that line to save more lives than it cost.
+
+### D&D 5e
+
+**Human Warlock 3** · Medium · Neutral
+
+| STR | DEX | CON | INT | WIS | CHA |
+|---|---|---|---|---|---|
+| 11 (+0) | 12 (+1) | 13 (+1) | 11 (+0) | 11 (+0) | 19 (+4) |
+
+- **AC** 12 (leather armor) · **HP** 21 (3d8) · **Speed** 30 ft. · **Proficiency** +2
+- **Saving throws:** WIS +2, CHA +6
+- *Non-fantasy character: built as a Human with a reskinned class.*
+
+<sub>This work includes material taken from the System Reference Document 5.1 ("SRD 5.1") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.</sub>
+
+---
+Generated by Castmaker · seed \`snap-3\`"
+`;

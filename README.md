@@ -375,12 +375,13 @@ Rules:
 
 ## Getting Started
 
-No build step and no dependencies. Serve the folder with any static web server, because browsers block JavaScript modules opened straight from disk:
+Needs Node 22 or newer.
 
 ```bash
-python3 -m http.server 8080      # then open http://localhost:8080
-node tools/smoke-test.js 300     # rolls 900 characters and checks every output
-python3 tools/build-preview.py   # optional: single-page copy for hosts that wrap the HTML
+npm install
+npm run dev          # development server with hot reload
+npm test             # unit, content and snapshot tests
+npm run build        # production build in dist/
 ```
 
 Install it as an app from the browser's address bar (Chrome, Edge) or Share → Add to Home Screen (Safari). After the first visit it works offline.
@@ -408,9 +409,8 @@ js/prose/provider.js            ProseProvider interface (templates now, AI later
 js/prose/templates.js           built-in template prose
 js/data/shared.js               genre-neutral tables
 js/data/genres/*.js             fantasy, modern and sci-fi tables
-tools/smoke-test.js             automated generation checks
-tools/rarity-sim.js             grade, gift, role and morality simulator
-tools/variety.js                repetition measurement
+tools/rarity-sim.ts             grade, gift, role and morality simulator
+tools/variety.ts                repetition measurement
 ```
 
 ### How coherence works

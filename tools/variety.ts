@@ -1,15 +1,16 @@
 // Measures repetition: rolls batches of 20 characters (one sitting at the
 // table) and counts how many times a line you've already seen in that batch
 // shows up again. Lower is better.
-// Run: node tools/variety.js [batches]
+// Run: npm run variety -- [batches]
 
 import * as gen from "../src/engine/generate.ts";
+import type { Character } from "../src/engine/types.ts";
 import { GENRE_ORDER } from "../src/engine/data/genres/index.ts";
 
 const BATCHES = Number(process.argv[2] || 100);
 const BATCH = 20;
 
-const FIELDS = {
+const FIELDS: Record<string, (c: Character) => string[]> = {
   occupation: (c) => [c.core.identity.occupation.t],
   upbringing: (c) => [c.core.background.upbringing],
   event: (c) => [c.core.background.event.t],
@@ -35,36 +36,37 @@ const FIELDS = {
   "party hook": (c) => [c.layers.tabletop.partyHook],
 };
 
-function measure(avoid) {
-  const totals = Object.fromEntries(Object.keys(FIELDS).map((k) => [k, 0]));
+function measure(avoid: boolean): Record<string, number> {
+  const totals: Record<string, number> = Object.fromEntries(Object.keys(FIELDS).map((k) => [k, 0]));
   let runs = 0;
   for (const genre of GENRE_ORDER) {
     for (let b = 0; b < BATCHES; b++) {
-      if (gen.resetRecent) gen.resetRecent();
-      const seen = Object.fromEntries(Object.keys(FIELDS).map((k) => [k, new Set()]));
+      gen.resetRecent();
+      const seen = new Map(Object.keys(FIELDS).map((k) => [k, new Set<string>()]));
       for (let i = 0; i < BATCH; i++) {
         const c = gen.rollCharacter({ genre, seed: `var-${genre}-${b}-${i}`, avoidRepeats: avoid });
         for (const [k, fn] of Object.entries(FIELDS)) {
           for (const v of fn(c)) {
-            if (seen[k].has(v)) totals[k]++;
-            seen[k].add(v);
+            const set = seen.get(k)!;
+            if (set.has(v)) totals[k]!++;
+            set.add(v);
           }
         }
       }
       runs++;
     }
   }
-  for (const k of Object.keys(totals)) totals[k] /= runs;
+  for (const k of Object.keys(totals)) totals[k]! /= runs;
   return totals;
 }
 
 const off = measure(false);
-const on = gen.resetRecent ? measure(true) : null;
-const total = (t) => Object.values(t).reduce((a, b) => a + b, 0);
+const on = measure(true);
+const total = (t: Record<string, number>) => Object.values(t).reduce((a, b) => a + b, 0);
 
 console.log(`Repeated lines per ${BATCH} rolls (average over ${BATCHES} batches x ${GENRE_ORDER.length} genres)\n`);
-console.log("field".padEnd(20) + "no memory".padStart(11) + (on ? "with memory".padStart(13) : ""));
+console.log("field".padEnd(20) + "no memory".padStart(11) + "with memory".padStart(13));
 for (const k of Object.keys(FIELDS)) {
-  console.log(k.padEnd(20) + off[k].toFixed(1).padStart(11) + (on ? on[k].toFixed(1).padStart(13) : ""));
+  console.log(k.padEnd(20) + off[k]!.toFixed(1).padStart(11) + on[k]!.toFixed(1).padStart(13));
 }
-console.log("TOTAL".padEnd(20) + total(off).toFixed(1).padStart(11) + (on ? total(on).toFixed(1).padStart(13) : ""));
+console.log("TOTAL".padEnd(20) + total(off).toFixed(1).padStart(11) + total(on).toFixed(1).padStart(13));
