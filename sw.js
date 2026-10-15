@@ -3,7 +3,7 @@
 
 // Shown to people as prototype v0.1; the build number changes on every release
 // so installed copies pick up new files.
-const VERSION = "castmaker-v0.1-build6";
+const VERSION = "castmaker-v0.1-build7";
 const SHELL = [
   "./",
   "index.html",

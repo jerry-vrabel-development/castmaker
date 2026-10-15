@@ -341,7 +341,8 @@ dialog.export::backdrop { background: rgb(10 15 13 / 0.45); }
 
 /* ---------- reveal ---------- */
 [data-reveal] { transition: opacity 0.28s ease-out, transform 0.38s cubic-bezier(0.2, 0.8, 0.25, 1.15); }
-.pending { opacity: 0; transform: perspective(900px) rotateX(-14deg) translateY(12px); }
+/* Not yet revealed: takes no space, so the card grows as each part arrives. */
+.pending { display: none !important; }
 .char-name.spinning { color: var(--muted); }
 .sec.flash, .chips.flash { animation: flash 0.9s ease-out; }
 .spark {

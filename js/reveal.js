@@ -118,6 +118,7 @@ export async function playReveal(sheet, c, rarity) {
     if (el.classList.contains("rarity-zone")) {
       el.classList.remove("pending");
       el.classList.add("awaiting");
+      growIn(el);
       await rollDice(el, alive, sheet);
       if (!alive()) return;
       // Tension, then the grade.
@@ -139,10 +140,23 @@ export async function playReveal(sheet, c, rarity) {
       continue;
     }
     el.classList.remove("pending");
+    growIn(el);
     sfx.flip();
     await sleep(120);
   }
   if (alive()) finalState();
+}
+
+// Expand a newly revealed part from zero height, so the card grows around it.
+function growIn(el) {
+  if (reducedMotion() || !el.animate) return;
+  const h = el.offsetHeight;
+  el.style.overflow = "hidden";
+  const anim = el.animate(
+    [{ height: "0px", opacity: 0, transform: "translateY(-6px)" }, { height: `${h}px`, opacity: 1, transform: "none" }],
+    { duration: 300, easing: "cubic-bezier(0.2, 0.8, 0.25, 1)" },
+  );
+  anim.onfinish = anim.oncancel = () => { el.style.overflow = ""; };
 }
 
 // The six ability dice tumble, then land one by one.
