@@ -1,19 +1,25 @@
+import type { Rng } from "./rng.ts";
+import type { Tier } from "./types.ts";
+
 // Real dice. A character's grade comes from rolling six ability scores with
 // 4d6-drop-lowest, the classic heroic method. The total decides the grade,
 // so the chance of a Legendary character is exactly the chance of rolling
 // that well: about 1 in 55.
 
-export function roll4d6DropLowest(rng) {
+export function roll4d6DropLowest(rng: Rng): number {
   const d = [rng.int(1, 6), rng.int(1, 6), rng.int(1, 6), rng.int(1, 6)].sort((a, b) => a - b);
-  return d[1] + d[2] + d[3];
+  return d[1]! + d[2]! + d[3]!;
 }
 
 // Exact probability of each single score (3..18).
 const SINGLE = (() => {
   const counts = new Array(19).fill(0);
-  for (let a = 1; a <= 6; a++) for (let b = 1; b <= 6; b++) for (let c = 1; c <= 6; c++) for (let d = 1; d <= 6; d++) {
-    counts[a + b + c + d - Math.min(a, b, c, d)]++;
-  }
+  for (let a = 1; a <= 6; a++)
+    for (let b = 1; b <= 6; b++)
+      for (let c = 1; c <= 6; c++)
+        for (let d = 1; d <= 6; d++) {
+          counts[a + b + c + d - Math.min(a, b, c, d)]++;
+        }
   return counts.map((n) => n / 1296);
 })();
 
@@ -22,38 +28,45 @@ const TOTALS = (() => {
   let dist = [1];
   for (let k = 0; k < 6; k++) {
     const next = new Array(dist.length + 18).fill(0);
-    dist.forEach((p, i) => { if (p) SINGLE.forEach((q, s) => { if (q) next[i + s] += p * q; }); });
+    dist.forEach((p, i) => {
+      if (p)
+        SINGLE.forEach((q, s) => {
+          if (q) next[i + s] += p * q;
+        });
+    });
     dist = next;
   }
   return dist;
 })();
 
-export const P_SINGLE_18 = SINGLE[18]; // ≈ 1.6%
+export const P_SINGLE_18 = SINGLE[18]!; // ≈ 1.6%
 
 // Chance of rolling this total or higher.
-export function oddsAtLeast(total) {
+export function oddsAtLeast(total: number): number {
   let p = 0;
   for (let s = total; s < TOTALS.length; s++) p += TOTALS[s] || 0;
   return p;
 }
 
 // Lowest total for each grade: Common, Uncommon, Rare, Epic, Legendary.
-export const GRADE_MIN = [0, 74, 79, 84, 88];
+export const GRADE_MIN: readonly number[] = [0, 74, 79, 84, 88];
 
-export function gradeOfTotal(total) {
-  let g = 0;
-  GRADE_MIN.forEach((min, i) => { if (total >= min) g = i; });
+export function gradeOfTotal(total: number): Tier {
+  let g: Tier = 0;
+  GRADE_MIN.forEach((min, i) => {
+    if (total >= min) g = i as Tier;
+  });
   return g;
 }
 
 // Chance of landing in a grade band.
-export function gradeOdds(tier) {
-  const lo = GRADE_MIN[tier];
-  const hi = tier < 4 ? GRADE_MIN[tier + 1] : 999;
+export function gradeOdds(tier: number): number {
+  const lo = GRADE_MIN[tier] ?? 0;
+  const hi = tier < 4 ? (GRADE_MIN[tier + 1] ?? 999) : 999;
   return oddsAtLeast(lo) - (hi < 999 ? oddsAtLeast(hi) : 0);
 }
 
-export function oneIn(p) {
+export function oneIn(p: number): string {
   if (p <= 0) return "never";
   const n = 1 / p;
   if (n < 1.5) return "most rolls";

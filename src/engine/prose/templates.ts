@@ -2,57 +2,82 @@
 // readable text with no network and no AI. Every ProseProvider returns the
 // same shape, so an AI provider can replace any field later.
 
-import { GENRES } from "../data/genres/index.js";
-import { PRONOUNS, fill, cap, article, stripArticle } from "../engine/text.js";
-import { ARCHETYPES } from "../engine/generate.js";
-import { FOUNDATIONS, VALUES } from "../data/psyche.js";
-import { joinList } from "../engine/text.js";
-import { orientationLabel, spouseWord } from "../data/orientation.js";
+import type { Character, GiftSection, LoveSection, Foundation, ScoredDimension } from "../types.ts";
+import { GENRES } from "../data/genres/index.ts";
+import { PRONOUNS, fill, cap, article, stripArticle, type TextContext } from "../text.ts";
+import { ARCHETYPES } from "../generate.ts";
+import { FOUNDATIONS, VALUES } from "../data/psyche.ts";
+import { joinList } from "../text.ts";
+import { orientationLabel, spouseWord } from "../data/orientation.ts";
 
-const PARTNER_PRONOUNS = {
+const PARTNER_PRONOUNS: Record<string, { pthey: string; pthem: string; ptheir: string }> = {
   woman: { pthey: "she", pthem: "her", ptheir: "her" },
   man: { pthey: "he", pthem: "him", ptheir: "his" },
   nonbinary: { pthey: "they", pthem: "them", ptheir: "their" },
 };
 
 // Moral Foundations: strongest and weakest foundation.
-export function foundationSummary(c) {
+export interface FoundationSummary {
+  top: Foundation & { v: number };
+  bottom: Foundation & { v: number };
+  ranked: (Foundation & { v: number })[];
+  text: string;
+}
+
+export function foundationSummary(c: Character): FoundationSummary | null {
   const f = c.core.morality?.foundations;
   if (!f) return null;
-  const ranked = FOUNDATIONS.map((d) => ({ ...d, v: f[d.id] })).sort((a, b) => b.v - a.v);
-  const top = ranked[0];
-  const bottom = ranked[ranked.length - 1];
+  const ranked = FOUNDATIONS.map((d) => ({ ...d, v: f[d.id] ?? 3 })).sort((a, b) => b.v - a.v);
+  const top = ranked[0]!;
+  const bottom = ranked[ranked.length - 1]!;
   const x = textContext(c);
   return {
-    top, bottom, ranked,
+    top,
+    bottom,
+    ranked,
     text: `${c.core.identity.first} ${fill(top.high, x)}, but ${fill(bottom.low, x)}.`,
   };
 }
 
 // Schwartz values: the top three, the least important, and any tension
 // between top values that sit on opposite sides of the circle.
-export function valuesSummary(c) {
+type RankedValue = ScoredDimension & { i: number; v: number };
+export interface ValuesSummary {
+  top: RankedValue[];
+  least: RankedValue;
+  torn: [RankedValue, RankedValue] | null;
+  ranked: RankedValue[];
+  text: string;
+}
+
+export function valuesSummary(c: Character): ValuesSummary | null {
   const v = c.core.morality?.values;
   if (!v) return null;
-  const ranked = VALUES.map((d, i) => ({ ...d, i, v: v[d.id] })).sort((a, b) => b.v - a.v);
+  const ranked: RankedValue[] = VALUES.map((d, i) => ({ ...d, i, v: v[d.id] ?? 3 })).sort((a, b) => b.v - a.v);
   const top = ranked.slice(0, 3);
-  const least = ranked[ranked.length - 1];
-  const dist = (a, b) => { const d = Math.abs(a.i - b.i); return Math.min(d, VALUES.length - d); };
-  const torn = dist(top[0], top[1]) >= 4 ? [top[0], top[1]] : null;
+  const least = ranked[ranked.length - 1]!;
+  const dist = (a: RankedValue, b: RankedValue) => {
+    const d = Math.abs(a.i - b.i);
+    return Math.min(d, VALUES.length - d);
+  };
+  const [a, b] = [top[0]!, top[1]!];
+  const torn: [RankedValue, RankedValue] | null = dist(a, b) >= 4 ? [a, b] : null;
   const first = c.core.identity.first;
   let text = `${first} is driven by ${joinList(top.map((t) => t.label.toLowerCase()))}, and cares least about ${least.label.toLowerCase()}.`;
-  if (torn) text += ` ${torn[0].label} and ${torn[1].label.toLowerCase()} pull in opposite directions, and ${first} feels it.`;
+  if (torn)
+    text += ` ${torn[0].label} and ${torn[1].label.toLowerCase()} pull in opposite directions, and ${first} feels it.`;
   return { top, least, torn, ranked, text };
 }
 
-export function giftList(c) {
-  const g = c.core.gift;
+export function giftList(c: Character): GiftSection["list"] {
+  // Characters saved before multiple gifts had a single { t, tier } or { none }.
+  const g = c.core.gift as (GiftSection & { none?: boolean; t?: string; tier?: number }) | undefined;
   if (!g) return [];
   if (Array.isArray(g.list)) return g.list;
-  return g.none ? [] : [{ t: g.t, tier: g.tier }];
+  return g.none || !g.t ? [] : [{ t: g.t, tier: g.tier ?? 1 }];
 }
 
-export function textContext(c) {
+export function textContext(c: Character): TextContext {
   const id = c.core.identity;
   const P = PRONOUNS[id.pronouns] || PRONOUNS.they;
   const G = GENRES[c.genre];
@@ -68,7 +93,7 @@ export function textContext(c) {
   };
 }
 
-function loveTokens(love) {
+function loveTokens(love: LoveSection | undefined): TextContext {
   if (!love || !love.partner) return {};
   const g = love.partner.gender;
   return {
@@ -80,10 +105,25 @@ function loveTokens(love) {
 }
 
 // "bisexual", "lesbian", "attracted to men" and so on.
-export function loveLabel(c) {
+export function loveLabel(c: Character): string {
   const love = c.core.love;
   if (!love) return "";
   return orientationLabel({ id: love.orientation, target: love.target }, c.core.identity.pronouns, love.variant);
+}
+
+export interface ProseResult {
+  pitch: string;
+  backstory: string;
+  gmNotes: string;
+  arc: { start: string; turn: string; end: string };
+  wound: string;
+  partyHook: string;
+  hook: string;
+  voiceLine: string;
+  moral: { foundations: FoundationSummary | null; values: ValuesSummary | null; line: string } | null;
+  gifts: string[];
+  love: string | null;
+  archetypeLabel: string;
 }
 
 export const TemplateProvider = {
@@ -91,9 +131,9 @@ export const TemplateProvider = {
   label: "Built-in templates",
   available: true,
 
-  render(c) {
+  render(c: Character): ProseResult {
     const x = textContext(c);
-    const f = (s) => fill(s, x);
+    const f = (s: string) => fill(s, x);
     const id = c.core.identity;
     const bg = c.core.background;
     const pe = c.core.personality;
@@ -107,31 +147,38 @@ export const TemplateProvider = {
     const occ = stripArticle(id.occupation.t);
     const gifts = giftList(c);
 
-    const pitch = `${cap(article(traits[0]))} ${traits[0]} ${occ} from ${f(id.originShort)} who wants to ${f(mo.short)}.`;
+    const lead = traits[0] ?? "curious";
+    const pitch = `${cap(article(lead))} ${lead} ${occ} from ${f(id.originShort)} who wants to ${f(mo.short)}.`;
 
     const backstory = [
       `${first} comes from ${f(id.origin)} and grew up ${f(bg.upbringing)}.`,
       `Everything changed when ${f(bg.event.t)}.`,
       `Then came the turning point: ${f(bg.turningPoint)}.`,
-      `Now ${first} is ${article(traits[0])} ${traits.join(", ")} ${occ}. ${f("{They} {is}")} ${f(pe.temperament.phrase)}.`,
+      `Now ${first} is ${article(lead)} ${traits.join(", ")} ${occ}. ${f("{They} {is}")} ${f(pe.temperament.phrase)}.`,
       gifts.length ? `And ${first} ${joinList(gifts.map((g) => f(g.t)))}.` : "",
       `What ${first} wants most is ${f(mo.want)}, ${f(mo.why)}.`,
-      `${f("{They}")} won't admit it, but ${f("{they} {is}")} afraid of ${f(fl.deepFear || fl.fears?.[0] || "the dark")}.`,
-    ].filter(Boolean).join(" ");
+      `${f("{They}")} won't admit it, but ${f("{they} {is}")} afraid of ${f(fl.deepFear)}.`,
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     const mo2 = c.core.morality;
-    const moral = mo2 ? {
-      foundations: foundationSummary(c),
-      values: valuesSummary(c),
-      line: `${first} ${f(mo2.line)}, but would cross that line ${f(mo2.breakingPoint)}.`,
-    } : null;
+    const moral = mo2
+      ? {
+          foundations: foundationSummary(c),
+          values: valuesSummary(c),
+          line: `${first} ${f(mo2.line)}, but would cross that line ${f(mo2.breakingPoint)}.`,
+        }
+      : null;
 
     const gmNotes = [
-      `Play ${first} ${f(vo.desc)}. ${first} ${f(vo.habits[0])}.`,
-      `Under pressure, ${first} ${f(fl.defining || fl.weaknesses?.[0] || "")}.`,
+      `Play ${first} ${f(vo.desc)}. ${first} ${f(vo.habits[0] ?? "")}.`,
+      `Under pressure, ${first} ${f(fl.defining)}.`,
       `Bring up ${f(bg.event.short)} and watch ${f("{them}")} go quiet.`,
       moral ? moral.line : "",
-    ].filter(Boolean).join(" ");
+    ]
+      .filter(Boolean)
+      .join(" ");
 
     let arc;
     if (wr.arcType === "positive") {

@@ -1,16 +1,16 @@
 // Castmaker — interface.
 
-import { rollCharacter, rerollSection, toggleLock, upgradeCharacter, STRENGTHS } from "./engine/generate.js";
-import { GENRES, GENRE_ORDER } from "./data/genres/index.js";
-import { renderProse } from "./prose/provider.js";
-import { textContext, loveLabel, giftList } from "./prose/templates.js";
-import { fill, cap, stripArticle, PRONOUNS } from "./engine/text.js";
-import { oneIn } from "./engine/dice.js";
-import { BIG5, FOUNDATIONS, VALUES } from "./data/psyche.js";
-import { toDnd5e, signed, ABILITIES } from "./engine/adapters/dnd5e.js";
-import { toMarkdown, toJSON } from "./export.js";
+import { rollCharacter, rerollSection, toggleLock, upgradeCharacter, STRENGTHS } from "../src/engine/generate.ts";
+import { GENRES, GENRE_ORDER } from "../src/engine/data/genres/index.ts";
+import { renderProse } from "../src/engine/prose/provider.ts";
+import { textContext, loveLabel, giftList } from "../src/engine/prose/templates.ts";
+import { fill, cap, stripArticle, PRONOUNS } from "../src/engine/text.ts";
+import { oneIn } from "../src/engine/dice.ts";
+import { BIG5, FOUNDATIONS, VALUES } from "../src/engine/data/psyche.ts";
+import { toDnd5e, signed, ABILITIES } from "../src/engine/adapters/dnd5e.ts";
+import { toMarkdown, toJSON } from "../src/engine/export.ts";
 import { storage } from "./storage.js";
-import { computeRarity, TIERS } from "./engine/rarity.js";
+import { computeRarity, TIERS } from "../src/engine/rarity.ts";
 import { sfx, reducedMotion, playReveal, skipReveal, isRevealing, flashSection } from "./reveal.js";
 
 const SMOOTH = () => (reducedMotion() ? "auto" : "smooth");

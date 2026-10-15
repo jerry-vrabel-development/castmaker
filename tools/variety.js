@@ -3,8 +3,8 @@
 // shows up again. Lower is better.
 // Run: node tools/variety.js [batches]
 
-import * as gen from "../js/engine/generate.js";
-import { GENRE_ORDER } from "../js/data/genres/index.js";
+import * as gen from "../src/engine/generate.ts";
+import { GENRE_ORDER } from "../src/engine/data/genres/index.ts";
 
 const BATCHES = Number(process.argv[2] || 100);
 const BATCH = 20;

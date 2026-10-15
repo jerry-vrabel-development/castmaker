@@ -2,11 +2,11 @@
 // match the exact dice odds), gift counts, roles, and strongest moral foundation.
 // Run: node tools/rarity-sim.js [count]
 
-import { rollCharacter } from "../js/engine/generate.js";
-import { computeRarity, TIERS } from "../js/engine/rarity.js";
-import { gradeOdds } from "../js/engine/dice.js";
-import { GENRE_ORDER } from "../js/data/genres/index.js";
-import { foundationSummary } from "../js/prose/templates.js";
+import { rollCharacter } from "../src/engine/generate.ts";
+import { computeRarity, TIERS } from "../src/engine/rarity.ts";
+import { gradeOdds } from "../src/engine/dice.ts";
+import { GENRE_ORDER } from "../src/engine/data/genres/index.ts";
+import { foundationSummary } from "../src/engine/prose/templates.ts";
 
 const N = Number(process.argv[2] || 3000);
 console.log("Exact dice odds: " + TIERS.map((t, i) => `${t.label} ${(100 * gradeOdds(i)).toFixed(1)}%`).join("  "));

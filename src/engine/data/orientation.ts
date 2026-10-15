@@ -13,6 +13,16 @@
 // Transgender identity is a gender identity, not an orientation, so it is not
 // part of this table.
 
+import type { LoveSection } from "../types.ts";
+
+export interface OrientationEntry {
+  id: string;
+  kind: LoveSection["kind"];
+  realistic: number;
+  even: number;
+  estimate?: boolean;
+}
+
 export const ORIENTATION_SOURCE = {
   short: "Gallup 2025",
   url: "https://news.gallup.com/poll/702206/lgbtq-identification-holds.aspx",
@@ -21,7 +31,7 @@ export const ORIENTATION_SOURCE = {
 // kind: who the character is drawn to.
 //   different: a gender other than their own; same: their own gender;
 //   multi: more than one gender; none: little or no sexual attraction.
-export const ORIENTATIONS = [
+export const ORIENTATIONS: OrientationEntry[] = [
   { id: "straight", kind: "different", realistic: 86, even: 1 },
   { id: "gay-lesbian", kind: "same", realistic: 3.0, even: 1 },
   { id: "bisexual", kind: "multi", realistic: 5.3, even: 1 },
@@ -31,7 +41,11 @@ export const ORIENTATIONS = [
 
 // Pronouns stand in for gender when labeling: she = woman, he = man,
 // they = nonbinary.
-export function orientationLabel(o, pronouns, variant) {
+export function orientationLabel(
+  o: { id: string; target?: string | null },
+  pronouns: string,
+  variant?: string | null,
+): string {
   switch (o.id) {
     case "straight":
       return pronouns === "they" ? `attracted to ${o.target === "woman" ? "women" : "men"}` : "straight";
@@ -39,28 +53,33 @@ export function orientationLabel(o, pronouns, variant) {
       if (pronouns === "she") return "lesbian";
       if (pronouns === "he") return "gay";
       return `attracted to ${o.target === "woman" ? "women" : "men"}`;
-    case "bisexual": return "bisexual";
-    case "pan-queer": return variant || "pansexual";
-    case "asexual": return "asexual";
-    default: return "";
+    case "bisexual":
+      return "bisexual";
+    case "pan-queer":
+      return variant || "pansexual";
+    case "asexual":
+      return "asexual";
+    default:
+      return "";
   }
 }
 
 // Relationship status by stage of life. Designed odds, not statistics.
-export const STATUS_BY_STAGE = {
+export const STATUS_BY_STAGE: Record<"young" | "middle" | "older", Record<string, number>> = {
   young: { single: 45, dating: 33, partnered: 12, married: 9, divorced: 1, widowed: 0 },
   middle: { single: 20, dating: 11, partnered: 14, married: 38, divorced: 14, widowed: 3 },
   older: { single: 14, dating: 5, partnered: 8, married: 38, divorced: 15, widowed: 20 },
 };
 
-const SPOUSE = { woman: "wife", man: "husband", nonbinary: "spouse" };
-export const spouseWord = (g) => SPOUSE[g] || "spouse";
-export const personWord = (g) => ({ woman: "woman", man: "man", nonbinary: "nonbinary person" })[g] || "person";
+const SPOUSE: Record<string, string> = { woman: "wife", man: "husband", nonbinary: "spouse" };
+export const spouseWord = (g: string): string => SPOUSE[g] || "spouse";
+export const personWord = (g: string): string =>
+  (({ woman: "woman", man: "man", nonbinary: "nonbinary person" }) as Record<string, string>)[g] || "person";
 
 // Notes after the character's name. Tokens: {partner} partner's name,
 // {spouse} wife/husband/spouse, {pthey} {pthem} {ptheir} partner's pronouns,
 // {duration} together.
-export const LOVE_NOTES = {
+export const LOVE_NOTES: Record<string, string[]> = {
   single: [
     "is single and hasn't looked for anyone in years",
     "is single, and quietly hoping someone will notice",

@@ -1,34 +1,53 @@
 // Markdown and JSON export.
 
-import { renderProse, } from "./prose/provider.js";
-import { textContext, loveLabel } from "./prose/templates.js";
-import { fill, cap, stripArticle } from "./engine/text.js";
-import { toDnd5e, signed, ABILITIES, ATTRIBUTION } from "./engine/adapters/dnd5e.js";
-import { STRENGTHS } from "./engine/generate.js";
-import { PRONOUNS } from "./engine/text.js";
-import { GENRES } from "./data/genres/index.js";
-import { computeRarity } from "./engine/rarity.js";
-import { oneIn } from "./engine/dice.js";
-import { BIG5, FOUNDATIONS, VALUES } from "./data/psyche.js";
+import type { Character } from "./types.ts";
+import { renderProse } from "./prose/provider.ts";
+import { textContext, loveLabel } from "./prose/templates.ts";
+import { fill, cap, stripArticle } from "./text.ts";
+import { toDnd5e, signed, ABILITIES, ATTRIBUTION } from "./adapters/dnd5e.ts";
+import { STRENGTHS } from "./generate.ts";
+import { PRONOUNS } from "./text.ts";
+import { GENRES } from "./data/genres/index.ts";
+import { computeRarity } from "./rarity.ts";
+import { oneIn } from "./dice.ts";
+import { BIG5, FOUNDATIONS, VALUES } from "./data/psyche.ts";
 
-export function toJSON(c) {
-  const strip = (o) => JSON.parse(JSON.stringify(o, (k, v) => (k === "_tags" ? undefined : v)));
+/** The character as JSON, without the internal coherence tags. */
+export function toJSON(c: Character): string {
+  const strip = (o: unknown) => JSON.parse(JSON.stringify(o, (k, v) => (k === "_tags" ? undefined : v)));
   return JSON.stringify(strip(c), null, 2);
 }
 
-export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1, showLove = true, ethics = "both" } = {}) {
+export interface MarkdownOptions {
+  mode?: "tabletop" | "writer";
+  system?: "dnd5e" | "agnostic" | "";
+  level?: number;
+  showLove?: boolean;
+  ethics?: "foundations" | "values" | "both";
+}
+
+export function toMarkdown(
+  c: Character,
+  { mode = "tabletop", system = "dnd5e", level = 1, showLove = true, ethics = "both" }: MarkdownOptions = {},
+): string {
   const p = renderProse(c);
   const x = textContext(c);
-  const f = (s) => fill(s, x);
+  const f = (s: string) => fill(s, x);
   const id = c.core.identity;
   const first = id.first;
-  const L = [];
+  const L: string[] = [];
 
   L.push(`# ${id.name}`, "", `*${p.pitch}*`, "");
-  L.push(`**${cap(id.peopleLabel)}, ${id.age}** · ${PRONOUNS[id.pronouns].label} · ${cap(stripArticle(id.occupation.t))} · ${GENRES[c.genre].label}`, "");
+  L.push(
+    `**${cap(id.peopleLabel)}, ${id.age}** · ${PRONOUNS[id.pronouns].label} · ${cap(stripArticle(id.occupation.t))} · ${GENRES[c.genre].label}`,
+    "",
+  );
 
   const r = computeRarity(c);
-  L.push(`**Grade: ${r.tierInfo.label}** · rolled ${r.rolls.join(", ")} = ${r.total} · ${oneIn(r.gradeOdds)} rolls land in this grade`, "");
+  L.push(
+    `**Grade: ${r.tierInfo.label}** · rolled ${r.rolls.join(", ")} = ${r.total} · ${oneIn(r.gradeOdds)} rolls land in this grade`,
+    "",
+  );
   if (p.gifts.length) L.push(`**Gift${p.gifts.length > 1 ? "s" : ""}:** ${p.gifts.join(" ")}`, "");
   if (p.love && showLove) L.push(`**Love life:** ${cap(loveLabel(c))}. ${p.love}`, "");
   L.push("## Background", "", p.backstory, "");
@@ -59,18 +78,33 @@ export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1, 
     L.push("## Morality", "");
     if (ethics !== "values" && p.moral.foundations) {
       L.push(`**Moral Foundations:** ${p.moral.foundations.text}`, "");
-      L.push(`${FOUNDATIONS.map((d) => `${d.label} ${m.foundations[d.id].toFixed(1)}`).join(" · ")} (1 to 5)`, "");
+      L.push(
+        `${FOUNDATIONS.map((d) => `${d.label} ${(m.foundations[d.id] ?? 3).toFixed(1)}`).join(" · ")} (1 to 5)`,
+        "",
+      );
     }
     if (ethics !== "foundations" && p.moral.values) {
       L.push(`**Values:** ${p.moral.values.text}`, "");
-      L.push(`${VALUES.map((d) => `${d.label} ${m.values[d.id].toFixed(1)}`).join(" · ")} (1 to 5)`, "");
+      L.push(`${VALUES.map((d) => `${d.label} ${(m.values[d.id] ?? 3).toFixed(1)}`).join(" · ")} (1 to 5)`, "");
     }
     L.push(p.moral.line, "");
   }
 
   const ap = c.core.appearance;
-  L.push("## Appearance", "", `${cap(ap.build)}, with ${ap.features.map(f).join(" and ")}. Wears ${f(ap.style)}. Never without ${f(ap.item)}.`, "");
-  L.push("## Voice", "", `Speaks ${f(c.core.voice.desc)}. ${c.core.voice.habits.map((h) => `${first} ${f(h)}.`).join(" ")}`, "", `> "${p.voiceLine}"`, "");
+  L.push(
+    "## Appearance",
+    "",
+    `${cap(ap.build)}, with ${ap.features.map(f).join(" and ")}. Wears ${f(ap.style)}. Never without ${f(ap.item)}.`,
+    "",
+  );
+  L.push(
+    "## Voice",
+    "",
+    `Speaks ${f(c.core.voice.desc)}. ${c.core.voice.habits.map((h) => `${first} ${f(h)}.`).join(" ")}`,
+    "",
+    `> "${p.voiceLine}"`,
+    "",
+  );
   L.push("## Hook", "", p.hook, "");
   L.push("## Relationships", "");
   for (const r of c.core.relationships.list) L.push(`- **${r.type}: ${r.name}** ${f(r.note)}.`);
@@ -90,7 +124,9 @@ export function toMarkdown(c, { mode = "tabletop", system = "dnd5e", level = 1, 
       L.push(`### D&D 5e`, "", `**${d.ancestry} ${d.className} ${d.level}** · ${d.size} · ${d.alignment}`, "");
       L.push(`| ${ABILITIES.map((a) => a.toUpperCase()).join(" | ")} |`, `|${ABILITIES.map(() => "---").join("|")}|`);
       L.push(`| ${ABILITIES.map((a) => `${d.scores[a]} (${signed(d.mods[a])})`).join(" | ")} |`, "");
-      L.push(`- **AC** ${d.ac} (${d.armor}) · **HP** ${d.hp} (${d.hitDice}) · **Speed** ${d.speed} ft. · **Proficiency** ${signed(d.prof)}`);
+      L.push(
+        `- **AC** ${d.ac} (${d.armor}) · **HP** ${d.hp} (${d.hitDice}) · **Speed** ${d.speed} ft. · **Proficiency** ${signed(d.prof)}`,
+      );
       L.push(`- **Saving throws:** ${d.saves.join(", ")}`);
       if (d.note) L.push(`- *${d.note}*`);
       L.push("", `<sub>${ATTRIBUTION}</sub>`, "");

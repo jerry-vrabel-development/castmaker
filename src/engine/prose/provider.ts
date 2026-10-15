@@ -13,15 +13,23 @@
 // An AI provider should start from the template result and only rewrite the
 // prose fields, so the app keeps working if a call fails.
 
-import { TemplateProvider } from "./templates.js";
+import type { Character } from "../types.ts";
+import { TemplateProvider, type ProseResult } from "./templates.ts";
 
-const providers = { templates: TemplateProvider };
+export interface ProseProvider {
+  id: string;
+  label: string;
+  available: boolean;
+  render(character: Character): ProseResult;
+}
 
-export function getProvider(id = "templates") {
+const providers: Record<string, ProseProvider> = { templates: TemplateProvider };
+
+export function getProvider(id = "templates"): ProseProvider {
   const p = providers[id];
   return p && p.available ? p : TemplateProvider;
 }
 
-export function renderProse(character, providerId) {
+export function renderProse(character: Character, providerId?: string): ProseResult {
   return getProvider(providerId).render(character);
 }

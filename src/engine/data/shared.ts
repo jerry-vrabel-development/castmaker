@@ -10,14 +10,25 @@
 //   {was} {is} {has} {does}                           verbs that agree with the pronoun
 //   {coin} {drink} {package} {messages} {city}        genre vocabulary
 
-export const TAGS = [
-  "loss", "violence", "faith", "wealth", "poverty", "learning", "crime",
-  "duty", "wild", "art", "betrayal", "ambition", "family", "isolation",
-  "craft", "travel", "healing", "secrecy", "order", "chaos", "tech",
-];
+import type {
+  Tagged,
+  TagBag,
+  TraitEntry,
+  TemperamentEntry,
+  VoiceStyle,
+  WantEntry,
+  StakedEntry,
+  LieEntry,
+  RoleEntry,
+  RelationshipType,
+  MoralLine,
+  SecretParts,
+} from "../types.ts";
+
+export { TAGS } from "../types.ts";
 
 // law / good feed alignment in tabletop adapters. opp = never paired with.
-export const TRAITS = [
+export const TRAITS: TraitEntry[] = [
   { t: "watchful", tags: ["secrecy", "crime", "violence"] },
   { t: "dutiful", tags: ["duty", "order", "faith"], law: 1 },
   { t: "reckless", tags: ["chaos", "violence", "ambition"], law: -1, opp: "meticulous" },
@@ -56,21 +67,65 @@ export const TRAITS = [
   { t: "principled", tags: ["order", "duty", "faith"], law: 1, good: 1 },
 ];
 
-export const TEMPERAMENTS = [
-  { t: "steady", phrase: "slow to anger and slower to forgive", tags: ["duty", "craft", "order"], voices: ["measured", "plainspoken"] },
-  { t: "fiery", phrase: "quick to anger and quick to laugh", tags: ["violence", "chaos", "ambition"], voices: ["blunt", "theatrical"] },
-  { t: "brooding", phrase: "inward, private, always half somewhere else", tags: ["loss", "isolation", "secrecy"], voices: ["terse", "measured"] },
-  { t: "bright", phrase: "warm, loud, and impossible to stay angry at", tags: ["art", "family", "travel"], voices: ["chatty", "theatrical"] },
-  { t: "cool", phrase: "composed in a way that unsettles people", tags: ["secrecy", "wealth", "crime", "ambition"], voices: ["precise", "sardonic"] },
-  { t: "anxious", phrase: "always braced for the next bad thing", tags: ["poverty", "learning", "betrayal"], voices: ["rambling", "precise"] },
-  { t: "warm", phrase: "gentle with others and hard on {themself}", tags: ["healing", "family", "faith"], voices: ["gentle", "plainspoken"] },
-  { t: "wry", phrase: "amused by most things, including disaster", tags: ["crime", "art", "learning"], voices: ["sardonic", "chatty"] },
+export const TEMPERAMENTS: TemperamentEntry[] = [
+  {
+    t: "steady",
+    phrase: "slow to anger and slower to forgive",
+    tags: ["duty", "craft", "order"],
+    voices: ["measured", "plainspoken"],
+  },
+  {
+    t: "fiery",
+    phrase: "quick to anger and quick to laugh",
+    tags: ["violence", "chaos", "ambition"],
+    voices: ["blunt", "theatrical"],
+  },
+  {
+    t: "brooding",
+    phrase: "inward, private, always half somewhere else",
+    tags: ["loss", "isolation", "secrecy"],
+    voices: ["terse", "measured"],
+  },
+  {
+    t: "bright",
+    phrase: "warm, loud, and impossible to stay angry at",
+    tags: ["art", "family", "travel"],
+    voices: ["chatty", "theatrical"],
+  },
+  {
+    t: "cool",
+    phrase: "composed in a way that unsettles people",
+    tags: ["secrecy", "wealth", "crime", "ambition"],
+    voices: ["precise", "sardonic"],
+  },
+  {
+    t: "anxious",
+    phrase: "always braced for the next bad thing",
+    tags: ["poverty", "learning", "betrayal"],
+    voices: ["rambling", "precise"],
+  },
+  {
+    t: "warm",
+    phrase: "gentle with others and hard on {themself}",
+    tags: ["healing", "family", "faith"],
+    voices: ["gentle", "plainspoken"],
+  },
+  {
+    t: "wry",
+    phrase: "amused by most things, including disaster",
+    tags: ["crime", "art", "learning"],
+    voices: ["sardonic", "chatty"],
+  },
 ];
 
-export const VOICES = {
+export const VOICES: Record<string, VoiceStyle> = {
   measured: {
     desc: "in a measured, unhurried way, choosing each word",
-    habits: ["pauses before answering, even small questions", "repeats the other person's last words back to them", "never raises {their} voice"],
+    habits: [
+      "pauses before answering, even small questions",
+      "repeats the other person's last words back to them",
+      "never raises {their} voice",
+    ],
     lines: [
       "Let's not decide anything tonight. Sleep on it, and see what still seems true in the morning.",
       "I heard what you said. I'm still deciding what you meant.",
@@ -79,7 +134,11 @@ export const VOICES = {
   },
   plainspoken: {
     desc: "plainly, with short words and no decoration",
-    habits: ["calls everyone by their first name immediately", "answers questions with a nod or shake when possible", "uses old sayings from home"],
+    habits: [
+      "calls everyone by their first name immediately",
+      "answers questions with a nod or shake when possible",
+      "uses old sayings from home",
+    ],
     lines: [
       "I don't know much, but I know when a deal stinks, and this one does.",
       "Eat first. Then tell me the bad news.",
@@ -111,7 +170,11 @@ export const VOICES = {
   },
   chatty: {
     desc: "in a rush of words, circling back to the point eventually",
-    habits: ["over-explains when nervous", "remembers everyone's family members by name", "laughs at {their} own stories before the end"],
+    habits: [
+      "over-explains when nervous",
+      "remembers everyone's family members by name",
+      "laughs at {their} own stories before the end",
+    ],
     lines: [
       "Sorry, I'm talking too much. My sister says I do that when I'm nervous. Am I nervous? I might be nervous.",
       "Oh, you'll love this, it's a funny story. Well, funny now. Not funny at the time.",
@@ -120,7 +183,11 @@ export const VOICES = {
   },
   precise: {
     desc: "precisely, correcting small inaccuracies as {they} go{es}",
-    habits: ["counts things out loud", "corrects other people's grammar under {their} breath", "gives estimates with error margins"],
+    habits: [
+      "counts things out loud",
+      "corrects other people's grammar under {their} breath",
+      "gives estimates with error margins",
+    ],
     lines: [
       "Three exits. Two of them are watched. I'd like to discuss the third.",
       "That is not what I said. I said probably.",
@@ -129,7 +196,11 @@ export const VOICES = {
   },
   sardonic: {
     desc: "sardonically, with a dry edge on everything",
-    habits: ["thanks people for terrible news", "raises one eyebrow instead of answering", "narrates disasters as they happen"],
+    habits: [
+      "thanks people for terrible news",
+      "raises one eyebrow instead of answering",
+      "narrates disasters as they happen",
+    ],
     lines: [
       "Wonderful. My favorite kind of plan: the kind where I get hurt.",
       "I'd say I'm surprised, but I've met people.",
@@ -138,7 +209,11 @@ export const VOICES = {
   },
   rambling: {
     desc: "in long, looping sentences that wander off and come back",
-    habits: ["starts stories in the middle", "loses track of what {they} {was} saying", "apologizes for things that aren't {their} fault"],
+    habits: [
+      "starts stories in the middle",
+      "loses track of what {they} {was} saying",
+      "apologizes for things that aren't {their} fault",
+    ],
     lines: [
       "Right, so, where was I? The thing is, it's not the {drink}, it's who poured it.",
       "I had a point. It was a good point. It'll come back to me.",
@@ -147,7 +222,11 @@ export const VOICES = {
   },
   gentle: {
     desc: "gently, softening hard truths without hiding them",
-    habits: ["touches people's arms when talking", "asks how people are and waits for the real answer", "never says 'I told you so'"],
+    habits: [
+      "touches people's arms when talking",
+      "asks how people are and waits for the real answer",
+      "never says 'I told you so'",
+    ],
     lines: [
       "You don't have to tell me. But I'll listen if you do.",
       "Sit down a minute. The world will still be on fire after.",
@@ -156,7 +235,7 @@ export const VOICES = {
   },
 };
 
-export const QUIRKS = [
+export const QUIRKS: Tagged[] = [
   { t: "counts {coin} when nervous", tags: ["poverty", "wealth"] },
   { t: "hums the same four notes over and over", tags: ["art", "isolation"] },
   { t: "keeps a list of everyone who has ever lied to {them}", tags: ["betrayal", "secrecy"] },
@@ -179,7 +258,7 @@ export const QUIRKS = [
   { t: "takes {their} {drink} far too seriously", tags: ["craft", "art"] },
 ];
 
-export const FLAWS = [
+export const FLAWS: Tagged[] = [
   { t: "can't ask for help", tags: ["isolation", "duty", "poverty"] },
   { t: "drinks to quiet {their} thoughts", tags: ["loss", "violence"] },
   { t: "lies first, thinks later", tags: ["crime", "secrecy", "poverty"] },
@@ -202,7 +281,7 @@ export const FLAWS = [
   { t: "takes responsibility for things that were never {their} fault", tags: ["loss", "family", "healing"] },
 ];
 
-export const FEARS = [
+export const FEARS: Tagged[] = [
   { t: "being forgotten", tags: ["art", "isolation", "ambition"] },
   { t: "fire", tags: ["loss", "violence"] },
   { t: "becoming like {their} parents", tags: ["family", "violence"] },
@@ -223,56 +302,162 @@ export const FEARS = [
   { t: "being ordinary", tags: ["ambition", "learning", "art"] },
 ];
 
-export const WANTS = [
-  { t: "to clear {their} family's name", short: "clear {their} family's name", tags: ["family", "betrayal", "duty"],
-    why: ["because the shame landed on people who didn't earn it", "because {they} {is} certain the accusation was a lie"] },
-  { t: "to buy back the land {their} family lost", short: "win back {their} family's land", tags: ["family", "poverty", "wealth"],
-    why: ["because {their} grandmother is buried there", "because it's the last thing {their} father asked for"] },
-  { t: "to find the person who betrayed {them}", short: "find the one who betrayed {them}", tags: ["betrayal", "violence"],
-    why: ["because {they} {has} to know why", "because some debts can only be paid in person"] },
-  { t: "to be remembered for something", short: "do something worth remembering", tags: ["art", "ambition"],
-    why: ["because nobody remembers {their} parents", "because {they} {has} already been forgotten once"] },
-  { t: "to protect a younger sibling from the life {they} lived", short: "keep a younger sibling safe", tags: ["family", "poverty", "crime"],
-    why: ["because {they} promised {their} mother", "because {they} {has} seen where that road ends"] },
-  { t: "to master {their} craft completely", short: "master {their} craft", tags: ["craft", "learning", "art"],
-    why: ["because it is the one thing that has never let {them} down", "because a rival said {they} never would"] },
-  { t: "to pay off a debt before it is collected the hard way", short: "pay off a dangerous debt", tags: ["crime", "wealth", "poverty"],
-    why: ["because the collector has started asking about {their} friends", "because {they} signed for someone else's mistake"] },
-  { t: "to find out what really happened", short: "learn the truth about the past", tags: ["secrecy", "learning", "loss"],
-    why: ["because the official story has too many holes", "because someone keeps paying to keep it buried"] },
-  { t: "to atone for one terrible choice", short: "make up for a terrible choice", tags: ["violence", "faith", "loss"],
-    why: ["because {they} can still see the faces", "because nobody else ever punished {them} for it"] },
-  { t: "to get rich enough to never be afraid again", short: "get rich and get safe", tags: ["poverty", "wealth", "ambition"],
-    why: ["because {they} {has} not forgotten being hungry", "because money is the only wall {they} trust{s}"] },
-  { t: "to see what lies past the edge of the map", short: "go where no map reaches", tags: ["travel", "wild", "learning"],
-    why: ["because staying put feels like dying slowly", "because {their} mentor went and never came back"] },
-  { t: "to tear down the people at the top", short: "bring down the powerful", tags: ["poverty", "order", "violence"],
-    why: ["because {they} watched them ruin {their} street", "because nobody else will"] },
-  { t: "to earn a place where {they} truly belong", short: "find somewhere to belong", tags: ["isolation", "family"],
-    why: ["because {they} {has} been a guest everywhere and family nowhere", "because {they} {is} tired of leaving"] },
-  { t: "to keep a dangerous promise", short: "keep a dangerous promise", tags: ["duty", "faith", "loss"],
-    why: ["because {they} gave {their} word to someone who died", "because breaking it would make {them} someone {they} hate{s}"] },
-  { t: "to prove {their} old mentor wrong", short: "prove {their} mentor wrong", tags: ["learning", "ambition", "betrayal"],
-    why: ["because the mentor called {them} ordinary", "because the mentor stole {their} best work"] },
+export const WANTS: WantEntry[] = [
+  {
+    t: "to clear {their} family's name",
+    short: "clear {their} family's name",
+    tags: ["family", "betrayal", "duty"],
+    why: [
+      "because the shame landed on people who didn't earn it",
+      "because {they} {is} certain the accusation was a lie",
+    ],
+  },
+  {
+    t: "to buy back the land {their} family lost",
+    short: "win back {their} family's land",
+    tags: ["family", "poverty", "wealth"],
+    why: ["because {their} grandmother is buried there", "because it's the last thing {their} father asked for"],
+  },
+  {
+    t: "to find the person who betrayed {them}",
+    short: "find the one who betrayed {them}",
+    tags: ["betrayal", "violence"],
+    why: ["because {they} {has} to know why", "because some debts can only be paid in person"],
+  },
+  {
+    t: "to be remembered for something",
+    short: "do something worth remembering",
+    tags: ["art", "ambition"],
+    why: ["because nobody remembers {their} parents", "because {they} {has} already been forgotten once"],
+  },
+  {
+    t: "to protect a younger sibling from the life {they} lived",
+    short: "keep a younger sibling safe",
+    tags: ["family", "poverty", "crime"],
+    why: ["because {they} promised {their} mother", "because {they} {has} seen where that road ends"],
+  },
+  {
+    t: "to master {their} craft completely",
+    short: "master {their} craft",
+    tags: ["craft", "learning", "art"],
+    why: ["because it is the one thing that has never let {them} down", "because a rival said {they} never would"],
+  },
+  {
+    t: "to pay off a debt before it is collected the hard way",
+    short: "pay off a dangerous debt",
+    tags: ["crime", "wealth", "poverty"],
+    why: [
+      "because the collector has started asking about {their} friends",
+      "because {they} signed for someone else's mistake",
+    ],
+  },
+  {
+    t: "to find out what really happened",
+    short: "learn the truth about the past",
+    tags: ["secrecy", "learning", "loss"],
+    why: ["because the official story has too many holes", "because someone keeps paying to keep it buried"],
+  },
+  {
+    t: "to atone for one terrible choice",
+    short: "make up for a terrible choice",
+    tags: ["violence", "faith", "loss"],
+    why: ["because {they} can still see the faces", "because nobody else ever punished {them} for it"],
+  },
+  {
+    t: "to get rich enough to never be afraid again",
+    short: "get rich and get safe",
+    tags: ["poverty", "wealth", "ambition"],
+    why: ["because {they} {has} not forgotten being hungry", "because money is the only wall {they} trust{s}"],
+  },
+  {
+    t: "to see what lies past the edge of the map",
+    short: "go where no map reaches",
+    tags: ["travel", "wild", "learning"],
+    why: ["because staying put feels like dying slowly", "because {their} mentor went and never came back"],
+  },
+  {
+    t: "to tear down the people at the top",
+    short: "bring down the powerful",
+    tags: ["poverty", "order", "violence"],
+    why: ["because {they} watched them ruin {their} street", "because nobody else will"],
+  },
+  {
+    t: "to earn a place where {they} truly belong",
+    short: "find somewhere to belong",
+    tags: ["isolation", "family"],
+    why: ["because {they} {has} been a guest everywhere and family nowhere", "because {they} {is} tired of leaving"],
+  },
+  {
+    t: "to keep a dangerous promise",
+    short: "keep a dangerous promise",
+    tags: ["duty", "faith", "loss"],
+    why: [
+      "because {they} gave {their} word to someone who died",
+      "because breaking it would make {them} someone {they} hate{s}",
+    ],
+  },
+  {
+    t: "to prove {their} old mentor wrong",
+    short: "prove {their} mentor wrong",
+    tags: ["learning", "ambition", "betrayal"],
+    why: ["because the mentor called {them} ordinary", "because the mentor stole {their} best work"],
+  },
   // Small, everyday wants for background characters.
-  { t: "to get through the week without trouble", short: "get through the week", tags: ["poverty", "duty"],
-    why: ["because the rent is due and the roof leaks", "because last week was bad enough"] },
-  { t: "to be left alone to do {their} work", short: "be left alone", tags: ["craft", "isolation"],
-    why: ["because people are more trouble than they're worth", "because the work is the only thing that makes sense"] },
-  { t: "to open a small business of {their} own", short: "open a business of {their} own", tags: ["ambition", "craft", "family"],
-    why: ["because {they} {is} tired of making someone else rich", "because {their} grandfather always meant to"] },
-  { t: "to win back someone's good opinion", short: "win back someone's respect", tags: ["family", "art"],
-    why: ["because {they} said something unforgivable at a wedding", "because it was {their} fault the shop burned"] },
+  {
+    t: "to get through the week without trouble",
+    short: "get through the week",
+    tags: ["poverty", "duty"],
+    why: ["because the rent is due and the roof leaks", "because last week was bad enough"],
+  },
+  {
+    t: "to be left alone to do {their} work",
+    short: "be left alone",
+    tags: ["craft", "isolation"],
+    why: ["because people are more trouble than they're worth", "because the work is the only thing that makes sense"],
+  },
+  {
+    t: "to open a small business of {their} own",
+    short: "open a business of {their} own",
+    tags: ["ambition", "craft", "family"],
+    why: ["because {they} {is} tired of making someone else rich", "because {their} grandfather always meant to"],
+  },
+  {
+    t: "to win back someone's good opinion",
+    short: "win back someone's respect",
+    tags: ["family", "art"],
+    why: ["because {they} said something unforgivable at a wedding", "because it was {their} fault the shop burned"],
+  },
   // World-scale wants for heroes of legend.
-  { t: "to stop a catastrophe only {they} can see coming", short: "stop the catastrophe only {they} can see", tags: ["faith", "duty", "loss"],
-    why: ["because the visions get closer every night", "because {they} saw it happen once already, and woke up in the past"] },
-  { t: "to break a curse that has followed {their} bloodline for generations", short: "break {their} family's curse", tags: ["family", "faith", "loss"],
-    why: ["because {they} {is} the last one left", "because it took {their} mother on her fortieth birthday, and {their} own is coming"] },
-  { t: "to overthrow the power that rules {their} world", short: "overthrow the power that rules {their} world", tags: ["order", "violence", "poverty"],
-    why: ["because no one else has ever come so close", "because {they} {was} raised to be its weapon and know where it is weak"] },
+  {
+    t: "to stop a catastrophe only {they} can see coming",
+    short: "stop the catastrophe only {they} can see",
+    tags: ["faith", "duty", "loss"],
+    why: [
+      "because the visions get closer every night",
+      "because {they} saw it happen once already, and woke up in the past",
+    ],
+  },
+  {
+    t: "to break a curse that has followed {their} bloodline for generations",
+    short: "break {their} family's curse",
+    tags: ["family", "faith", "loss"],
+    why: [
+      "because {they} {is} the last one left",
+      "because it took {their} mother on her fortieth birthday, and {their} own is coming",
+    ],
+  },
+  {
+    t: "to overthrow the power that rules {their} world",
+    short: "overthrow the power that rules {their} world",
+    tags: ["order", "violence", "poverty"],
+    why: [
+      "because no one else has ever come so close",
+      "because {they} {was} raised to be its weapon and know where it is weak",
+    ],
+  },
 ];
 
-export const TURNING_POINTS = [
+export const TURNING_POINTS: Tagged[] = [
   { t: "walking away from the only people who knew {them}", tags: ["isolation", "travel"] },
   { t: "being given a second chance by someone who had no reason to give it", tags: ["faith", "healing"] },
   { t: "a debt called in at the worst possible moment", tags: ["crime", "wealth", "poverty"] },
@@ -286,22 +471,82 @@ export const TURNING_POINTS = [
 ];
 
 // Writer layer: the lie a character believes and the truth they need.
-export const LIES = [
-  { lie: "If I let anyone close, they'll leave.", need: "to let someone stay, and believe they will", never: "I don't want you to go.", tags: ["loss", "betrayal", "isolation", "family"] },
-  { lie: "I'm only worth what I can do for people.", need: "to accept being cared for without earning it", never: "I need help.", tags: ["poverty", "duty", "healing"] },
-  { lie: "Power is the only real safety.", need: "to find safety in trust instead of control", never: "I was wrong to want it.", tags: ["violence", "ambition", "wealth", "poverty"] },
-  { lie: "It was my fault.", need: "to forgive {themself}", never: "It wasn't my fault.", tags: ["loss", "violence", "family"] },
-  { lie: "The rules exist for a reason, and the reason is always good.", need: "to judge right and wrong by {their} own conscience", never: "The rules were wrong.", tags: ["order", "duty", "faith"] },
-  { lie: "Everyone lies, so I may as well lie first.", need: "to risk honesty with one person", never: "I trust you.", tags: ["crime", "betrayal", "secrecy"] },
-  { lie: "Feelings get people killed.", need: "to let {themself} grieve", never: "I miss them.", tags: ["violence", "loss", "duty"] },
-  { lie: "I don't belong anywhere.", need: "to see the home that is already {theirs}", never: "I'm happy here.", tags: ["isolation", "travel", "family"] },
-  { lie: "If I stop moving, I'll have to feel it.", need: "to stay still long enough to face what happened", never: "I'm staying.", tags: ["travel", "chaos", "loss"] },
-  { lie: "Being clever is the same as being right.", need: "to listen to people who know less and see more", never: "I didn't think of that.", tags: ["learning", "ambition", "tech"] },
-  { lie: "The world can't change, so why try?", need: "to act as if one person matters", never: "Let's try.", tags: ["poverty", "betrayal", "loss"] },
-  { lie: "Faith protects the faithful.", need: "to keep faith through doubt instead of without it", never: "I don't know if anyone is listening.", tags: ["faith"] },
+export const LIES: LieEntry[] = [
+  {
+    lie: "If I let anyone close, they'll leave.",
+    need: "to let someone stay, and believe they will",
+    never: "I don't want you to go.",
+    tags: ["loss", "betrayal", "isolation", "family"],
+  },
+  {
+    lie: "I'm only worth what I can do for people.",
+    need: "to accept being cared for without earning it",
+    never: "I need help.",
+    tags: ["poverty", "duty", "healing"],
+  },
+  {
+    lie: "Power is the only real safety.",
+    need: "to find safety in trust instead of control",
+    never: "I was wrong to want it.",
+    tags: ["violence", "ambition", "wealth", "poverty"],
+  },
+  {
+    lie: "It was my fault.",
+    need: "to forgive {themself}",
+    never: "It wasn't my fault.",
+    tags: ["loss", "violence", "family"],
+  },
+  {
+    lie: "The rules exist for a reason, and the reason is always good.",
+    need: "to judge right and wrong by {their} own conscience",
+    never: "The rules were wrong.",
+    tags: ["order", "duty", "faith"],
+  },
+  {
+    lie: "Everyone lies, so I may as well lie first.",
+    need: "to risk honesty with one person",
+    never: "I trust you.",
+    tags: ["crime", "betrayal", "secrecy"],
+  },
+  {
+    lie: "Feelings get people killed.",
+    need: "to let {themself} grieve",
+    never: "I miss them.",
+    tags: ["violence", "loss", "duty"],
+  },
+  {
+    lie: "I don't belong anywhere.",
+    need: "to see the home that is already {theirs}",
+    never: "I'm happy here.",
+    tags: ["isolation", "travel", "family"],
+  },
+  {
+    lie: "If I stop moving, I'll have to feel it.",
+    need: "to stay still long enough to face what happened",
+    never: "I'm staying.",
+    tags: ["travel", "chaos", "loss"],
+  },
+  {
+    lie: "Being clever is the same as being right.",
+    need: "to listen to people who know less and see more",
+    never: "I didn't think of that.",
+    tags: ["learning", "ambition", "tech"],
+  },
+  {
+    lie: "The world can't change, so why try?",
+    need: "to act as if one person matters",
+    never: "Let's try.",
+    tags: ["poverty", "betrayal", "loss"],
+  },
+  {
+    lie: "Faith protects the faithful.",
+    need: "to keep faith through doubt instead of without it",
+    never: "I don't know if anyone is listening.",
+    tags: ["faith"],
+  },
 ];
 
-export const ARC_TURNS = [
+export const ARC_TURNS: { t: string }[] = [
   { t: "the plan finally works and costs exactly what {they} feared" },
   { t: "someone {they} dismissed saves {their} life" },
   { t: "the truth about {eventShort} comes out" },
@@ -310,7 +555,7 @@ export const ARC_TURNS = [
   { t: "the person {they} {has} been protecting turns out not to need it" },
 ];
 
-export const ROLES = [
+export const ROLES: RoleEntry[] = [
   { t: "protagonist", minGood: 0 },
   { t: "foil" },
   { t: "mentor", minAge: 45 },
@@ -321,13 +566,28 @@ export const ROLES = [
   { t: "love interest", minGood: 0 },
 ];
 
-export const HOOKS = [
-  { t: "is carrying a {package} {they} {was} paid to deliver. {They} read it. {They} {has}n't delivered it.", tags: ["secrecy", "crime", "betrayal"] },
+export const HOOKS: StakedEntry[] = [
+  {
+    t: "is carrying a {package} {they} {was} paid to deliver. {They} read it. {They} {has}n't delivered it.",
+    tags: ["secrecy", "crime", "betrayal"],
+  },
   { t: "owes a large sum to someone who would much rather be owed a favor.", tags: ["crime", "wealth", "poverty"] },
-  { t: "is the only living witness to a crime that powerful people want forgotten.", tags: ["secrecy", "crime", "order"] },
-  { t: "has been sending money every month to a family that doesn't know who it comes from.", tags: ["family", "secrecy", "loss"] },
-  { t: "once went by a different name, and someone in {city} just recognized the old one.", tags: ["secrecy", "betrayal", "crime"] },
-  { t: "found something on {their} last job that {they} {has}n't told anyone about.", tags: ["learning", "secrecy", "tech"] },
+  {
+    t: "is the only living witness to a crime that powerful people want forgotten.",
+    tags: ["secrecy", "crime", "order"],
+  },
+  {
+    t: "has been sending money every month to a family that doesn't know who it comes from.",
+    tags: ["family", "secrecy", "loss"],
+  },
+  {
+    t: "once went by a different name, and someone in {city} just recognized the old one.",
+    tags: ["secrecy", "betrayal", "crime"],
+  },
+  {
+    t: "found something on {their} last job that {they} {has}n't told anyone about.",
+    tags: ["learning", "secrecy", "tech"],
+  },
   { t: "is being quietly watched, and {has} noticed.", tags: ["secrecy", "violence"] },
   { t: "made a promise to a dying stranger and still {does}n't know what it means.", tags: ["faith", "loss", "duty"] },
   { t: "has a twin nobody here knows about.", tags: ["family", "secrecy"] },
@@ -343,45 +603,75 @@ export const HOOKS = [
   { t: "is quietly planning to quit.", tags: ["travel", "chaos"] },
   { t: "waters down the {drink}, but only for people {they} dislike{s}.", tags: ["crime", "craft"] },
   // World-shaking secrets for heroes of legend.
-  { t: "is the subject of a prophecy {they} {has} spent {their} whole life trying to outrun.", tags: ["faith", "secrecy", "travel"] },
-  { t: "carries the only key to something that was locked away for a very good reason.", tags: ["secrecy", "duty", "learning"] },
+  {
+    t: "is the subject of a prophecy {they} {has} spent {their} whole life trying to outrun.",
+    tags: ["faith", "secrecy", "travel"],
+  },
+  {
+    t: "carries the only key to something that was locked away for a very good reason.",
+    tags: ["secrecy", "duty", "learning"],
+  },
   { t: "is the lost heir of the very power {they} {is} fighting against.", tags: ["family", "secrecy", "order"] },
 ];
 
-export const RELATIONSHIP_TYPES = [
-  { type: "Mentor", tags: ["learning", "craft", "duty"], notes: [
-    "taught {them} everything useful and one thing that wasn't",
-    "is dying, and has asked to see {them} once more",
-    "disappeared without a word three years ago",
-  ] },
-  { type: "Sibling", tags: ["family"], notes: [
-    "took the blame for something {they} did, and never mentions it",
-    "chose the other side when the family split",
-    "is the only person {they} would cross a city for",
-  ] },
-  { type: "Rival", tags: ["ambition", "violence", "art"], notes: [
-    "wants the same thing and is a little better at getting it",
-    "used to be {their} closest friend",
-    "has never once beaten {them}, and has never stopped trying",
-  ] },
-  { type: "Creditor", tags: ["crime", "wealth", "poverty"], notes: [
-    "is patient, polite, and keeps very good records",
-    "would forgive the debt in exchange for one particular favor",
-    "is owed more than money",
-  ] },
-  { type: "Old flame", tags: ["family", "art", "travel"], notes: [
-    "left without explanation and just came back",
-    "is now married to someone {they} can't stand",
-    "still has something of {theirs} and won't give it back",
-  ] },
-  { type: "Former partner", tags: ["crime", "duty", "betrayal"], notes: [
-    "went to prison for a job they did together",
-    "saved {their} life and has never let {them} forget it",
-    "thinks {they} {is} dead",
-  ] },
+export const RELATIONSHIP_TYPES: RelationshipType[] = [
+  {
+    type: "Mentor",
+    tags: ["learning", "craft", "duty"],
+    notes: [
+      "taught {them} everything useful and one thing that wasn't",
+      "is dying, and has asked to see {them} once more",
+      "disappeared without a word three years ago",
+    ],
+  },
+  {
+    type: "Sibling",
+    tags: ["family"],
+    notes: [
+      "took the blame for something {they} did, and never mentions it",
+      "chose the other side when the family split",
+      "is the only person {they} would cross a city for",
+    ],
+  },
+  {
+    type: "Rival",
+    tags: ["ambition", "violence", "art"],
+    notes: [
+      "wants the same thing and is a little better at getting it",
+      "used to be {their} closest friend",
+      "has never once beaten {them}, and has never stopped trying",
+    ],
+  },
+  {
+    type: "Creditor",
+    tags: ["crime", "wealth", "poverty"],
+    notes: [
+      "is patient, polite, and keeps very good records",
+      "would forgive the debt in exchange for one particular favor",
+      "is owed more than money",
+    ],
+  },
+  {
+    type: "Old flame",
+    tags: ["family", "art", "travel"],
+    notes: [
+      "left without explanation and just came back",
+      "is now married to someone {they} can't stand",
+      "still has something of {theirs} and won't give it back",
+    ],
+  },
+  {
+    type: "Former partner",
+    tags: ["crime", "duty", "betrayal"],
+    notes: [
+      "went to prison for a job they did together",
+      "saved {their} life and has never let {them} forget it",
+      "thinks {they} {is} dead",
+    ],
+  },
 ];
 
-export const PARTY_HOOKS = [
+export const PARTY_HOOKS: string[] = [
   "needs capable people to help {them} {wantShort}, and can't pay up front.",
   "will join anyone heading away from {originShort}, and won't say why.",
   "is after the same thing the party is, for very different reasons.",
@@ -396,20 +686,30 @@ export const PARTY_HOOKS = [
 //   mercy:  Ruthlessness (-1) <-> Mercy (+1)
 
 // Tags that pull a character along each axis.
-export const MORAL_PULL = {
+export const MORAL_PULL: Record<"order" | "mercy", TagBag> = {
   order: { duty: 1, order: 1, faith: 0.6, family: 0.3, chaos: -1, crime: -0.6, travel: -0.4, art: -0.3 },
-  mercy: { healing: 1, family: 0.6, faith: 0.5, loss: 0.2, violence: -0.6, crime: -0.4, betrayal: -0.5, ambition: -0.5, wealth: -0.3 },
+  mercy: {
+    healing: 1,
+    family: 0.6,
+    faith: 0.5,
+    loss: 0.2,
+    violence: -0.6,
+    crime: -0.4,
+    betrayal: -0.5,
+    ambition: -0.5,
+    wealth: -0.3,
+  },
 };
 
 // Names for the nine regions of the compass, [mercy row][order column],
 // rows from merciful to ruthless, columns from order to freedom.
-export const MORAL_NAMES = [
+export const MORAL_NAMES: string[][] = [
   ["Guardian", "Good Samaritan", "Rebel with a cause"],
   ["Rule keeper", "Pragmatist", "Free agent"],
   ["Iron fist", "Mercenary", "Wildfire"],
 ];
 
-export const MORAL_LINES = [
+export const MORAL_LINES: MoralLine[] = [
   { t: "never harms a child", tags: ["family", "healing"], mercy: 0 },
   { t: "never breaks a sworn oath", tags: ["duty", "order", "faith"], order: 0.2 },
   { t: "never leaves anyone behind", tags: ["family", "duty", "violence"], mercy: 0.2 },
@@ -424,7 +724,7 @@ export const MORAL_LINES = [
   { t: "never sells out a friend, whatever the price", tags: ["betrayal", "family", "crime"] },
 ];
 
-export const BREAKING_POINTS = [
+export const BREAKING_POINTS: Tagged[] = [
   { t: "if someone {they} love{s} were in danger", tags: ["family", "loss"] },
   { t: "for enough money to never be poor again", tags: ["poverty", "wealth"] },
   { t: "to keep {their} past buried", tags: ["secrecy", "crime"] },
@@ -480,18 +780,47 @@ TRAITS.push(
 );
 
 TEMPERAMENTS.push(
-  { t: "nervous", phrase: "jumpy, quick to apologize, slow to relax", tags: ["poverty", "isolation"], voices: ["rambling", "quiet"] },
+  {
+    t: "nervous",
+    phrase: "jumpy, quick to apologize, slow to relax",
+    tags: ["poverty", "isolation"],
+    voices: ["rambling", "quiet"],
+  },
   { t: "stern", phrase: "hard to impress and harder to please", tags: ["order", "duty"], voices: ["formal", "blunt"] },
-  { t: "playful", phrase: "never entirely serious, even in danger", tags: ["art", "chaos"], voices: ["chatty", "folksy"] },
-  { t: "gloomy", phrase: "certain the worst is coming, and usually right", tags: ["loss", "betrayal"], voices: ["sardonic", "quiet"] },
-  { t: "earnest", phrase: "means every word, sometimes painfully", tags: ["faith", "duty", "family"], voices: ["formal", "plainspoken"] },
+  {
+    t: "playful",
+    phrase: "never entirely serious, even in danger",
+    tags: ["art", "chaos"],
+    voices: ["chatty", "folksy"],
+  },
+  {
+    t: "gloomy",
+    phrase: "certain the worst is coming, and usually right",
+    tags: ["loss", "betrayal"],
+    voices: ["sardonic", "quiet"],
+  },
+  {
+    t: "earnest",
+    phrase: "means every word, sometimes painfully",
+    tags: ["faith", "duty", "family"],
+    voices: ["formal", "plainspoken"],
+  },
   { t: "restless", phrase: "always halfway out the door", tags: ["travel", "chaos"], voices: ["chatty", "terse"] },
-  { t: "serene", phrase: "calm in a way that took years to earn", tags: ["faith", "healing", "wild"], voices: ["gentle", "measured"] },
+  {
+    t: "serene",
+    phrase: "calm in a way that took years to earn",
+    tags: ["faith", "healing", "wild"],
+    voices: ["gentle", "measured"],
+  },
 );
 
-const VOICE_EXTRA = {
+const VOICE_EXTRA: Record<string, Pick<VoiceStyle, "habits" | "lines">> = {
   measured: {
-    habits: ["steeples {their} fingers while listening", "answers a question with a careful summary of it first", "never uses a word {they} {does}n't know"],
+    habits: [
+      "steeples {their} fingers while listening",
+      "answers a question with a careful summary of it first",
+      "never uses a word {they} {does}n't know",
+    ],
     lines: [
       "There are two ways to read this. I'd like to be sure before I pick one.",
       "Anger is expensive. I prefer to spend it on purpose.",
@@ -501,7 +830,11 @@ const VOICE_EXTRA = {
     ],
   },
   plainspoken: {
-    habits: ["spits before making a promise", "calls weather by its local name", "won't say a word in front of strangers until fed"],
+    habits: [
+      "spits before making a promise",
+      "calls weather by its local name",
+      "won't say a word in front of strangers until fed",
+    ],
     lines: [
       "Roof's leaking, horse is lame, and now you. Fine. Sit.",
       "Folks round here don't ask questions. That's how they get old.",
@@ -521,7 +854,11 @@ const VOICE_EXTRA = {
     ],
   },
   theatrical: {
-    habits: ["bows slightly when introduced", "quotes lines from plays nobody else has seen", "lowers {their} voice for the important part"],
+    habits: [
+      "bows slightly when introduced",
+      "quotes lines from plays nobody else has seen",
+      "lowers {their} voice for the important part",
+    ],
     lines: [
       "Picture it: rain, a locked door, and me, magnificent as ever.",
       "I've died twice on stage and once for real. Only the stage deaths got applause.",
@@ -535,7 +872,11 @@ const VOICE_EXTRA = {
     lines: ["Done.", "Wrong door.", "Maybe. Pay first.", "Not tonight.", "I saw. I'm not telling."],
   },
   chatty: {
-    habits: ["tells strangers {their} life story within minutes", "fills every silence", "names {their} tools and animals"],
+    habits: [
+      "tells strangers {their} life story within minutes",
+      "fills every silence",
+      "names {their} tools and animals",
+    ],
     lines: [
       "Oh, I know that look. That's a 'something went wrong' look. Tell me everything.",
       "You'll never guess who I saw at the market. Well, you might. Guess.",
@@ -555,7 +896,11 @@ const VOICE_EXTRA = {
     ],
   },
   sardonic: {
-    habits: ["applauds slowly at bad ideas", "calls everyone 'friend' in a tone that suggests otherwise", "sighs before good news, too"],
+    habits: [
+      "applauds slowly at bad ideas",
+      "calls everyone 'friend' in a tone that suggests otherwise",
+      "sighs before good news, too",
+    ],
     lines: [
       "Ah, a heroic plan. My favorite kind to survive.",
       "No, please, keep explaining. I love this part.",
@@ -565,7 +910,11 @@ const VOICE_EXTRA = {
     ],
   },
   rambling: {
-    habits: ["counts on {their} fingers and loses count", "starts sentences with 'Anyway'", "remembers the end of the story first"],
+    habits: [
+      "counts on {their} fingers and loses count",
+      "starts sentences with 'Anyway'",
+      "remembers the end of the story first",
+    ],
     lines: [
       "Anyway, the point is, never trust a goat. Or a priest. Or was it a priest's goat?",
       "I had a dream like this once. Not exactly like this. There was more soup.",
@@ -586,13 +935,19 @@ const VOICE_EXTRA = {
   },
 };
 for (const [style, extra] of Object.entries(VOICE_EXTRA)) {
-  VOICES[style].habits.push(...extra.habits);
-  VOICES[style].lines.push(...extra.lines);
+  VOICES[style]!.habits.push(...extra.habits);
+  VOICES[style]!.lines.push(...extra.lines);
 }
 Object.assign(VOICES, {
   formal: {
     desc: "formally, with old-fashioned courtesy",
-    habits: ["uses titles, never first names", "apologizes before disagreeing", "stands when others enter", "folds {their} hands while speaking", "never contracts a word"],
+    habits: [
+      "uses titles, never first names",
+      "apologizes before disagreeing",
+      "stands when others enter",
+      "folds {their} hands while speaking",
+      "never contracts a word",
+    ],
     lines: [
       "I must respectfully decline. Twice, if you insist on asking again.",
       "It would be my honor. It would also be extremely dangerous.",
@@ -603,7 +958,13 @@ Object.assign(VOICES, {
     ],
   },
   quiet: {
-    habits: ["speaks so softly people lean in", "goes silent when lied to", "answers with a look first", "waits until the room empties to say the real thing", "writes things down rather than say them"],
+    habits: [
+      "speaks so softly people lean in",
+      "goes silent when lied to",
+      "answers with a look first",
+      "waits until the room empties to say the real thing",
+      "writes things down rather than say them",
+    ],
     lines: [
       "I heard. I always hear.",
       "Not here. Later, when it's just us.",
@@ -614,7 +975,13 @@ Object.assign(VOICES, {
     ],
   },
   folksy: {
-    habits: ["has a proverb for everything", "calls younger people 'kid'", "measures distance in meals", "talks about the weather as if it were a person", "remembers everyone's grandmother"],
+    habits: [
+      "has a proverb for everything",
+      "calls younger people 'kid'",
+      "measures distance in meals",
+      "talks about the weather as if it were a person",
+      "remembers everyone's grandmother",
+    ],
     lines: [
       "Well, that's a horse of a different color, and it's kicking.",
       "My mother always said trouble comes in threes, and she was trouble one through three.",
@@ -744,66 +1111,218 @@ FEARS.push(
 
 WANTS.push(
   // stakes 0: everyday
-  { t: "to fix the leak in the roof before winter", short: "fix the roof before winter", tier: 0, tags: ["poverty", "craft"],
-    why: ["because the baby keeps getting sick", "because {they} promised {their} father {they} would"] },
-  { t: "to win the local contest {they} lose{s} every year", short: "finally win the yearly contest", tier: 0, tags: ["ambition", "art"],
-    why: ["because the same smug rival wins every time", "because {their} mother never saw {them} win anything"] },
-  { t: "to make it through a season without a fight", short: "get through a season without a fight", tier: 0, tags: ["violence", "family"],
-    why: ["because the last fight nearly cost {them} {their} job", "because {they} promised someone"] },
-  { t: "to earn enough to visit home", short: "save enough to visit home", tier: 0, tags: ["travel", "family", "poverty"],
-    why: ["because {their} grandmother is getting old", "because {they} left on bad terms"] },
-  { t: "to be taken seriously at work", short: "be taken seriously at work", tier: 0, tags: ["ambition", "craft"],
-    why: ["because everyone still treats {them} like the new one", "because {they} {is} better at it than {their} boss"] },
-  { t: "to make one real friend in this place", short: "make one real friend here", tier: 0, tags: ["isolation", "family"],
-    why: ["because the nights are long", "because {they} {has} been here a year and still {has} no one"] },
-  { t: "to retire somewhere quiet", short: "retire somewhere quiet", tier: 0, tags: ["travel", "wealth"],
-    why: ["because {their} knees have had enough", "because {they} {has} seen enough noise for a lifetime"] },
-  { t: "to learn to read", short: "learn to read", tier: 0, tags: ["learning", "poverty"],
-    why: ["because {they} {is} tired of pretending", "because {their} child is learning and {they} {is} determined to keep up"] },
+  {
+    t: "to fix the leak in the roof before winter",
+    short: "fix the roof before winter",
+    tier: 0,
+    tags: ["poverty", "craft"],
+    why: ["because the baby keeps getting sick", "because {they} promised {their} father {they} would"],
+  },
+  {
+    t: "to win the local contest {they} lose{s} every year",
+    short: "finally win the yearly contest",
+    tier: 0,
+    tags: ["ambition", "art"],
+    why: ["because the same smug rival wins every time", "because {their} mother never saw {them} win anything"],
+  },
+  {
+    t: "to make it through a season without a fight",
+    short: "get through a season without a fight",
+    tier: 0,
+    tags: ["violence", "family"],
+    why: ["because the last fight nearly cost {them} {their} job", "because {they} promised someone"],
+  },
+  {
+    t: "to earn enough to visit home",
+    short: "save enough to visit home",
+    tier: 0,
+    tags: ["travel", "family", "poverty"],
+    why: ["because {their} grandmother is getting old", "because {they} left on bad terms"],
+  },
+  {
+    t: "to be taken seriously at work",
+    short: "be taken seriously at work",
+    tier: 0,
+    tags: ["ambition", "craft"],
+    why: [
+      "because everyone still treats {them} like the new one",
+      "because {they} {is} better at it than {their} boss",
+    ],
+  },
+  {
+    t: "to make one real friend in this place",
+    short: "make one real friend here",
+    tier: 0,
+    tags: ["isolation", "family"],
+    why: ["because the nights are long", "because {they} {has} been here a year and still {has} no one"],
+  },
+  {
+    t: "to retire somewhere quiet",
+    short: "retire somewhere quiet",
+    tier: 0,
+    tags: ["travel", "wealth"],
+    why: ["because {their} knees have had enough", "because {they} {has} seen enough noise for a lifetime"],
+  },
+  {
+    t: "to learn to read",
+    short: "learn to read",
+    tier: 0,
+    tags: ["learning", "poverty"],
+    why: [
+      "because {they} {is} tired of pretending",
+      "because {their} child is learning and {they} {is} determined to keep up",
+    ],
+  },
   // stakes 1: personal
-  { t: "to win back a partner {they} drove away", short: "win back the one {they} drove away", tier: 1, tags: ["family", "loss"],
-    why: ["because {they} {has} finally understood what went wrong", "because the other person is about to marry someone else"] },
-  { t: "to escape a dead-end life before it's too late", short: "escape a dead-end life", tier: 1, tags: ["poverty", "travel", "ambition"],
-    why: ["because {their} parents never left, and regretted it", "because something in {them} is going quiet"] },
-  { t: "to find the parent who abandoned {them}", short: "find the parent who left", tier: 1, tags: ["family", "loss", "secrecy"],
-    why: ["because {they} {has} to know if it was {their} fault", "because a letter arrived with no return address"] },
-  { t: "to be forgiven by someone {they} hurt badly", short: "earn one person's forgiveness", tier: 1, tags: ["betrayal", "healing"],
-    why: ["because that person is dying", "because {they} can't forgive {themself} until then"] },
-  { t: "to get out from under a criminal boss", short: "get free of a criminal boss", tier: 1, tags: ["crime", "poverty"],
-    why: ["because the jobs keep getting worse", "because the boss has started asking about {their} family"] },
-  { t: "to make a name in the big city", short: "make a name in the city", tier: 1, tags: ["ambition", "art", "travel"],
-    why: ["because everyone back home said {they} couldn't", "because it's the only dream {they} {has} ever had"] },
-  { t: "to protect a secret that would ruin {their} family", short: "protect a family secret", tier: 1, tags: ["family", "secrecy"],
-    why: ["because {they} {is} the only one who knows", "because {their} sister would never recover"] },
+  {
+    t: "to win back a partner {they} drove away",
+    short: "win back the one {they} drove away",
+    tier: 1,
+    tags: ["family", "loss"],
+    why: [
+      "because {they} {has} finally understood what went wrong",
+      "because the other person is about to marry someone else",
+    ],
+  },
+  {
+    t: "to escape a dead-end life before it's too late",
+    short: "escape a dead-end life",
+    tier: 1,
+    tags: ["poverty", "travel", "ambition"],
+    why: ["because {their} parents never left, and regretted it", "because something in {them} is going quiet"],
+  },
+  {
+    t: "to find the parent who abandoned {them}",
+    short: "find the parent who left",
+    tier: 1,
+    tags: ["family", "loss", "secrecy"],
+    why: ["because {they} {has} to know if it was {their} fault", "because a letter arrived with no return address"],
+  },
+  {
+    t: "to be forgiven by someone {they} hurt badly",
+    short: "earn one person's forgiveness",
+    tier: 1,
+    tags: ["betrayal", "healing"],
+    why: ["because that person is dying", "because {they} can't forgive {themself} until then"],
+  },
+  {
+    t: "to get out from under a criminal boss",
+    short: "get free of a criminal boss",
+    tier: 1,
+    tags: ["crime", "poverty"],
+    why: ["because the jobs keep getting worse", "because the boss has started asking about {their} family"],
+  },
+  {
+    t: "to make a name in the big city",
+    short: "make a name in the city",
+    tier: 1,
+    tags: ["ambition", "art", "travel"],
+    why: ["because everyone back home said {they} couldn't", "because it's the only dream {they} {has} ever had"],
+  },
+  {
+    t: "to protect a secret that would ruin {their} family",
+    short: "protect a family secret",
+    tier: 1,
+    tags: ["family", "secrecy"],
+    why: ["because {they} {is} the only one who knows", "because {their} sister would never recover"],
+  },
   // stakes 2: dangerous
-  { t: "to bring a murderer to justice", short: "bring a killer to justice", tier: 2, tags: ["violence", "order", "loss"],
-    why: ["because the law closed the case too quickly", "because the victim was {their} friend"] },
-  { t: "to steal back what was stolen from {their} people", short: "steal back what was taken from {their} people", tier: 2, tags: ["crime", "family", "betrayal"],
-    why: ["because it's sitting in a rich man's vault as decoration", "because the elders are dying without it"] },
-  { t: "to expose a powerful liar", short: "expose a powerful liar", tier: 2, tags: ["secrecy", "order", "betrayal"],
-    why: ["because the lie has already cost lives", "because {they} helped tell it once"] },
-  { t: "to find a cure for a sickness everyone else has given up on", short: "find a cure no one believes in", tier: 2, tags: ["healing", "learning"],
-    why: ["because someone {they} love{s} has it", "because {they} {has} seen it beaten before"] },
-  { t: "to free the people {they} once helped imprison", short: "free the people {they} helped imprison", tier: 2, tags: ["order", "betrayal", "violence"],
-    why: ["because {they} finally saw the inside of those cells", "because one of them saved {their} life"] },
+  {
+    t: "to bring a murderer to justice",
+    short: "bring a killer to justice",
+    tier: 2,
+    tags: ["violence", "order", "loss"],
+    why: ["because the law closed the case too quickly", "because the victim was {their} friend"],
+  },
+  {
+    t: "to steal back what was stolen from {their} people",
+    short: "steal back what was taken from {their} people",
+    tier: 2,
+    tags: ["crime", "family", "betrayal"],
+    why: ["because it's sitting in a rich man's vault as decoration", "because the elders are dying without it"],
+  },
+  {
+    t: "to expose a powerful liar",
+    short: "expose a powerful liar",
+    tier: 2,
+    tags: ["secrecy", "order", "betrayal"],
+    why: ["because the lie has already cost lives", "because {they} helped tell it once"],
+  },
+  {
+    t: "to find a cure for a sickness everyone else has given up on",
+    short: "find a cure no one believes in",
+    tier: 2,
+    tags: ["healing", "learning"],
+    why: ["because someone {they} love{s} has it", "because {they} {has} seen it beaten before"],
+  },
+  {
+    t: "to free the people {they} once helped imprison",
+    short: "free the people {they} helped imprison",
+    tier: 2,
+    tags: ["order", "betrayal", "violence"],
+    why: ["because {they} finally saw the inside of those cells", "because one of them saved {their} life"],
+  },
   // stakes 3: grand
-  { t: "to end a war {they} helped start", short: "end the war {they} helped start", tier: 3, tags: ["violence", "duty", "loss"],
-    why: ["because the reasons turned out to be lies", "because both sides are now burying children"] },
-  { t: "to unite enemies against something worse", short: "unite old enemies against a greater threat", tier: 3, tags: ["duty", "order", "violence"],
-    why: ["because no one else has seen what's coming", "because {they} {has} friends on both sides"] },
-  { t: "to reclaim a stolen birthright", short: "reclaim a stolen birthright", tier: 3, tags: ["family", "wealth", "order"],
-    why: ["because {their} uncle took it the night {their} parents died", "because the people are suffering under the usurper"] },
-  { t: "to rebuild a destroyed order or guild", short: "rebuild a fallen order", tier: 3, tags: ["duty", "faith", "craft"],
-    why: ["because {they} {is} its last true member", "because its oath still binds {them}"] },
+  {
+    t: "to end a war {they} helped start",
+    short: "end the war {they} helped start",
+    tier: 3,
+    tags: ["violence", "duty", "loss"],
+    why: ["because the reasons turned out to be lies", "because both sides are now burying children"],
+  },
+  {
+    t: "to unite enemies against something worse",
+    short: "unite old enemies against a greater threat",
+    tier: 3,
+    tags: ["duty", "order", "violence"],
+    why: ["because no one else has seen what's coming", "because {they} {has} friends on both sides"],
+  },
+  {
+    t: "to reclaim a stolen birthright",
+    short: "reclaim a stolen birthright",
+    tier: 3,
+    tags: ["family", "wealth", "order"],
+    why: [
+      "because {their} uncle took it the night {their} parents died",
+      "because the people are suffering under the usurper",
+    ],
+  },
+  {
+    t: "to rebuild a destroyed order or guild",
+    short: "rebuild a fallen order",
+    tier: 3,
+    tags: ["duty", "faith", "craft"],
+    why: ["because {they} {is} its last true member", "because its oath still binds {them}"],
+  },
   // stakes 4: world-scale
-  { t: "to seal away an ancient evil before it fully wakes", short: "seal away an ancient evil", tier: 4, tags: ["faith", "duty", "violence"],
-    why: ["because {they} {has} heard it whispering", "because the last seal was broken by {their} own family"] },
-  { t: "to change the fate written for {them} before {they} {was} born", short: "rewrite {their} written fate", tier: 4, tags: ["faith", "chaos", "family"],
-    why: ["because the prophecy ends with {them} destroying everything", "because {they} {is} no one's instrument"] },
-  { t: "to free {their} people from a centuries-old bondage", short: "free {their} people from bondage", tier: 4, tags: ["order", "violence", "family"],
-    why: ["because {they} {is} the first to slip the chains", "because the old songs say one of them would"] },
-  { t: "to find the last door out of a dying world", short: "find a way out of a dying world", tier: 4, tags: ["travel", "loss", "learning"],
-    why: ["because the end has a date now", "because {they} {has} seen the other side in dreams"] },
+  {
+    t: "to seal away an ancient evil before it fully wakes",
+    short: "seal away an ancient evil",
+    tier: 4,
+    tags: ["faith", "duty", "violence"],
+    why: ["because {they} {has} heard it whispering", "because the last seal was broken by {their} own family"],
+  },
+  {
+    t: "to change the fate written for {them} before {they} {was} born",
+    short: "rewrite {their} written fate",
+    tier: 4,
+    tags: ["faith", "chaos", "family"],
+    why: ["because the prophecy ends with {them} destroying everything", "because {they} {is} no one's instrument"],
+  },
+  {
+    t: "to free {their} people from a centuries-old bondage",
+    short: "free {their} people from bondage",
+    tier: 4,
+    tags: ["order", "violence", "family"],
+    why: ["because {they} {is} the first to slip the chains", "because the old songs say one of them would"],
+  },
+  {
+    t: "to find the last door out of a dying world",
+    short: "find a way out of a dying world",
+    tier: 4,
+    tags: ["travel", "loss", "learning"],
+    why: ["because the end has a date now", "because {they} {has} seen the other side in dreams"],
+  },
 );
 
 TURNING_POINTS.push(
@@ -832,20 +1351,85 @@ TURNING_POINTS.push(
 LIES.push(
   { lie: "I don't need anyone.", need: "to let people in", never: "Stay.", tags: ["isolation", "loss"] },
   { lie: "Love always ends in loss.", need: "to choose love anyway", never: "I love you.", tags: ["loss", "family"] },
-  { lie: "I'm too old to change.", need: "to begin again", never: "I'd like to try something new.", tags: ["loss", "craft"] },
-  { lie: "Money solves everything.", need: "to value what can't be bought", never: "Keep the money.", tags: ["wealth", "poverty"] },
-  { lie: "I am what my father made me.", need: "to become {their} own person", never: "I'm nothing like him.", tags: ["family", "violence"] },
-  { lie: "If I'm perfect, I'll be safe.", need: "to accept failing", never: "I made a mistake.", tags: ["order", "ambition"] },
-  { lie: "Nobody could love the real me.", need: "to be seen and stay anyway", never: "This is who I really am.", tags: ["secrecy", "isolation"] },
+  {
+    lie: "I'm too old to change.",
+    need: "to begin again",
+    never: "I'd like to try something new.",
+    tags: ["loss", "craft"],
+  },
+  {
+    lie: "Money solves everything.",
+    need: "to value what can't be bought",
+    never: "Keep the money.",
+    tags: ["wealth", "poverty"],
+  },
+  {
+    lie: "I am what my father made me.",
+    need: "to become {their} own person",
+    never: "I'm nothing like him.",
+    tags: ["family", "violence"],
+  },
+  {
+    lie: "If I'm perfect, I'll be safe.",
+    need: "to accept failing",
+    never: "I made a mistake.",
+    tags: ["order", "ambition"],
+  },
+  {
+    lie: "Nobody could love the real me.",
+    need: "to be seen and stay anyway",
+    never: "This is who I really am.",
+    tags: ["secrecy", "isolation"],
+  },
   { lie: "The past can be fixed.", need: "to let the past go", never: "It's over.", tags: ["loss", "family"] },
-  { lie: "Only the strong survive.", need: "to protect the weak", never: "I'll carry you.", tags: ["violence", "poverty"] },
-  { lie: "I owe everyone everything.", need: "to set down debts that were never {theirs}", never: "No.", tags: ["duty", "family"] },
-  { lie: "Talent is all that matters.", need: "to value the work over the gift", never: "I had help.", tags: ["art", "ambition"] },
-  { lie: "Revenge will make it stop hurting.", need: "to grieve instead of hunt", never: "I forgive you.", tags: ["betrayal", "violence", "loss"] },
-  { lie: "Home is a place I can go back to.", need: "to build a new home", never: "This is home now.", tags: ["travel", "family"] },
-  { lie: "If I tell the truth, I'll lose everything.", need: "to trust the truth", never: "I lied.", tags: ["secrecy", "crime"] },
-  { lie: "Knowledge is safer than feeling.", need: "to trust what {they} feel{s}", never: "I don't know, I just feel it.", tags: ["learning", "isolation"] },
-  { lie: "I'm the villain of this story.", need: "to believe {they} can be good", never: "I deserve this.", tags: ["violence", "betrayal", "faith"] },
+  {
+    lie: "Only the strong survive.",
+    need: "to protect the weak",
+    never: "I'll carry you.",
+    tags: ["violence", "poverty"],
+  },
+  {
+    lie: "I owe everyone everything.",
+    need: "to set down debts that were never {theirs}",
+    never: "No.",
+    tags: ["duty", "family"],
+  },
+  {
+    lie: "Talent is all that matters.",
+    need: "to value the work over the gift",
+    never: "I had help.",
+    tags: ["art", "ambition"],
+  },
+  {
+    lie: "Revenge will make it stop hurting.",
+    need: "to grieve instead of hunt",
+    never: "I forgive you.",
+    tags: ["betrayal", "violence", "loss"],
+  },
+  {
+    lie: "Home is a place I can go back to.",
+    need: "to build a new home",
+    never: "This is home now.",
+    tags: ["travel", "family"],
+  },
+  {
+    lie: "If I tell the truth, I'll lose everything.",
+    need: "to trust the truth",
+    never: "I lied.",
+    tags: ["secrecy", "crime"],
+  },
+  {
+    lie: "Knowledge is safer than feeling.",
+    need: "to trust what {they} feel{s}",
+    never: "I don't know, I just feel it.",
+    tags: ["learning", "isolation"],
+  },
+  {
+    lie: "I'm the villain of this story.",
+    need: "to believe {they} can be good",
+    never: "I deserve this.",
+    tags: ["violence", "betrayal", "faith"],
+  },
 );
 
 ARC_TURNS.push(
@@ -867,7 +1451,11 @@ ARC_TURNS.push(
 
 HOOKS.push(
   // stakes 0: small, everyday secrets
-  { t: "has been quietly stealing {coin} from {their} employer, a little at a time.", tier: 0, tags: ["crime", "poverty"] },
+  {
+    t: "has been quietly stealing {coin} from {their} employer, a little at a time.",
+    tier: 0,
+    tags: ["crime", "poverty"],
+  },
   { t: "is learning to read in secret, at night.", tier: 0, tags: ["learning", "poverty"] },
   { t: "writes anonymous love poems to someone {they} see every day.", tier: 0, tags: ["art", "isolation"] },
   { t: "lied about {their} age to get {their} job.", tier: 0, tags: ["crime", "ambition"] },
@@ -894,23 +1482,39 @@ HOOKS.push(
   { t: "is a spy for a rival power, and has started to like it here.", tier: 2, tags: ["secrecy", "betrayal"] },
   { t: "has a bounty on {their} head under another name.", tier: 2, tags: ["crime", "violence"] },
   { t: "killed someone in self-defense and hid the body.", tier: 2, tags: ["violence", "secrecy"] },
-  { t: "is the anonymous writer of a pamphlet {authority} is desperate to silence.", tier: 2, tags: ["order", "art", "secrecy"] },
+  {
+    t: "is the anonymous writer of a pamphlet {authority} is desperate to silence.",
+    tier: 2,
+    tags: ["order", "art", "secrecy"],
+  },
   // stakes 3: grand
   { t: "carries a map to something that rewrites history.", tier: 3, tags: ["learning", "secrecy", "travel"] },
-  { t: "was once sworn to an order that everyone believes was destroyed.", tier: 3, tags: ["duty", "faith", "secrecy"] },
+  {
+    t: "was once sworn to an order that everyone believes was destroyed.",
+    tier: 3,
+    tags: ["duty", "faith", "secrecy"],
+  },
   { t: "holds evidence that {their} ruler murdered the last one.", tier: 3, tags: ["order", "secrecy", "violence"] },
   { t: "is the true author of a famous work credited to someone else.", tier: 3, tags: ["art", "betrayal"] },
   { t: "has been dead once already, and came back different.", tier: 3, tags: ["faith", "loss"] },
   // stakes 4: world-shaking
-  { t: "is the only one who knows the war was started on purpose, and by whom.", tier: 4, tags: ["violence", "secrecy", "order"] },
+  {
+    t: "is the only one who knows the war was started on purpose, and by whom.",
+    tier: 4,
+    tags: ["violence", "secrecy", "order"],
+  },
   { t: "was born to be a vessel for something ancient, and can feel it stirring.", tier: 4, tags: ["faith", "chaos"] },
-  { t: "remembers a world that existed before this one, and everyone else has forgotten it.", tier: 4, tags: ["loss", "learning"] },
+  {
+    t: "remembers a world that existed before this one, and everyone else has forgotten it.",
+    tier: 4,
+    tags: ["loss", "learning"],
+  },
   { t: "is a living key to a door that should never be opened.", tier: 4, tags: ["secrecy", "faith", "duty"] },
 );
 
 // Secrets built from parts, so small and medium secrets rarely repeat.
 // Read as: {first name} {act} {whom}{twist}.
-export const SECRET_PARTS = {
+export const SECRET_PARTS: SecretParts = {
   acts: [
     { t: "has been stealing from", tier: 0 },
     { t: "has a hopeless crush on", tier: 0 },
@@ -929,54 +1533,143 @@ export const SECRET_PARTS = {
     { t: "helped bury the crimes of", tier: 2 },
   ],
   whom: [
-    "{their} employer", "{their} landlord", "{their} oldest friend", "a local priest", "the captain of {authority}",
-    "a rival's daughter", "a rival's son", "{their} former teacher", "a stranger {they} met on the road", "the richest family in {city}",
-    "{their} own sibling", "a famous performer", "the neighbor everyone avoids", "an old flame", "{their} business partner",
-    "a retired soldier", "{their} best customer", "a known smuggler", "the healer down the street", "{ruler}",
+    "{their} employer",
+    "{their} landlord",
+    "{their} oldest friend",
+    "a local priest",
+    "the captain of {authority}",
+    "a rival's daughter",
+    "a rival's son",
+    "{their} former teacher",
+    "a stranger {they} met on the road",
+    "the richest family in {city}",
+    "{their} own sibling",
+    "a famous performer",
+    "the neighbor everyone avoids",
+    "an old flame",
+    "{their} business partner",
+    "a retired soldier",
+    "{their} best customer",
+    "a known smuggler",
+    "the healer down the street",
+    "{ruler}",
   ],
   twists: [
-    "", "", "", "",
-    ", and is about to be found out", ", and nobody else knows", ", and doesn't regret it",
-    ", and it's getting worse", ", and has started to enjoy it", ", and wants to confess",
+    "",
+    "",
+    "",
+    "",
+    ", and is about to be found out",
+    ", and nobody else knows",
+    ", and doesn't regret it",
+    ", and it's getting worse",
+    ", and has started to enjoy it",
+    ", and wants to confess",
   ],
 };
 
 RELATIONSHIP_TYPES.forEach((r) => {
   const extra = {
-    Mentor: ["still sends a letter every winter, unsigned", "taught {them} a trade and a grudge", "wants {them} to take over, and {they} won't"],
-    Sibling: ["borrows money and never pays it back", "is the family's favorite, and knows it", "is the only one who still calls {them} by a childhood name"],
-    Rival: ["is the only person who truly understands {their} work", "spread a rumor {they} {has} never shaken", "is secretly the person {they} admire most"],
-    Creditor: ["has started being friendly, which is worse", "inherited the debt from a dead partner and wants it closed", "keeps {their} grandmother's ring as collateral"],
-    "Old flame": ["is getting married next month and sent an invitation", "never got the letter {they} wrote", "is raising a child with {their} eyes"],
-    "Former partner": ["kept the money from their last job", "is now on the other side of the law", "still has {their} back, and that scares {them}"],
+    Mentor: [
+      "still sends a letter every winter, unsigned",
+      "taught {them} a trade and a grudge",
+      "wants {them} to take over, and {they} won't",
+    ],
+    Sibling: [
+      "borrows money and never pays it back",
+      "is the family's favorite, and knows it",
+      "is the only one who still calls {them} by a childhood name",
+    ],
+    Rival: [
+      "is the only person who truly understands {their} work",
+      "spread a rumor {they} {has} never shaken",
+      "is secretly the person {they} admire most",
+    ],
+    Creditor: [
+      "has started being friendly, which is worse",
+      "inherited the debt from a dead partner and wants it closed",
+      "keeps {their} grandmother's ring as collateral",
+    ],
+    "Old flame": [
+      "is getting married next month and sent an invitation",
+      "never got the letter {they} wrote",
+      "is raising a child with {their} eyes",
+    ],
+    "Former partner": [
+      "kept the money from their last job",
+      "is now on the other side of the law",
+      "still has {their} back, and that scares {them}",
+    ],
   }[r.type];
   if (extra) r.notes.push(...extra);
 });
 RELATIONSHIP_TYPES.push(
-  { type: "Parent", tags: ["family"], notes: [
-    "never approved of a single choice {they} made", "is ill and refuses to say how badly", "keeps a shrine to {them} in the old house",
-    "remarried someone {they} can't stand", "taught {them} everything, including the bad habits",
-  ] },
-  { type: "Child", tags: ["family"], notes: [
-    "is grown and barely speaks to {them}", "is far braver than {they} {was} at that age", "wants to follow in {their} footsteps, which terrifies {them}",
-    "was raised by someone else", "is the only thing {they} {has} ever done right",
-  ] },
-  { type: "Best friend", tags: ["family", "art"], notes: [
-    "has known {them} since before {they} could walk", "is the only one {they} tell the truth", "owes {them} a life and pays it back in jokes",
-    "is drifting away, and neither of them will mention it", "would bury a body for {them}, no questions",
-  ] },
-  { type: "Enemy", tags: ["violence", "betrayal"], notes: [
-    "swore to ruin {them} and is patient about it", "was once {their} closest ally", "has never forgiven {them} for a single sentence",
-    "is respected by everyone who doesn't know the truth", "is dying, and wants to make peace",
-  ] },
-  { type: "Protégé", tags: ["learning", "craft", "duty"], notes: [
-    "is better than {them} already", "worships {them}, which is a heavy thing to carry", "is learning the wrong lessons from {them}",
-    "was taken in off the street", "will soon be good enough to leave",
-  ] },
-  { type: "Patron", tags: ["wealth", "ambition", "art"], notes: [
-    "pays well and asks strange favors", "wants {their} loyalty more than {their} work", "is quietly losing everything",
-    "has a dangerous rival who has noticed {them}", "has never once said thank you",
-  ] },
+  {
+    type: "Parent",
+    tags: ["family"],
+    notes: [
+      "never approved of a single choice {they} made",
+      "is ill and refuses to say how badly",
+      "keeps a shrine to {them} in the old house",
+      "remarried someone {they} can't stand",
+      "taught {them} everything, including the bad habits",
+    ],
+  },
+  {
+    type: "Child",
+    tags: ["family"],
+    notes: [
+      "is grown and barely speaks to {them}",
+      "is far braver than {they} {was} at that age",
+      "wants to follow in {their} footsteps, which terrifies {them}",
+      "was raised by someone else",
+      "is the only thing {they} {has} ever done right",
+    ],
+  },
+  {
+    type: "Best friend",
+    tags: ["family", "art"],
+    notes: [
+      "has known {them} since before {they} could walk",
+      "is the only one {they} tell the truth",
+      "owes {them} a life and pays it back in jokes",
+      "is drifting away, and neither of them will mention it",
+      "would bury a body for {them}, no questions",
+    ],
+  },
+  {
+    type: "Enemy",
+    tags: ["violence", "betrayal"],
+    notes: [
+      "swore to ruin {them} and is patient about it",
+      "was once {their} closest ally",
+      "has never forgiven {them} for a single sentence",
+      "is respected by everyone who doesn't know the truth",
+      "is dying, and wants to make peace",
+    ],
+  },
+  {
+    type: "Protégé",
+    tags: ["learning", "craft", "duty"],
+    notes: [
+      "is better than {them} already",
+      "worships {them}, which is a heavy thing to carry",
+      "is learning the wrong lessons from {them}",
+      "was taken in off the street",
+      "will soon be good enough to leave",
+    ],
+  },
+  {
+    type: "Patron",
+    tags: ["wealth", "ambition", "art"],
+    notes: [
+      "pays well and asks strange favors",
+      "wants {their} loyalty more than {their} work",
+      "is quietly losing everything",
+      "has a dangerous rival who has noticed {them}",
+      "has never once said thank you",
+    ],
+  },
 );
 
 PARTY_HOOKS.push(

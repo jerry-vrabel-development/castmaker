@@ -2,9 +2,9 @@
 // crashes, unfilled {tokens}, "undefined", and broken lock/reroll behavior.
 // Run: node tools/smoke-test.js [samples]
 
-import { rollCharacter, rerollSection, toggleLock, SECTIONS } from "../js/engine/generate.js";
-import { toMarkdown } from "../js/export.js";
-import { GENRE_ORDER } from "../js/data/genres/index.js";
+import { rollCharacter, rerollSection, toggleLock, SECTIONS } from "../src/engine/generate.ts";
+import { toMarkdown } from "../src/engine/export.ts";
+import { GENRE_ORDER } from "../src/engine/data/genres/index.ts";
 
 const N = Number(process.argv[2] || 300);
 let failures = 0;

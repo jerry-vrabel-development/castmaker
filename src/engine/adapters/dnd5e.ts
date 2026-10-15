@@ -2,10 +2,35 @@
 // 5e-style stat block using only SRD 5.1 content (CC BY 4.0).
 // Ancestries, classes, hit dice and armor values are from the SRD 5.1.
 
-export const ATTRIBUTION =
-  "This work includes material taken from the System Reference Document 5.1 (\"SRD 5.1\") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.";
+import type { Character } from "../types.ts";
 
-const ANCESTRIES = {
+export const ATTRIBUTION =
+  'This work includes material taken from the System Reference Document 5.1 ("SRD 5.1") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode.';
+
+export const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"] as const;
+export type Ability = (typeof ABILITIES)[number];
+export type AbilityScores = Record<Ability, number>;
+
+type ArmorKind =
+  "none" | "leather" | "leather+shield" | "scale" | "scale+shield" | "chain+shield" | "barbarian" | "monk";
+
+interface Ancestry {
+  name: string;
+  bonus: Partial<AbilityScores>;
+  /** Extra +1s the player assigns (half-elf). */
+  flex?: number;
+  speed: number;
+  size: "Small" | "Medium";
+}
+
+interface ClassInfo {
+  hd: number;
+  prim: [Ability, Ability];
+  saves: [Ability, Ability];
+  armor: ArmorKind;
+}
+
+const ANCESTRIES: Record<string, Ancestry> = {
   human: { name: "Human", bonus: { str: 1, dex: 1, con: 1, int: 1, wis: 1, cha: 1 }, speed: 30, size: "Medium" },
   elf: { name: "High Elf", bonus: { dex: 2, int: 1 }, speed: 30, size: "Medium" },
   dwarf: { name: "Hill Dwarf", bonus: { con: 2, wis: 1 }, speed: 25, size: "Medium" },
@@ -16,8 +41,9 @@ const ANCESTRIES = {
   dragonborn: { name: "Dragonborn", bonus: { str: 2, cha: 1 }, speed: 30, size: "Medium" },
   halfelf: { name: "Half-Elf", bonus: { cha: 2 }, flex: 2, speed: 30, size: "Medium" },
 };
+const HUMAN = ANCESTRIES.human!;
 
-const CLASSES = {
+const CLASSES: Record<string, ClassInfo> = {
   Barbarian: { hd: 12, prim: ["str", "con"], saves: ["str", "con"], armor: "barbarian" },
   Bard: { hd: 8, prim: ["cha", "dex"], saves: ["dex", "cha"], armor: "leather" },
   Cleric: { hd: 8, prim: ["wis", "con"], saves: ["wis", "cha"], armor: "scale+shield" },
@@ -32,43 +58,58 @@ const CLASSES = {
   Wizard: { hd: 6, prim: ["int", "con"], saves: ["int", "wis"], armor: "none" },
 };
 
-const ARMOR_LABEL = {
-  none: "no armor", leather: "leather armor", "leather+shield": "leather armor, shield", scale: "scale mail",
-  "scale+shield": "scale mail, shield", "chain+shield": "chain mail, shield", barbarian: "unarmored defense", monk: "unarmored defense",
+const ARMOR_LABEL: Record<ArmorKind, string> = {
+  none: "no armor",
+  leather: "leather armor",
+  "leather+shield": "leather armor, shield",
+  scale: "scale mail",
+  "scale+shield": "scale mail, shield",
+  "chain+shield": "chain mail, shield",
+  barbarian: "unarmored defense",
+  monk: "unarmored defense",
 };
 
-export const ABILITIES = ["str", "dex", "con", "int", "wis", "cha"];
 const STANDARD_ARRAY = [15, 14, 13, 12, 10, 8]; // fallback for characters saved before rolled stats
 const ASI_LEVELS = [4, 8, 12, 16, 19];
 
-export const mod = (score) => Math.floor((score - 10) / 2);
-export const signed = (n) => (n >= 0 ? `+${n}` : `${n}`);
+export const mod = (score: number): number => Math.floor((score - 10) / 2);
+export const signed = (n: number): string => (n >= 0 ? `+${n}` : `${n}`);
 
-function armorClass(kind, m) {
+export function armorClass(kind: ArmorKind, m: AbilityScores): number {
   switch (kind) {
-    case "leather": return 11 + m.dex;
-    case "leather+shield": return 13 + m.dex;
-    case "scale": return 14 + Math.min(m.dex, 2);
-    case "scale+shield": return 16 + Math.min(m.dex, 2);
-    case "chain+shield": return 18;
-    case "barbarian": return 10 + m.dex + m.con;
-    case "monk": return 10 + m.dex + m.wis;
-    default: return 10 + m.dex;
+    case "leather":
+      return 11 + m.dex;
+    case "leather+shield":
+      return 13 + m.dex;
+    case "scale":
+      return 14 + Math.min(m.dex, 2);
+    case "scale+shield":
+      return 16 + Math.min(m.dex, 2);
+    case "chain+shield":
+      return 18;
+    case "barbarian":
+      return 10 + m.dex + m.con;
+    case "monk":
+      return 10 + m.dex + m.wis;
+    default:
+      return 10 + m.dex;
   }
 }
 
-// Moral Foundations map onto the nine 5e alignments: care and fairness give
-// good versus evil; authority and loyalty against liberty give law versus chaos.
-export function alignment(c) {
+/**
+ * Moral Foundations map onto the nine 5e alignments: care and fairness give
+ * good versus evil; authority and loyalty against liberty give law versus chaos.
+ */
+export function alignment(c: Character): string {
   const f = c.core.morality?.foundations;
-  let law, good;
+  let law: number;
+  let good: number;
   if (f) {
-    const g = (f.care + f.fairness) / 2 - 3;
-    const l = (f.authority + f.loyalty) / 2 - f.liberty;
+    const g = ((f.care ?? 3) + (f.fairness ?? 3)) / 2 - 3;
+    const l = ((f.authority ?? 3) + (f.loyalty ?? 3)) / 2 - (f.liberty ?? 3);
     good = g >= 0.6 ? 1 : g <= -0.6 ? -1 : 0;
     law = l >= 0.8 ? 1 : l <= -0.8 ? -1 : 0;
-  }
-  else {
+  } else {
     const traits = c.core.personality?.traits || [];
     law = traits.reduce((s, t) => s + (t.law || 0), 0);
     good = traits.reduce((s, t) => s + (t.good || 0), 0);
@@ -78,41 +119,74 @@ export function alignment(c) {
   return a === "Neutral" && b === "Neutral" ? "Neutral" : `${a} ${b}`;
 }
 
-export function toDnd5e(c, level = 1) {
+export interface Dnd5eBlock {
+  ancestry: string;
+  size: string;
+  className: string;
+  level: number;
+  alignment: string;
+  rolled: number[];
+  scores: AbilityScores;
+  mods: AbilityScores;
+  ac: number;
+  armor: string;
+  hp: number;
+  hitDice: string;
+  speed: number;
+  prof: number;
+  saves: string[];
+  note: string;
+}
+
+export function toDnd5e(c: Character, level = 1): Dnd5eBlock {
   const tt = c.layers.tabletop;
   const id = c.core.identity;
   const cls = CLASSES[tt.systems.dnd5e.class] ? tt.systems.dnd5e.class : "Fighter";
-  const K = CLASSES[cls];
-  const anc = ANCESTRIES[c.genre === "fantasy" ? id.people : "human"] || ANCESTRIES.human;
+  const K = CLASSES[cls]!;
+  const anc = ANCESTRIES[c.genre === "fantasy" ? id.people : "human"] || HUMAN;
   const s = tt.strengths;
 
   // Rank the six abilities: class primaries first, then by agnostic strengths.
-  const affinity = {
-    str: s.might, dex: s.agility, con: s.resolve, int: s.wits,
-    wis: (s.wits + s.resolve) / 2 + 0.1, cha: s.presence,
+  const affinity: AbilityScores = {
+    str: s.might,
+    dex: s.agility,
+    con: s.resolve,
+    int: s.wits,
+    wis: (s.wits + s.resolve) / 2 + 0.1,
+    cha: s.presence,
   };
   const rest = ABILITIES.filter((a) => !K.prim.includes(a)).sort((a, b) => affinity[b] - affinity[a]);
-  const order = [...K.prim, ...rest];
-  const scores = {};
+  const order: Ability[] = [...K.prim, ...rest];
   // Rolled scores (4d6 drop lowest), highest assigned to the class's key abilities.
   const values = (c.core.grade?.rolls || STANDARD_ARRAY).slice().sort((x, y) => y - x);
-  order.forEach((a, i) => { scores[a] = values[i]; });
+  const scores = { str: 0, dex: 0, con: 0, int: 0, wis: 0, cha: 0 } as AbilityScores;
+  order.forEach((a, i) => {
+    scores[a] = values[i] ?? 10;
+  });
 
-  for (const [a, v] of Object.entries(anc.bonus)) scores[a] += v;
+  for (const [a, v] of Object.entries(anc.bonus) as [Ability, number][]) scores[a] += v;
   if (anc.flex) {
-    rest.concat(K.prim).filter((a) => a !== "cha").slice(0, anc.flex).forEach((a) => { scores[a] += 1; });
+    [...rest, ...K.prim]
+      .filter((a) => a !== "cha")
+      .slice(0, anc.flex)
+      .forEach((a) => {
+        scores[a] += 1;
+      });
   }
-  // Ability score improvements go into the primary ability, capped at 20.
+  // Ability score improvements go into the primary abilities, capped at 20.
   for (const lv of ASI_LEVELS) {
     if (level >= lv) {
       let pts = 2;
       for (const a of K.prim) {
-        while (pts > 0 && scores[a] < 20) { scores[a] += 1; pts -= 1; }
+        while (pts > 0 && scores[a] < 20) {
+          scores[a] += 1;
+          pts -= 1;
+        }
       }
     }
   }
 
-  const m = Object.fromEntries(ABILITIES.map((a) => [a, mod(scores[a])]));
+  const m = Object.fromEntries(ABILITIES.map((a) => [a, mod(scores[a])])) as AbilityScores;
   const prof = 2 + Math.floor((level - 1) / 4);
   const perLevel = Math.max(1, K.hd / 2 + 1 + m.con);
   const hp = Math.max(1, K.hd + m.con) + (level - 1) * perLevel;

@@ -2,7 +2,7 @@
 // tension builds, the grade stamps in, then the sections flip in one by one.
 // Clicking anywhere on the sheet (or rolling again) skips to the result.
 
-import { GENRES } from "./data/genres/index.js";
+import { GENRES } from "../src/engine/data/genres/index.ts";
 import { SoundEngine } from "./audio.js";
 
 export const reducedMotion = () => {
