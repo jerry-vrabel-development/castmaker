@@ -18,7 +18,12 @@ const FIELDS = {
   quirks: (c) => c.core.personality.quirks,
   flaws: (c) => [c.core.flaws.defining, ...c.core.flaws.minor],
   fears: (c) => [c.core.flaws.deepFear, c.core.flaws.phobia, c.core.flaws.socialFear],
-  behavior: (c) => [c.core.personality.stress, c.core.personality.conflict, c.core.personality.strangers, c.core.personality.humor],
+  behavior: (c) => [
+    c.core.personality.stress,
+    c.core.personality.conflict,
+    c.core.personality.strangers,
+    c.core.personality.humor,
+  ],
   want: (c) => [c.core.motivation.want],
   secret: (c) => [c.core.hook.t],
   gifts: (c) => c.core.gift.list.map((g) => g.t),

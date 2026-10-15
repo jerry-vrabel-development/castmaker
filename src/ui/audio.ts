@@ -7,7 +7,14 @@
 // grade, growing from a muted thud (Common) to a full fanfare (Legendary).
 
 export class SoundEngine {
-  constructor(ctx) {
+  readonly ctx: BaseAudioContext;
+  private master: GainNode;
+  private dry: GainNode;
+  private reverb: ConvolverNode;
+  private wet: GainNode;
+  private noise: AudioBuffer;
+
+  constructor(ctx: BaseAudioContext) {
     this.ctx = ctx;
     this.master = ctx.createGain();
     this.master.gain.value = 0.85;
@@ -30,9 +37,11 @@ export class SoundEngine {
     this.noise = this.noiseBuffer(1.5);
   }
 
-  get now() { return this.ctx.currentTime; }
+  get now(): number {
+    return this.ctx.currentTime;
+  }
 
-  noiseBuffer(seconds) {
+  noiseBuffer(seconds: number): AudioBuffer {
     const { ctx } = this;
     const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * seconds), ctx.sampleRate);
     const d = buf.getChannelData(0);
@@ -41,7 +50,7 @@ export class SoundEngine {
   }
 
   // A stereo decaying-noise impulse makes a soft hall reverb.
-  impulse(seconds, decay) {
+  impulse(seconds: number, decay: number): AudioBuffer {
     const { ctx } = this;
     const len = Math.floor(ctx.sampleRate * seconds);
     const buf = ctx.createBuffer(2, len, ctx.sampleRate);
@@ -53,7 +62,7 @@ export class SoundEngine {
   }
 
   // Route a node to the dry bus and, optionally, the reverb.
-  out(node, send = 0) {
+  out(node: AudioNode, send = 0): void {
     node.connect(this.dry);
     if (send > 0) {
       const s = this.ctx.createGain();
@@ -62,7 +71,7 @@ export class SoundEngine {
     }
   }
 
-  env(t, peak, attack, decay, hold = 0) {
+  env(t: number, peak: number, attack: number, decay: number, hold = 0): GainNode {
     const g = this.ctx.createGain();
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(Math.max(peak, 0.0002), t + attack);
@@ -71,7 +80,7 @@ export class SoundEngine {
     return g;
   }
 
-  noiseSource(t, dur) {
+  noiseSource(t: number, dur: number): AudioBufferSourceNode {
     const src = this.ctx.createBufferSource();
     src.buffer = this.noise;
     src.start(t, Math.random() * 0.5);
@@ -82,7 +91,7 @@ export class SoundEngine {
   // ---------- voices ----------
 
   // Short filtered-noise click: reel ticks, dice rattle.
-  click(t, freq = 2500, vol = 0.12, dur = 0.03, q = 6) {
+  click(t: number, freq = 2500, vol = 0.12, dur = 0.03, q = 6): void {
     const f = this.ctx.createBiquadFilter();
     f.type = "bandpass";
     f.frequency.value = freq;
@@ -93,7 +102,7 @@ export class SoundEngine {
   }
 
   // Pitched sine that drops: thumps and booms.
-  thump(t, from = 160, to = 50, vol = 0.5, dur = 0.25) {
+  thump(t: number, from = 160, to = 50, vol = 0.5, dur = 0.25): void {
     const o = this.ctx.createOscillator();
     o.type = "sine";
     o.frequency.setValueAtTime(from, t);
@@ -106,7 +115,7 @@ export class SoundEngine {
   }
 
   // FM bell: bright attack, long ring, sent to the reverb.
-  bell(t, freq, vol = 0.12, dur = 1.4, ratio = 3.5, send = 0.5) {
+  bell(t: number, freq: number, vol = 0.12, dur = 1.4, ratio = 3.5, send = 0.5): void {
     const { ctx } = this;
     const car = ctx.createOscillator();
     const mod = ctx.createOscillator();
@@ -119,12 +128,14 @@ export class SoundEngine {
     const g = this.env(t, vol, 0.003, dur);
     car.connect(g);
     this.out(g, send);
-    car.start(t); mod.start(t);
-    car.stop(t + dur + 0.1); mod.stop(t + dur + 0.1);
+    car.start(t);
+    mod.start(t);
+    car.stop(t + dur + 0.1);
+    mod.stop(t + dur + 0.1);
   }
 
   // Plucked string: triangle through a closing low-pass.
-  pluck(t, freq, vol = 0.18, dur = 0.5) {
+  pluck(t: number, freq: number, vol = 0.18, dur = 0.5): void {
     const { ctx } = this;
     const o = ctx.createOscillator();
     o.type = "triangle";
@@ -141,7 +152,7 @@ export class SoundEngine {
   }
 
   // Brass or choir pad: detuned saws through an opening filter.
-  pad(t, freqs, dur = 1.6, vol = 0.07, bright = 2400, attack = 0.08) {
+  pad(t: number, freqs: number[], dur = 1.6, vol = 0.07, bright = 2400, attack = 0.08): void {
     const { ctx } = this;
     const f = ctx.createBiquadFilter();
     f.type = "lowpass";
@@ -166,7 +177,7 @@ export class SoundEngine {
   }
 
   // Filtered-noise sweep: rising tension or a cymbal-like swell.
-  riser(t, dur, vol = 0.12, from = 400, to = 6000) {
+  riser(t: number, dur: number, vol = 0.12, from = 400, to = 6000): void {
     const { ctx } = this;
     const f = ctx.createBiquadFilter();
     f.type = "bandpass";
@@ -177,12 +188,14 @@ export class SoundEngine {
     g.gain.setValueAtTime(0.0001, t);
     g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.95);
     g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.06);
-    this.noiseSource(t, dur + 0.1).connect(f).connect(g);
+    this.noiseSource(t, dur + 0.1)
+      .connect(f)
+      .connect(g);
     this.out(g, 0.3);
   }
 
   // Crash: bright noise burst with a long tail.
-  crash(t, vol = 0.18, dur = 1.6) {
+  crash(t: number, vol = 0.18, dur = 1.6): void {
     const f = this.ctx.createBiquadFilter();
     f.type = "highpass";
     f.frequency.value = 3000;
@@ -193,10 +206,13 @@ export class SoundEngine {
 
   // ---------- cues ----------
 
-  tick() { this.click(this.now, 2200 + Math.random() * 600, 0.7, 0.025, 5); this.thump(this.now, 900, 600, 0.04, 0.02); }
+  tick(): void {
+    this.click(this.now, 2200 + Math.random() * 600, 0.7, 0.025, 5);
+    this.thump(this.now, 900, 600, 0.04, 0.02);
+  }
 
   // The name reel stops: a wooden thunk and a soft chime.
-  land() {
+  land(): void {
     const t = this.now;
     this.thump(t, 220, 90, 0.35, 0.12);
     this.click(t, 900, 0.5, 0.05, 3);
@@ -204,13 +220,14 @@ export class SoundEngine {
   }
 
   // Dice tumbling: a cluster of random clicks.
-  rattle() {
+  rattle(): void {
     const t = this.now;
-    for (let i = 0; i < 3; i++) this.click(t + Math.random() * 0.03, 1400 + Math.random() * 2400, 0.35 + Math.random() * 0.25, 0.02, 4);
+    for (let i = 0; i < 3; i++)
+      this.click(t + Math.random() * 0.03, 1400 + Math.random() * 2400, 0.35 + Math.random() * 0.25, 0.02, 4);
   }
 
   // One die lands. Higher values sound brighter; 17s and 18s ring.
-  dieLand(value) {
+  dieLand(value: number): void {
     const t = this.now;
     const k = (value - 3) / 15;
     this.click(t, 1200 + k * 2000, 0.6, 0.05, 3);
@@ -220,9 +237,9 @@ export class SoundEngine {
   }
 
   // Tension before the grade. Longer and brighter when the dice ran hot.
-  anticipation(tier) {
+  anticipation(tier: number): number {
     const t = this.now;
-    const dur = [0.25, 0.4, 0.6, 0.85, 1.15][tier];
+    const dur = [0.25, 0.4, 0.6, 0.85, 1.15][tier] ?? 0.5;
     this.riser(t, dur, 0.05 + tier * 0.025, 300, 2500 + tier * 1500);
     if (tier >= 2) {
       // a soft drumroll under the riser
@@ -233,10 +250,10 @@ export class SoundEngine {
   }
 
   // The grade lands.
-  stamp(tier) {
+  stamp(tier: number): void {
     const t = this.now;
     const C = 261.63;
-    const st = (n) => C * Math.pow(2, n / 12);
+    const st = (n: number) => C * Math.pow(2, n / 12);
     switch (tier) {
       case 0: // Common: understated
         this.thump(t, 180, 80, 0.3, 0.18);
@@ -264,14 +281,16 @@ export class SoundEngine {
         this.pad(t, [st(-12), st(-5), st(0), st(4), st(7), st(12)], 3.2, 0.06, 4200, 0.04);
         this.pad(t + 0.6, [st(-10), st(-3), st(2), st(5), st(9), st(14)], 2.6, 0.05, 4800, 0.12);
         [12, 16, 19, 24, 28, 31, 36].forEach((n, i) => this.bell(t + 0.2 + i * 0.06, st(n), 0.06, 2));
-        [24, 28, 31, 36, 40, 43, 48, 43, 48].forEach((n, i) => this.bell(t + 0.75 + i * 0.05, st(n), 0.035, 1.2, 2.01, 0.7));
+        [24, 28, 31, 36, 40, 43, 48, 43, 48].forEach((n, i) =>
+          this.bell(t + 0.75 + i * 0.05, st(n), 0.035, 1.2, 2.01, 0.7),
+        );
         this.bell(t + 1.35, st(36), 0.08, 3.2, 3.5, 0.8);
         break;
     }
   }
 
   // A section turning over: a soft paper flick.
-  flip() {
+  flip(): void {
     const t = this.now;
     const f = this.ctx.createBiquadFilter();
     f.type = "highpass";
@@ -282,5 +301,7 @@ export class SoundEngine {
   }
 
   // Settings changes and locks.
-  ui() { this.click(this.now, 3000, 0.5, 0.02, 5); }
+  ui(): void {
+    this.click(this.now, 3000, 0.5, 0.02, 5);
+  }
 }

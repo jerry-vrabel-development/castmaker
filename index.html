@@ -1,123 +1,146 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Castmaker</title>
-<meta name="description" content="Generate original characters for tabletop games and fiction.">
-<meta name="theme-color" content="#1f6f66">
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap">
-<link rel="stylesheet" href="styles.css">
-</head>
-<body>
-<header class="topbar">
-  <div class="topbar-inner">
-    <div class="brand">
-      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="11" cy="12" r="5"/><circle cx="21" cy="12" r="5"/><path d="M3 27c1.5-5 4.5-8 8-8s6.5 3 8 8M13 27c1.5-5 4.5-8 8-8s6.5 3 8 8"/></svg>
-      <span class="brand-name">Castmaker</span>
-      <span class="brand-tag">v0.1 prototype</span>
-    </div>
-    <div class="topbar-actions">
-      <button class="btn ghost" data-action="export" id="btn-export">Export</button>
-      <button class="btn" data-action="save" id="btn-save">Save to cast</button>
-    </div>
-  </div>
-</header>
-
-<div class="shell">
-  <aside class="controls" aria-label="Generator settings">
-    <div class="control">
-      <span class="control-label" id="lbl-genre">Genre</span>
-      <div class="segmented" role="radiogroup" aria-labelledby="lbl-genre" id="genre-group"></div>
-    </div>
-    <div class="control">
-      <span class="control-label" id="lbl-mode">Mode</span>
-      <div class="segmented" role="radiogroup" aria-labelledby="lbl-mode" id="mode-group"></div>
-    </div>
-    <div class="control">
-      <span class="control-label" id="lbl-orient">Orientation</span>
-      <div class="segmented" role="radiogroup" aria-labelledby="lbl-orient" id="orient-group"></div>
-    </div>
-    <div class="control">
-      <span class="control-label" id="lbl-ethics">Morality</span>
-      <div class="segmented tight" role="radiogroup" aria-labelledby="lbl-ethics" id="ethics-group"></div>
-    </div>
-    <div class="control" id="tt-depth">
-      <span class="control-label" id="lbl-depth">Detail</span>
-      <div class="segmented" role="radiogroup" aria-labelledby="lbl-depth" id="depth-group"></div>
-    </div>
-    <div class="control" id="tt-system">
-      <span class="control-label" id="lbl-system">Rules</span>
-      <div class="segmented" role="radiogroup" aria-labelledby="lbl-system" id="system-group"></div>
-    </div>
-    <div class="control control-inline" id="tt-level">
-      <label class="control-label" for="level">5e level</label>
-      <input type="number" id="level" min="1" max="20" value="1" inputmode="numeric">
-    </div>
-
-    <div class="control-pair">
-      <div class="control">
-        <span class="control-label" id="lbl-reveal">Reveal</span>
-        <div class="segmented" role="radiogroup" aria-labelledby="lbl-reveal" id="reveal-group"></div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Castmaker</title>
+    <meta name="description" content="Generate original characters for tabletop games and fiction." />
+    <meta name="theme-color" content="#1f6f66" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Young+Serif&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap"
+    />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="11" cy="12" r="5" />
+            <circle cx="21" cy="12" r="5" />
+            <path d="M3 27c1.5-5 4.5-8 8-8s6.5 3 8 8M13 27c1.5-5 4.5-8 8-8s6.5 3 8 8" />
+          </svg>
+          <span class="brand-name">Castmaker</span>
+          <span class="brand-tag">v0.1 prototype</span>
+        </div>
+        <div class="topbar-actions">
+          <button class="btn ghost" data-action="export" id="btn-export">Export</button>
+          <button class="btn" data-action="save" id="btn-save">Save to cast</button>
+        </div>
       </div>
-      <div class="control">
-        <span class="control-label" id="lbl-sound">Sound</span>
-        <div class="segmented" role="radiogroup" aria-labelledby="lbl-sound" id="sound-group"></div>
-      </div>
+    </header>
+
+    <div class="shell">
+      <aside class="controls" aria-label="Generator settings">
+        <div class="control">
+          <span class="control-label" id="lbl-genre">Genre</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="lbl-genre" id="genre-group"></div>
+        </div>
+        <div class="control">
+          <span class="control-label" id="lbl-mode">Mode</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="lbl-mode" id="mode-group"></div>
+        </div>
+        <div class="control">
+          <span class="control-label" id="lbl-orient">Orientation</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="lbl-orient" id="orient-group"></div>
+        </div>
+        <div class="control">
+          <span class="control-label" id="lbl-ethics">Morality</span>
+          <div class="segmented tight" role="radiogroup" aria-labelledby="lbl-ethics" id="ethics-group"></div>
+        </div>
+        <div class="control" id="tt-depth">
+          <span class="control-label" id="lbl-depth">Detail</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="lbl-depth" id="depth-group"></div>
+        </div>
+        <div class="control" id="tt-system">
+          <span class="control-label" id="lbl-system">Rules</span>
+          <div class="segmented" role="radiogroup" aria-labelledby="lbl-system" id="system-group"></div>
+        </div>
+        <div class="control control-inline" id="tt-level">
+          <label class="control-label" for="level">5e level</label>
+          <input type="number" id="level" min="1" max="20" value="1" inputmode="numeric" />
+        </div>
+
+        <div class="control-pair">
+          <div class="control">
+            <span class="control-label" id="lbl-reveal">Reveal</span>
+            <div class="segmented" role="radiogroup" aria-labelledby="lbl-reveal" id="reveal-group"></div>
+          </div>
+          <div class="control">
+            <span class="control-label" id="lbl-sound">Sound</span>
+            <div class="segmented" role="radiogroup" aria-labelledby="lbl-sound" id="sound-group"></div>
+          </div>
+        </div>
+
+        <button class="btn primary roll" data-action="roll" id="btn-roll">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="3.5" />
+            <circle cx="8.5" cy="8.5" r="1.3" />
+            <circle cx="15.5" cy="15.5" r="1.3" />
+            <circle cx="12" cy="12" r="1.3" />
+          </svg>
+          Roll character
+        </button>
+        <p class="hint">Lock the sections you like, then roll again. Press <kbd>R</kbd> to roll.</p>
+
+        <section class="library" aria-labelledby="lbl-cast">
+          <div class="library-head">
+            <h2 id="lbl-cast">Your cast</h2>
+            <span class="count" id="cast-count">0</span>
+          </div>
+          <ul class="roster" id="roster"></ul>
+          <p class="storage-note" id="storage-note" hidden>
+            Storage is unavailable in this browser view, so your cast lasts until you close the page.
+          </p>
+        </section>
+      </aside>
+
+      <main class="sheet" id="sheet" aria-live="polite"></main>
     </div>
 
-    <button class="btn primary roll" data-action="roll" id="btn-roll">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.3"/><circle cx="15.5" cy="15.5" r="1.3"/><circle cx="12" cy="12" r="1.3"/></svg>
-      Roll character
-    </button>
-    <p class="hint">Lock the sections you like, then roll again. Press <kbd>R</kbd> to roll.</p>
+    <footer class="credits">
+      <p>Castmaker code is MIT licensed; original tables and text are CC BY 4.0.</p>
+      <p id="srd-credit">
+        D&amp;D 5e stat blocks use material from the System Reference Document 5.1 by Wizards of the Coast LLC, licensed
+        under
+        <a href="https://creativecommons.org/licenses/by/4.0/legalcode" target="_blank" rel="noopener">CC BY 4.0</a>.
+        Castmaker is not affiliated with Wizards of the Coast.
+      </p>
+    </footer>
 
-    <section class="library" aria-labelledby="lbl-cast">
-      <div class="library-head">
-        <h2 id="lbl-cast">Your cast</h2>
-        <span class="count" id="cast-count">0</span>
-      </div>
-      <ul class="roster" id="roster"></ul>
-      <p class="storage-note" id="storage-note" hidden>Storage is unavailable in this browser view, so your cast lasts until you close the page.</p>
-    </section>
-  </aside>
+    <dialog class="export" id="export-dialog" aria-labelledby="export-title">
+      <form method="dialog" class="export-inner">
+        <div class="export-head">
+          <h2 id="export-title">Export character</h2>
+          <div class="segmented small" role="radiogroup" aria-label="Format" id="format-group"></div>
+        </div>
+        <textarea id="export-text" readonly spellcheck="false" aria-label="Exported character"></textarea>
+        <div class="export-actions">
+          <button type="button" class="btn" data-action="copy" id="btn-copy">Copy</button>
+          <button type="button" class="btn ghost" data-action="download" id="btn-download">Download file</button>
+          <button type="submit" class="btn ghost" id="btn-close-export">Close</button>
+        </div>
+      </form>
+    </dialog>
 
-  <main class="sheet" id="sheet" aria-live="polite"></main>
-</div>
-
-<footer class="credits">
-  <p>Castmaker code is MIT licensed; original tables and text are CC BY 4.0.</p>
-  <p id="srd-credit">D&amp;D 5e stat blocks use material from the System Reference Document 5.1 by Wizards of the Coast LLC, licensed under <a href="https://creativecommons.org/licenses/by/4.0/legalcode" target="_blank" rel="noopener">CC BY 4.0</a>. Castmaker is not affiliated with Wizards of the Coast.</p>
-</footer>
-
-<dialog class="export" id="export-dialog" aria-labelledby="export-title">
-  <form method="dialog" class="export-inner">
-    <div class="export-head">
-      <h2 id="export-title">Export character</h2>
-      <div class="segmented small" role="radiogroup" aria-label="Format" id="format-group"></div>
+    <div class="mobile-roll">
+      <button class="btn primary" data-action="roll" id="btn-roll-mobile">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <rect x="3.5" y="3.5" width="17" height="17" rx="3.5" />
+          <circle cx="8.5" cy="8.5" r="1.3" />
+          <circle cx="15.5" cy="15.5" r="1.3" />
+          <circle cx="12" cy="12" r="1.3" />
+        </svg>
+        Roll character
+      </button>
     </div>
-    <textarea id="export-text" readonly spellcheck="false" aria-label="Exported character"></textarea>
-    <div class="export-actions">
-      <button type="button" class="btn" data-action="copy" id="btn-copy">Copy</button>
-      <button type="button" class="btn ghost" data-action="download" id="btn-download">Download file</button>
-      <button type="submit" class="btn ghost" id="btn-close-export">Close</button>
-    </div>
-  </form>
-</dialog>
 
-<div class="mobile-roll">
-  <button class="btn primary" data-action="roll" id="btn-roll-mobile">
-    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="3.5" width="17" height="17" rx="3.5"/><circle cx="8.5" cy="8.5" r="1.3"/><circle cx="15.5" cy="15.5" r="1.3"/><circle cx="12" cy="12" r="1.3"/></svg>
-    Roll character
-  </button>
-</div>
+    <div class="toast" id="toast" role="status" hidden></div>
 
-<div class="toast" id="toast" role="status" hidden></div>
-
-<script type="module" src="js/app.js"></script>
-</body>
+    <script type="module" src="/src/ui/main.ts"></script>
+  </body>
 </html>

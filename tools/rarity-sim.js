@@ -25,8 +25,19 @@ for (const genre of GENRE_ORDER) {
     labels[l] = (labels[l] || 0) + 1;
   }
   const avg = (a) => (a.length ? (a.reduce((x, y) => x + y, 0) / a.length).toFixed(2) : "-");
-  console.log(`\n${genre}: ` + TIERS.map((t, i) => `${t.label} ${(100 * tiers[i] / N).toFixed(1)}%`).join("  "));
+  console.log(`\n${genre}: ` + TIERS.map((t, i) => `${t.label} ${((100 * tiers[i]) / N).toFixed(1)}%`).join("  "));
   console.log("  average gifts by grade:", spread.map(avg).join(" / "));
-  console.log("  roles:", Object.entries(roles).map(([k, v]) => `${k} ${(100 * v / N).toFixed(0)}%`).join(", "));
-  console.log("  strongest foundation:", Object.entries(labels).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${(100 * v / N).toFixed(0)}%`).join(", "));
+  console.log(
+    "  roles:",
+    Object.entries(roles)
+      .map(([k, v]) => `${k} ${((100 * v) / N).toFixed(0)}%`)
+      .join(", "),
+  );
+  console.log(
+    "  strongest foundation:",
+    Object.entries(labels)
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, v]) => `${k} ${((100 * v) / N).toFixed(0)}%`)
+      .join(", "),
+  );
 }

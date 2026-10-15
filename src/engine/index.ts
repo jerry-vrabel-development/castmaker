@@ -26,3 +26,5 @@ export type { MarkdownOptions } from "./export.ts";
 export { toDnd5e, alignment, signed, ABILITIES, ATTRIBUTION } from "./adapters/dnd5e.ts";
 export { GENRES, GENRE_ORDER } from "./data/genres/index.ts";
 export { fill, cap, stripArticle, PRONOUNS } from "./text.ts";
+export type { TextContext } from "./text.ts";
+export { BIG5 as BIG5_DIMS, FOUNDATIONS, VALUES } from "./data/psyche.ts";
