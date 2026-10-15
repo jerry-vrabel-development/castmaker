@@ -1,0 +1,16 @@
+name: Feature idea
+description: A new mode, rules system, genre or feature.
+labels: [enhancement]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: The idea
+      description: What would you use it for?
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Anything else
+      description: Examples, sources (with licenses), or other tools that do it well.

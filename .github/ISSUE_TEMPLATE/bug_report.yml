@@ -1,0 +1,32 @@
+name: Bug report
+description: Something doesn't work or reads wrong.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What you did, what you expected, and what you saw instead.
+    validations:
+      required: true
+  - type: input
+    id: seed
+    attributes:
+      label: Seed
+      description: Shown on the character card, next to the name. With the seed, anyone can roll the same character.
+      placeholder: e.g. k7m2xq9
+  - type: dropdown
+    id: genre
+    attributes:
+      label: Genre
+      options: [Fantasy, Modern, Sci-fi]
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Mode
+      options: [Tabletop, Writer]
+  - type: input
+    id: browser
+    attributes:
+      label: Browser and device
+      placeholder: e.g. Chrome 140 on Android, installed as an app

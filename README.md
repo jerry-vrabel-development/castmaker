@@ -375,47 +375,74 @@ Rules:
 
 ## Getting Started
 
-Needs Node 22 or newer.
+Needs Node 22.18 or newer (`.nvmrc` pins 22).
 
 ```bash
 npm install
-npm run dev          # development server with hot reload
-npm test             # unit, content and snapshot tests
+npm run dev          # development server with hot reload at http://localhost:5173
 npm run build        # production build in dist/
+npm run preview      # serve the production build at http://localhost:4173
 ```
 
 Install it as an app from the browser's address bar (Chrome, Edge) or Share → Add to Home Screen (Safari). After the first visit it works offline.
 
+### Scripts
+
+| Command | What it does |
+|---|---|
+| `npm test` | Unit, content and snapshot tests (Vitest) |
+| `npm run test:watch` | The same, rerunning on every change |
+| `npm run coverage` | Unit tests with a coverage report in `coverage/` |
+| `npm run e2e` | Browser and accessibility tests against the production build (Playwright + axe) |
+| `npm run typecheck` | Strict TypeScript check |
+| `npm run lint` / `npm run format` | ESLint, and Prettier formatting |
+| `npm run sim -- 3000` | Grade, gift, role and morality odds over many rolls |
+| `npm run variety -- 100` | How often lines repeat within 20 rolls |
+
+The first time you run the browser tests, install the browser with `npx playwright install chromium`.
+
+### Deployment
+
+Every push to `main` runs CI (typecheck, lint, format check, unit tests with coverage thresholds, browser tests). When CI passes, the deploy workflow builds `dist/` and publishes it to GitHub Pages. In the repository's **Settings → Pages**, set **Source** to **GitHub Actions** once.
+
 ## Project Structure
 
 ```
-index.html, styles.css          app shell and design
-manifest.webmanifest, sw.js     PWA install and offline cache
-js/app.js                       interface
-js/storage.js                   local cast library (IndexedDB, in-memory fallback)
-js/export.js                    Markdown and JSON export
-js/reveal.js                    slot-style reveal
-js/audio.js                     synthesized sound engine and cues
-js/data/orientation.js          orientation odds and love-life tables
-js/data/psyche.js               Big Five, behavior, flaws, fears, Moral Foundations, Schwartz values
-js/engine/dice.js               real dice: 4d6-drop-lowest odds and grade bands
-js/engine/rarity.js             grade summary
-js/data/rarity.js               grades, stakes and real job statistics
-js/engine/rng.js                seeded random numbers (same seed, same character)
-js/engine/generate.js           rules engine: sections, tag-weighted picks, locks, rerolls
-js/engine/text.js               pronoun agreement and text tokens
-js/engine/adapters/dnd5e.js     D&D 5e adapter (SRD 5.1 only)
-js/prose/provider.js            ProseProvider interface (templates now, AI later)
-js/prose/templates.js           built-in template prose
-js/data/shared.js               genre-neutral tables
-js/data/genres/*.js             fantasy, modern and sci-fi tables
-tools/rarity-sim.ts             grade, gift, role and morality simulator
-tools/variety.ts                repetition measurement
+index.html                      app shell
+vite.config.ts                  build and PWA (manifest, service worker, offline cache)
+public/icons/                   app icons
+
+src/engine/                     the character engine: no browser code, usable anywhere
+  index.ts                      public API
+  types.ts                      character, section and table types
+  generate.ts                   rules engine: sections, tag-weighted picks, locks, rerolls
+  rng.ts, dice.ts               seeded random numbers; real 4d6-drop-lowest odds
+  rarity.ts                     grade summary
+  text.ts                       pronoun agreement and text tokens
+  export.ts                     Markdown and JSON export
+  prose/                        ProseProvider interface and the built-in template prose
+  adapters/dnd5e.ts             D&D 5e adapter (SRD 5.1 only)
+  data/                         content tables: shared, psyche, orientation, rarity, genres/
+
+src/ui/                         the interface
+  main.ts                       start-up and event wiring
+  actions.ts, state.ts          what buttons do; settings and the current character
+  controls.ts, roster.ts        settings rail and saved cast
+  sheet/                        the character sheet
+  reveal.ts, sound.ts, audio.ts slot-style reveal and synthesized sound
+  exportDialog.ts, storage.ts   export dialog; local library (IndexedDB, in-memory fallback)
+  styles.css
+
+tests/unit/                     Vitest: engine, content sweep, snapshots
+tests/e2e/                      Playwright: browser flows and accessibility
+tools/                          simulators (rarity-sim.ts, variety.ts)
 ```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for how the pieces fit together and [CONTRIBUTING.md](CONTRIBUTING.md) for how to add content or code.
 
 ### How coherence works
 Each section records the tags of what it picked (`loss`, `crime`, `faith`, …). Later picks are weighted toward entries that share those tags, so a thieves'-den upbringing makes a betrayal more likely, which makes a suspicious personality more likely, which shapes the flaws, the lie the character believes, and the class they end up with. Locked sections keep their content but still steer everything rolled around them.
 
 ## Status
 
-**Prototype v0.1.** Earlier internal iterations are folded into this version. Name is still a working title.
+**Prototype v0.1.** Earlier internal iterations are folded into this version. Name is still a working title. See [CHANGELOG.md](CHANGELOG.md) for what has changed.

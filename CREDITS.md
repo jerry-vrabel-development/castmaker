@@ -4,16 +4,16 @@ Every content pack records its source, license and attribution here.
 
 | Pack | Location | Source | License |
 |---|---|---|---|
-| Castmaker shared tables | `js/data/shared.js` | Original | CC BY 4.0 |
-| Fantasy genre | `js/data/genres/fantasy.js` | Original | CC BY 4.0 |
-| Modern genre | `js/data/genres/modern.js` | Original | CC BY 4.0 |
-| Sci-fi genre | `js/data/genres/scifi.js` | Original | CC BY 4.0 |
-| Template prose | `js/prose/templates.js` | Original | CC BY 4.0 |
-| Rarity tiers | `js/data/rarity.js` | Original | CC BY 4.0 |
-| Modern job counts | `js/data/rarity.js` | U.S. Bureau of Labor Statistics, Occupational Outlook Handbook (2025 data) | U.S. public domain |
-| Personality, flaws and morality tables | `js/data/psyche.js` | Original text, organized around the Big Five, Moral Foundations Theory and Schwartz's basic human values (research models, not licensed content) | CC BY 4.0 |
-| Orientation odds | `js/data/orientation.js` | Gallup, LGBTQ+ identification survey (2025 data, published Feb 2026) | Statistics cited with attribution |
-| D&D 5e adapter rules values | `js/engine/adapters/dnd5e.js` | System Reference Document 5.1 | CC BY 4.0 |
+| Castmaker shared tables | `src/engine/data/shared.ts` | Original | CC BY 4.0 |
+| Fantasy genre | `src/engine/data/genres/fantasy.ts` | Original | CC BY 4.0 |
+| Modern genre | `src/engine/data/genres/modern.ts` | Original | CC BY 4.0 |
+| Sci-fi genre | `src/engine/data/genres/scifi.ts` | Original | CC BY 4.0 |
+| Template prose | `src/engine/prose/templates.ts` | Original | CC BY 4.0 |
+| Rarity tiers | `src/engine/data/rarity.ts` | Original | CC BY 4.0 |
+| Modern job counts | `src/engine/data/rarity.ts` | U.S. Bureau of Labor Statistics, Occupational Outlook Handbook (2025 data) | U.S. public domain |
+| Personality, flaws and morality tables | `src/engine/data/psyche.ts` | Original text, organized around the Big Five, Moral Foundations Theory and Schwartz's basic human values (research models, not licensed content) | CC BY 4.0 |
+| Orientation odds | `src/engine/data/orientation.ts` | Gallup, LGBTQ+ identification survey (2025 data, published Feb 2026) | Statistics cited with attribution |
+| D&D 5e adapter rules values | `src/engine/adapters/dnd5e.ts` | System Reference Document 5.1 | CC BY 4.0 |
 
 ## System Reference Document 5.1
 
