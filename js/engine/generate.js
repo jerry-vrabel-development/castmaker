@@ -278,7 +278,7 @@ const GEN = {
     };
   },
 
-  motivation(c, rng, bag, G) {
+  motivation(c, rng, bag, _G) {
     const want = pickFresh(rng, "want", T.WANTS, (w) => w.short, graded(weigher(bag, 2.5), "want", (w) => w.short, gradeOf(c)));
     return { want: want.t, short: want.short, why: rng.pick(want.why), _tags: want.tags };
   },
@@ -451,7 +451,7 @@ const GEN = {
     };
   },
 
-  writer(c, rng, bag, G) {
+  writer(c, rng, bag, _G) {
     const evBag = { ...bag };
     for (const t of c.core.background?._tags || []) evBag[t] = (evBag[t] || 0) + 2;
     const lie = pickFresh(rng, "lie", T.LIES, (x) => x.lie, weigher(evBag, 2));

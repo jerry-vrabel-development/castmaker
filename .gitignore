@@ -36,3 +36,8 @@ desktop.ini
 *.log
 tmp/
 .cache/
+
+# Test output
+coverage/
+playwright-report/
+test-results/
