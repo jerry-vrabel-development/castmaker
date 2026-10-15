@@ -1,6 +1,7 @@
 // Castmaker: entry point. Wires up events and loads the last character.
 
 import "./styles.css";
+import { registerSW } from "virtual:pwa-register";
 import { GENRES, rollCharacter, upgradeCharacter, type Character, type SectionKey } from "../engine/index.ts";
 import { $, inFrame } from "./dom.ts";
 import { GROUPS, isGroupKey, renderGroups } from "./controls.ts";
@@ -94,9 +95,9 @@ async function start(): Promise<void> {
     setCurrent(rollCharacter({ genre: state.settings.genre }));
   }
 
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http") && !inFrame) {
-    navigator.serviceWorker.register("sw.js").catch(() => {});
-  }
+  // Offline support. Skipped when embedded in another page, where service
+  // workers aren't allowed.
+  if (!inFrame) registerSW({ immediate: true });
 }
 
 void start();
