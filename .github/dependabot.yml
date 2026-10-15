@@ -1,0 +1,23 @@
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      # These must move together: axe drives the same browser build as the test runner.
+      playwright:
+        patterns: ["@playwright/test", "playwright-core", "@axe-core/playwright"]
+      lint-and-format:
+        patterns: ["eslint", "@eslint/*", "typescript-eslint", "eslint-config-prettier", "globals", "prettier"]
+      vite-and-vitest:
+        patterns: ["vite", "vite-plugin-pwa", "vitest", "@vitest/*"]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      actions:
+        patterns: ["*"]
